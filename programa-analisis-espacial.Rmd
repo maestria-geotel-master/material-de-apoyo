@@ -25,65 +25,83 @@ Octubre 2019 <br/>
 
 ## URLs del contenido del curso:
 * [Programa (hipervínculo recursivo)](programa-biogeografia-geo1310.md)
-* Asignaciones. Se enviarán por correo electrónico.
 * [¿Cómo realizar una asignación?](ref/como-hacer-una-asignacion.md)
-* [Introducción a R y análisis exploratorio de datos (EDA)](ref/introduccion-a-r.md)
 * [Guía mínima de RMarkdown](ref/guia-minima-de-rmarkdown.md)
+* [Introducción a R](ref/introduccion-a-r.md)
 
 ## Descripción
 
-Como escribí ya en el programa de otra asignatura que imparto, la ciencia atraviesa por una crisis de reproducibilidad. Difícilmente un equipo científico reproduce el resultado que obtuvo otro. Se atribuye este déficit a que, al publicar los resultados, no se aportan ni las fuentes, ni los métodos empleados. El panorama está cambiando, pero la única forma de aumentar la reproducibilidad consiste en abrir las fuentes y el código. En análisis espacial es aún más crítica la necesidad de disponer de un documento reproducible para seguir los pasos de otros/as investigadores/as.
+Waldo Tobler se auto-atribuyó la denominada "primera ley de la geografía":
 
-Puedes sospechar desde ya que R estará de fondo (a fin de cuentas, este tali usa mucho R), sobre todo por tratarse de una asignatura meramente espacial. Dispondrás de un servidor de RStudio habilitado por mí con los paquetes requeridos en el curso ya pre-instalados. Así podrás realizar tus asignaciones sin preocuparte de instalaciones y dependencias.
+>"...I invoke the first law of geography: everything is related to everything else, but near things are more related than distant things." [@tobler1970computer]. En español sería: "Invoco la primera de la geografía: todo está relacionado con todo, pero las cosas próximas entre sí están más relacionadas que las distantes" [@olaya2014sistemas]
 
-Parecería "natural" utilizar interfaz gráfico de usuario para realizar análisis espacial, pero verás a lo largo de esta asignatura que es precisamente todo lo contrario. Realizar de manera eficiente análisis reproducibles, sólo se puede lograr escribiendo código. Igualmente, para visualizar patrones espaciales se requiere de herramientas versátiles, que tanto R como otros lenguajes también proveen. 
+El propio Tobler añadía en su artículo que "El hecho de que un proceso parezca complicado, no es motivo para suponer que es el resultado de reglas complicadas...". A partir de este punto, el autor dedica su trabajo a explicar un modelo de crecimiento urbano en Detroit basado en la densidad de población de las localidades que según él, podía aplicarse a otras ciudades. Basó sus aportes precisamente en que lo próximo es más parecido que lo distante, algo que conocemos hoy como autocorrelación espacial. Con independencia de la eficiencia de su modelo, Tobler continuó el camino de descomplicar las reglas, dando cuerpo matemático a este hecho.
 
-Como ves, en esta materia usaremos R, pero son bienvenidos otros lenguajes de programación que quieras utilizar. Si sabes Python, C++, Java o cualquier otro lenguaje que pueda ayudarte a responder preguntas sobre análisis espacial, puedes usarlos sin inconveniente alguno. La única condición es que tienes que publicar tu código y abrir tus fuentes.
+Varios autores han aportado herramientas para medir la autocorrelación espacial, o para considerarla en predicciones probabilísticas mediante geoestadística, siendo relevantes las contribuciones de @moran1948interpretation, @geary1954contiguity, @matheron1963principles, @anselin1988spatial, @cliff1972testing, @cressie1989geostatistics, @isaaks1989applied, @goovaerts1997geostatistics, @getis2010analysis, entre otros.
 
-Iniciar con un lenguaje de programación implica un desafío inherente. Hay una comunidad allá fuera que explica cómo atender los típicos desafíos y los mensajes de error, y yo también podré ayudar. Además, esa misma comunidad también podría interesarse por o necesitar tus aportes, así que no dudes en hacer un "hola mundo" bien documentado cuando necesites ayuda.
+Los datos espaciales tienen estructura, es decir, no son independientes entre sí, por lo que cualquier modelización que se intente realizar violará el supuesto de independencia de las observaciones, convirtiendo en absolutamente inútil la regresión lineal estándar. La estructura de los datos espaciales normalmente explica una parte importante del fenómeno, y ésta se encuentra en la forma de autocorrelación espacial y/o de heterogeneidad. Usando análisis exploratorio de datos espaciales, es posible medir tales características, si bien en términos prácticos no es fácil separar autocorrelación y heterogeneidad. Se trata una tarea imprescindible pero a la vez desafiante, porque los datos reales son, por defecto, muy diferentes a "los de libro".
+
+>"...It is not always easy to distinguish between the two components, and poorly specifying
+one could cause the other to also be erroneous...Depending on the question, the methodology will first deal with the spatial autocorrelation of the observations (i.e. the links between nearby units) or the heterogeneity of behaviours (i.e. their variability depending on location)." [@loonis2018handbook]
+
+Son muchas las herramientas disponibles, la mayoría de las cuales cuenta con interfaz de usuario (no necesariamente gráfico). Para el análisis exploratorio de datos espaciales, hay disponibles múltiples herramientas gráficas e índices, y para la predicción existen varios algoritmos de modelización y pruebas estadísticas que asisten en la difícil labor de elegir variables/modelos. Tratándose de un contexto tan complejo, con un "menú" diverso de herramientas y configuraciones posibles, la reproducibilidad de cualquier análisis resulta imprescindible.
+
+Como escribí ya en el programa de otra asignatura que imparto, la ciencia atraviesa por una crisis de reproducibilidad. Difícilmente un equipo científico reproduce el resultado que obtuvo otro. Se atribuye este déficit a que, al publicar los resultados, no se aportan ni las fuentes, ni los métodos empleados. El panorama está cambiando, pero la única forma de aumentar la reproducibilidad consiste en abrir las fuentes y el método de análisis, lo cual en última instancia implica abrir el código. En análisis espacial es aún más crítica la necesidad de disponer de un documento reproducible para seguir los pasos de otros/as investigadores/as.
+
+Puedes sospechar desde ya que [R](https://www.r-project.org/) estará de fondo (a fin de cuentas, este tali usa mucho R), sobre todo por tratarse de una asignatura meramente espacial. Dispondrás de un servidor de RStudio de modestas prestaciones habilitado por mí, con los paquetes requeridos en el curso ya pre-instalados. Así podrás realizar tus asignaciones sin preocuparte de instalaciones ni dependencias.
+
+Parecería "natural" utilizar interfaz gráfico de usuario para realizar análisis espacial, pero verás a lo largo de esta asignatura que lo razonable es utilizar código. Realizar de manera eficiente análisis reproducibles sólo se logra escribiendo y ejecutando código. Igualmente, para visualizar patrones espaciales se requiere de herramientas versátiles, que tanto R como otros lenguajes proveen normalmente a través de paquetes. 
+
+Aunque en la materia usaremos R, son bienvenidos otros lenguajes de programación que quieras utilizar. Si sabes Python, C++, Java o cualquier otro lenguaje que pueda ayudarte a responder preguntas sobre análisis espacial, puedes usarlos sin inconveniente alguno. La única condición es que tienes que publicar código que todos los mortales podamos ejecutar, pero igualmente tendrás que abrir tus fuentes de datos.
+
+Aunque iniciarse en un lenguaje de programación implica un desafío inherente, hay formas de hacer que el encontronazo sea leve. Por ejemplo, se puede recurrir a foros, listas de correo o a la propia comunidad de desarrolladores para solicitar ayuda ante los típicos desafíos y los mensajes de error; yo también podré ayudar. La clave para recibir ayuda eficientemente (y para ayudar a otros) consiste en trabajarse bien la pregunta: presentar ejemplos, código reproducible y mensajes de error. No olvides que la comunidad podría interesarse por o necesitar tus aportes, así que no dudes en hacer un "hola mundo" bien documentado cuando necesites ayuda.
 
 ## Evaluación
 
-| Ítem | % de la \ nota final |
+| Ítem | % de la <br/> nota final |
 |-|-:|
-| [Documento de proyecto](#documento-de-proyecto) | 30% |
-| [Presentación oral](#presentación-oral) | 10% |
-| [Código informático reproducible](#código-informático-reproducible) | 40% |
+| [**Proyecto**](#proyecto) <br/> ([Documento de proyecto](#documento-de-proyecto), 30%) <br/> ([Código informático reproducible](#código-informático-reproducible), 40%) <br/> ([Presentación oral](#presentación-oral), 10%) | **80%** |
 | [Examen basado en código](#examen-basado-en-código) | 20% |
 
-Brevemente, cada ítem a evaluar consistirá en lo siguiente (más detalles por medio de asignaciones a lo largo del curso):
+
+En los párrafos siguientes detallo en qué consiste cada ítem a evaluar.
+
+
+## Proyecto
+
+El proyecto consta de tres partes: documento, código y presentación.
 
 ### Documento de proyecto
 
 Consistirá en un fragmento de manuscrito científico, donde sólo se abordarán los apartados **Metodología** y **Resultados**, y que publicarás en el GitHub. Debido a la corta duración de la asignatura, no preveo que produzcas aportación científica; queda a opción tuya profundizar en tu proyecto a futuro. El proyecto lo elaborarás siguiendo las siguientes fases:
 
-1. Formular un problema cuya resolución requiera usar técnicas de análisis espacial.
+1. Formulación de un problema cuya resolución requiera usar técnicas de análisis espacial.
 
-2. Revisión bibliográfica. Aunque no se requiere una revisión escrita (la típica introducción de los artículos científicos), si usas una fuente, refiérela apropiadamente. Ahora bien, cuando revises bibliografía, evita abrumarte con el enorme número de publicaciones científicas sobre análisis espacial. Consulta y refiere preferiblemente publicaciones de acceso libre.
+2. Revisión bibliográfica. Aunque no se requerirá una revisión escrita (la típica introducción de los artículos científicos), si usas una fuente, refiérela apropiadamente. Ahora bien, cuando revises bibliografía, evita abrumarte con el gran número de publicaciones científicas sobre análisis espacial. En la medida de lo posible, evita las publicaciones tras muros de pago; consulta y refiere preferiblemente publicaciones de acceso libre.
 
-3. Selección de fuentes y metodología. Las fuentes de datos que usarás en tu proyecto deben ser abiertas. Dado que tus repos terminarán en modo público, no admitiré fuentes de datos privados (imágenes, bases de datos). Al seleccionar tu metodología, identifica las herramientas disponibles y verifica (consúltame) que verdaderamente te ayudarán a resolver el problema planteado. Recuerda: si conoces otros lenguajes de programación que no sean R, y que sean útiles para resolver tu problema, úsalos.
+3. Selección de fuentes y metodología. Las fuentes de datos que usarás en tu proyecto deben ser abiertas. Dado que tus repos terminarán en modo público, no admitiré fuentes de datos privados (imágenes, bases de datos). Al seleccionar tu metodología, identifica las herramientas disponibles y verifica (consúltame) que verdaderamente te ayudarán a resolver el problema planteado. Recuerda: si conoces otros lenguajes de programación diferentes a R, y que sean útiles para resolver tu problema, úsalos.
 
-4. Análisis de datos mediante código reproducible. Podrás ejecutar tus análisis en un servidor RStudio habilitado por mí, o alternativamente instalar R, RStudio y los paquetes requeridos por tu cuenta en una PC de tu elección. Ofreceré soporte para R, como motor de análisis, y también guiaré en la utilización de RStudio como **notebook**. Tendrás asignaciones para crear archivos RMarkdown, pero puedes utilizar otras alternativas, como Jupyter.
+4. Análisis de datos mediante código reproducible. Podrás ejecutar tus análisis en un servidor RStudio de modestas prestaciones habilitado por mí. Alternativamente, podrás instalar R, RStudio y los paquetes requeridos por tu cuenta en una PC de tu elección. Ofreceré soporte para R, como motor de análisis, y también guiaré en la utilización de RStudio como **notebook**, y tendrás asignaciones para crear archivos RMarkdown. Para crear tus cuadernos puedes utilizar otras alternativas, como Jupyter.
 
-5. Redacción de **Materiales y Métodos** y **Resultados**.
+5. Redacción de **Metodología** y **Resultados**.
 
-Los criterios de evaluación que usaré para el proyecto son:
+Los criterios que usaré para evaluar el documento son los siguientes:
 
 1. Cumplimiento de los requisitos exigidos por el [Anuario de Investigaciones Científicas de la UASD](docs/instrucciones-para-autores-anuario-investigaciones-cientificas-UASD.pdf) para las secciones **Metodología** y **Resultados**, sobre todo los de fondo.
 
 2. Redacción coherente y concisa. 
 
-3. Resultados, con el debido apoyo estadístico y gráfico, que aborden e intenten resolver el problema planteado.
+3. Resultados, con el debido apoyo estadístico y gráfico, que aborden e "intenten" resolver el problema planteado.
 
-4. Opcionalmente puedes elaborar conclusiones de tu proyecto.
+4. Opcionalmente puedes escribir conclusiones en tu documento.
 
-Tu proyecto sólo tendrá los siguientes ítems:
+Tu documento sólo tendrá los siguientes ítems:
 
   * Título.
   * Nombre de autor/a.
   * Metodología.
   * Resultados.
-  * Código informático reproducible. Puedes incluirlo en el despliegue de resultados. Es decir, doy flexibilidad para que hagas algo tal que ésto o algo tal que ésto otro.
+  * Código informático reproducible. Puedes incluirlo en el despliegue de resultados.
   * Referencias citadas (si aplica).
 
 > El plagio y la falsificación de datos supondrán la reprobación inmediata de la asignatura.
@@ -94,11 +112,11 @@ Dispondrás de 15 minutos para presentar oralmente tu trabajo al final de la asi
 
 ### Código informático reproducible
 
-Este es el fuerte de la asignatura, y es imprescindible para realizar el proyecto. Por correo electrónico, te enviaré asignaciones que te ayudarán a construir tu código reproducible. Las podrás realizar utilizando el servidor RStudio habilitado por el profesor (sólo necesitarás una PC con conexión a Internet y un navegador), o utilizando tu propia PC, pero en este último caso tendrás que instalar R, RStudio y los paquetes requeridos.
+Este es el fuerte de la asignatura, y es imprescindible para realizar culminar con éxito tu proyecto. Por correo electrónico, te enviaré asignaciones que te ayudarán a construir tu código reproducible. Las podrás realizar utilizando el servidor RStudio habilitado por el profesor (sólo necesitarás una PC con conexión a Internet y un navegador), o utilizando tu propia PC, pero en este último caso tendrás que instalar R, RStudio y los paquetes requeridos.
 
-Orientaré con ejemplos y soluciones de forma pública a través de *issues* que abrirás tú o yo en el GitHub. De esta forma las discusiones quedarán disponibles para otras personas. Evita preguntar por correo electrónico, porque cualquier consulta que realices, y las posibles soluciones, quedarán en privado y la comunidad no podrá aprovecharlas.
+Orientaré con ejemplos y soluciones a través de *issues* que abrirás tú o yo en el GitHub. De esta forma las discusiones quedarán disponibles para otras personas. Evita preguntar por correo electrónico, porque cualquier consulta que realices, así como las posibles soluciones que surjan, quedarán en privado y sólo serán aprovechables por ti.
 
-Al abrir un *issue* de GitHub debes plantear el problema al que te enfrentas, cómo has intentado resolverlo o qué soluciones has probado. Si se trata de cuestiones relacionadas con programación o análisis de datos, deberás facilitar **código reproducible y mensaje de error (si lo hubiere)**. Evita el típico comentario "da error", puesto que no conduce a nada.
+Al abrir un *issue* de GitHub debes plantear el problema al que te enfrentas, cómo has intentado resolverlo o qué soluciones has probado. Si se trata de cuestiones relacionadas con programación o análisis de datos, deberás aportar **código reproducible y mensaje de error (si lo hubiere)**. Evita el típico comentario "da error", puesto que no conduce a nada.
 
 ### Examen basado en código
 
@@ -106,15 +124,16 @@ Bueno, sobre ésto tengo poco que decir, sólo que preferiría no evaluar por me
 
 ## Contenido
 
-1. Datos espaciales, y datos espaciales en R (tipos, importar, exportar). Capítulo 1 de @ardilly2018handbook, capítulos 1 a 3 de @lovelace2019geocomputation, capítulos 1 y 2 de @bivand2008applied, capítulo 3 y 4 de @mas2013analisis
+1. Datos espaciales, y datos espaciales en R (tipos, importar, exportar). Capítulo 1 de @loonis2018handbook, capítulos 1 a 3 de @lovelace2019geocomputation, capítulos 1 y 2 de @bivand2008applied, capítulo 3 y 4 de @mas2013analisis.
 
-2. Manipulación de datos espaciales (operaciones con atributos y geométricas). Capítulos 2, 4 y 5 de @bivand2008applied, capítulos 3 a 5 de @lovelace2019geocomputation, capítulo 5 de @mas2013analisis.
+2. Manipulación de datos espaciales (operaciones con atributos y geométricas). Capítulos 2, 4 y 5 de @bivand2008applied, capítulos 3 a 5 de @lovelace2019geocomputation, capítulo 5 de @mas2013analisis, capítulo 10 de @olaya2014sistemas.
 
+3. Vecindad y autocorrelación espacial (análisis exploratorio, funciones de homogeneidad espacial, tipos de vecindad, ponderadores, índices). Capítulos 2 y 3 de @loonis2018handbook, capítulo 12 de @olaya2014sistemas, capítulos B.2 y B.3 de @fischer2009handbook.
 
+4. Datos puntuales, geoestadística (funciones aleatorias, variograma, kriging). Capítulo B.6 de @fischer2009handbook, Capítulos 1, 2, 5 y 6 de @hengl2009practical, capítulos 4 y 5 de @loonis2018handbook, capítulos 7 y 8 de @bivand2008applied, capítulo 7 de @mas2013analisis, capítulo 13 de @olaya2014sistemas, 
 
-3. Geoestadística. Capítulos 5 y 6 de @hengl2009practical
+5. Modelización de entidades poligonales. Capítulo 9 de @bivand2008applied, capítulos 6 a 9 de @loonis2018handbook, capítulos C.1 a C.7 de @fischer2009handbook.
 
-4. Mapas.
 
 ## Referencias
 
