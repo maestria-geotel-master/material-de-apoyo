@@ -14,7 +14,7 @@ Básicos:
 URLs del contenido del curso:
 -----------------------------
 
--   [Programa (hipervínculo recursivo)](programa-biogeografia-geo1310.md)
+-   [Programa (hipervínculo recursivo)](programa-analisis-espacial.md)
 -   [¿Cómo realizar una asignación?](ref/como-hacer-una-asignacion.md)
 -   [Guía mínima de RMarkdown](ref/guia-minima-de-rmarkdown.md)
 -   [Introducción a R](ref/introduccion-a-r.md)
@@ -34,7 +34,7 @@ Los datos espaciales tienen estructura, es decir, no son independientes entre s�
 
 > "...It is not always easy to distinguish between the two components, and poorly specifying one could cause the other to also be erroneous...Depending on the question, the methodology will first deal with the spatial autocorrelation of the observations (i.e. the links between nearby units) or the heterogeneity of behaviours (i.e. their variability depending on location)." (Loonis & Bellefon, 2018)
 
-Son muchas las herramientas disponibles, la mayoría de las cuales cuentan con interfaz de usuario (no necesariamente gráfico). Para el análisis exploratorio de datos espaciales, hay disponibles múltiples herramientas gráficas e índices, y para la predicción existen varios algoritmos de modelización y pruebas estadísticas que asisten en la difícil labor de elegir variables/modelos. Tratándose de un contexto tan complejo, con un "menú" diverso de herramientas y configuraciones posibles, la reproducibilidad de cualquier análisis resulta imprescindible.
+Son muchas las herramientas disponibles, la mayoría de las cuales cuenta con interfaz de usuario (no necesariamente gráfico). Para el análisis exploratorio de datos espaciales, hay disponibles múltiples herramientas gráficas e índices, y para la predicción existen varios algoritmos de modelización y pruebas estadísticas que asisten en la difícil labor de elegir variables/modelos. Tratándose de un contexto tan complejo, con un "menú" diverso de herramientas y configuraciones posibles, la reproducibilidad de cualquier análisis resulta imprescindible.
 
 Como escribí ya en el programa de otra asignatura que imparto, la ciencia atraviesa por una crisis de reproducibilidad. Difícilmente un equipo científico reproduce el resultado que obtuvo otro. Se atribuye este déficit a que, al publicar los resultados, no se aportan ni las fuentes, ni los métodos empleados. El panorama está cambiando, pero la única forma de aumentar la reproducibilidad consiste en abrir las fuentes y el método de análisis, lo cual en última instancia implica abrir el código. En análisis espacial es aún más crítica la necesidad de disponer de un documento reproducible para seguir los pasos de otros/as investigadores/as.
 

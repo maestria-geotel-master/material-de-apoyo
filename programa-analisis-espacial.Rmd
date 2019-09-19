@@ -24,7 +24,7 @@ Octubre 2019 <br/>
 * Lugar y horario: Aula ¿?, Lunes y Martes de 6 a 10 pm
 
 ## URLs del contenido del curso:
-* [Programa (hipervínculo recursivo)](programa-biogeografia-geo1310.md)
+* [Programa (hipervínculo recursivo)](programa-analisis-espacial.md)
 * [¿Cómo realizar una asignación?](ref/como-hacer-una-asignacion.md)
 * [Guía mínima de RMarkdown](ref/guia-minima-de-rmarkdown.md)
 * [Introducción a R](ref/introduccion-a-r.md)
