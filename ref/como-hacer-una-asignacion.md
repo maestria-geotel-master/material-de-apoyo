@@ -1,18 +1,18 @@
 # ¿Cómo realizar una asignación?
 
-En este documento te explico cómo crear un repositorio con tu asignación, cómo realizarla, cómo notificarme al terminarla y cómo crear un *issue* o incidencia para pedir ayuda. Recuerda que en el fondo subyace la necesidad de que hagas tus cambios con control de versiones para evitar [esto](http://phdcomics.com/comics/archive.php?comicid=1531).
+En este documento te explico cómo crear un repositorio con tu asignación, cómo realizarla, cómo notificarme al terminarla y cómo crear un *issue* o incidencia para pedir ayuda. Recuerda que en el fondo subyace la necesidad de que hagas tus cambios con control de versiones para evitar [esto](http://phdcomics.com/comics/archive.php?comicid=1531). No olvides leer también la sección [Aclaración sobre flujos de trabajo "no lineales"](#Aclaración-sobre-flujos-de-trabajo-no-lineales)
 
-No olvides leer también la sección [Aclaración sobre flujos de trabajo "no lineales"](#Aclaración-sobre-flujos-de-trabajo-no-lineales)
+Al finalizar esta lectura, práctica, o hazlo sobre la marcha. El objetivo es que utilices con destreza Git y GitHub para realizar las asignaciones de la materia, aun si no tienes experiencia con ninguna de estas herramientas. Si sabes usarlas, podrás saltarte algunas explicaciones y concentrarte en los detalles propios de la asignatura.
 
 ## Crea un repositorio con tu asignación
 
 1. Desde el navegador, entra en [Github](https://github.com/) e [inicia sesión](https://github.com/login) con tu cuenta. Si usas una PC pública o compartida, es preferible que inicies el navegador en modo incógnito. Si no tienes cuenta de Github, [crea una](https://github.com/join). Ésta será la cuenta que usarás durante el curso.
 
-2. Ve a tu buzón de correo y, en el mensaje enviado por el profesor (podría caer en spam), haz clic en el vínculo (será algo tal que https<i></i>://classroom.github.com/...).
+2. En la misma ventana del navegador, crea una nueva pestaña, y abre tu buzón de correo. En el mensaje enviado por el profesor (podría caer en spam), haz clic en el vínculo (será algo tal que https<i></i>://classroom.github.com/...).
 
 3. Al hacer clic, el navegador te dirigirá a aceptar la asignación. Te pedirá que inicies tu cuenta de Github si aún no lo has hecho. Usa siempre una ventana de incógnito o privada, asegurándote de que es tu cuenta la que figura como cuenta iniciada en GitHub (compruébalo en el botón derecho superior, donde verás tu avatar o imagen de perfil). Presiona `Accept this assignment`. Cuando quieras volver a tu asignación, puedes usar el vínculo del mensaje de invitación (...siempre que el tali no la borre, ejem).
 
-4. Automáticamente se creará, en una "organización" de GitHub que se corresponde con la asignatura y el semestre actual ([biogeografia-201902](https://github.com/biogeografia-201902), administrada por el profesor y de la cual formas parte), un repo conteniendo tu asignación. Listo, tienes ya un repo con tu asignación, donde realizarás tus actualizaciones. Normalmente, tú y el profesor serán los únicos contribuidores de dicho repo.
+4. Automáticamente se creará, en una "organización" de GitHub que se corresponde con la asignatura y el semestre actual ([maestria-geotel-201902](https://github.com/maestria-geotel-201902), administrada por el profesor y de la cual formas o formarás parte), un repo conteniendo tu asignación. Listo, tienes ya un repo con tu asignación, donde realizarás tus actualizaciones. Normalmente, tú y el profesor serán los únicos contribuidores de dicho repo.
 
 * Nota: estos 4 pasos se ejecutan una sola vez
 
@@ -24,7 +24,7 @@ Elige una de dos alternativas en función del tipo de asignación:
 
 Usa la interfaz web de GitHub si no necesitas ejecutar código. Por ejemplo, usa esta alternativa si vas a hacer un documento de texto en Markdown que contenga tus preguntas de investigación ([tutorial sobre Markdown](https://www.youtube.com/watch?v=y6XdzBNC0_0), [buen blog en inglés sobre Markdown](https://girlknowstech.com/how-to-write-in-markdown/), [este otro con vídeos cortos y concisos](https://instructor-support.datacamp.com/en/articles/2336337-markdown-tutorial) y [buen tutorial en inglés sobre redacción académica](https://www.youtube.com/watch?v=hpAJMSS8pvs)). El interfaz web de GitHub es bastante sencillo. Sigue estos pasos:
 
-1. Inicia sesión en GitHub con tu usuario/contraseña. Reitero: **no olvides asegurarte de que iniciaste con tu cuenta**.
+1. Inicia sesión en GitHub con tu usuario/contraseña. Reitero: **no olvides asegurarte de que inicias con tu cuenta**.
 
 2. Localiza el repo que contiene la asignación, donde podrás hacer cambios a un archivo existente o crear uno nuevo (dependerá de lo asignado):
 
@@ -38,7 +38,7 @@ Hasta aquí cómo usar la interfaz web de GitHub para realizar tus asignaciones.
 
 ### Usando RStudio
 
-Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar código de R e incluir los resultados de la consola en el documento de Markdown. Por ejemplo, una asignación consistirá en crear objetos o importar tablas a R, analizar matrices de comunidad, calcular índices diversidad, crear gráficos de ordenación, hacer análisis de agrupamiento (*cluster analysis*) o tareas similares. Todas esas tareas producen resultados, tanto gráficos como texto. Si hace todo el flujo de trabajo en RStudio, tendrás la ventaja de que, tanto gráficos como resultados textuales, se insertarán automáticamente en e documento Markdown (en concreto, se usa un formato denominado RMarkdown como puente, más detalles en el aula). Sigue estos pasos:
+Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar código de R e incluir los resultados de la consola en el documento de Markdown. Por ejemplo, las asignaciones consistirán en crear objetos e importar tablas a R, realizar análisis exploratorio de datos espaciales, crear variogramas, y otras tareas relacionadas con análisis espacial. Todas esas tareas producen resultados, tanto gráficos como texto. Si haces todo el flujo de trabajo en RStudio, tendrás la ventaja de que, tanto gráficos como resultados textuales, se insertarán automáticamente en el documento Markdown (en concreto, se usa un formato denominado RMarkdown como puente, más detalles en el aula). Sigue estos pasos:
 
 1. Abre RStudio. Dispones de dos alternativas para ejecutar RStudio:
 
@@ -129,7 +129,7 @@ Utiliza la sección `Issues` para pedir ayuda o reportar errores. Aunque puedes 
 
 ## Aclaración sobre flujos de trabajo "no lineales"
 
-Es más fácil citar las razones por las que una computadora y una persona frente a ella pueden trabajar de manera fluida y sin tropiezos. La lista de las innumerables razones por las que ocurre lo contrario es tan larga como un día de hambre. Por lo tanto, debes estar preparaod/a para los flujos de trabajo no lineales.
+Es más fácil citar las razones por las que una computadora y una persona frente a ella pueden trabajar de manera fluida y sin tropiezos. La lista de las innumerables razones por las que ocurre lo contrario es tan larga como un día de hambre. Por lo tanto, debes estar preparado/a para los flujos de trabajo no lineales.
 
 Tendrás que afrontar incidencias y situaciones muy diferentes a las descritas en esta guía, sobre todo mientras aumente tu actividad en un determinado repo. Probablemente las catalogues como "situaciones indeseadas" o tremendas vainas, pero lo único seguro es que te ocurrirán. Te presento dos de ellas:
 
