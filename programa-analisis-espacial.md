@@ -81,11 +81,11 @@ El proyecto consta de tres partes: documento, código y presentación.
 
 ### Documento de proyecto
 
-Consistirá en un fragmento de manuscrito científico, donde sólo se abordarán los apartados **Metodología** y **Resultados**, y que publicarás en el GitHub. Debido a la corta duración de la asignatura, no preveo que produzcas aportación científica; queda a opción tuya profundizar en tu proyecto a futuro. El proyecto lo elaborarás siguiendo las siguientes fases:
+Consistirá en un fragmento de manuscrito científico, donde abordarás, principalmente, los apartados **Metodología** y **Resultados**, y que publicarás en el GitHub. Debido a la corta duración de la asignatura, no preveo que produzcas aportación científica; queda a opción tuya profundizar en tu proyecto a futuro. Elabora tu proyecto según las siguientes fases:
 
 1.  Formulación de un problema cuya resolución requiera usar técnicas de análisis espacial.
 
-2.  Revisión bibliográfica. Aunque no se requerirá una revisión escrita (la típica introducción de los artículos científicos), si usas una fuente, refiérela apropiadamente. Ahora bien, cuando revises bibliografía, evita abrumarte con el gran número de publicaciones científicas sobre análisis espacial. En la medida de lo posible, evita las publicaciones tras muros de pago; consulta y refiere preferiblemente publicaciones de acceso libre.
+2.  Revisión bibliográfica. Aunque no se requerirá una revisión escrita (la típica introducción de los artículos científicos), las fuentes que uses deberás referirlas apropiadamente. Durante la revisión bibliográfica, evita abrumarte con el gran número de publicaciones científicas sobre análisis espacial (hay pila, ojo). En la medida de lo posible, evita las publicaciones tras muros de pago; consulta y refiere preferiblemente publicaciones de acceso libre.
 
 3.  Selección de fuentes y metodología. Las fuentes de datos que usarás en tu proyecto deben ser abiertas. Dado que tus repos terminarán en modo público, no admitiré fuentes de datos privados (imágenes, bases de datos). Al seleccionar tu metodología, identifica las herramientas disponibles y verifica (consúltame) que verdaderamente te ayudarán a resolver el problema planteado. Recuerda: si conoces otros lenguajes de programación diferentes a R, y que sean útiles para resolver tu problema, úsalos.
 
@@ -126,12 +126,15 @@ Orientaré con ejemplos y soluciones a través de *issues* que abrirás tú o yo
 
 Al abrir un *issue* de GitHub debes plantear el problema al que te enfrentas, cómo has intentado resolverlo o qué soluciones has probado. Si se trata de cuestiones relacionadas con programación o análisis de datos, deberás aportar **código reproducible y mensaje de error (si lo hubiere)**. Evita el típico comentario "da error", puesto que no conduce a nada.
 
-### Examen basado en código
+Examen basado en código
+-----------------------
 
 Bueno, sobre ésto tengo poco que decir, sólo que preferiría no evaluar por medio de exámenes.
 
 Contenido
 ---------
+
+El típico "temario" de la asignatura, AKA "teoría", el cual impartiré con breves introducciones, pero principalmente por medio de asignaciones. En la medida de lo posible, haré que este contenido sea de utilidad para los proyectos.
 
 1.  Datos espaciales, y datos espaciales en R (tipos, importar, exportar). Capítulo 1 de Loonis & Bellefon (2018), capítulos 1 a 3 de Lovelace, Nowosad, & Muenchow (2019), capítulos 1 y 2 de Bivand, Pebesma, Gomez-Rubio, & Pebesma (2008), capítulo 3 y 4 de Mas (2013).
 
