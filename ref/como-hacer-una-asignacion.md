@@ -48,17 +48,17 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
     
 2. En el menú `File` de RStudio, presiona `New Project` para crear un proyecto. Esto llamará la ventana `Create Project`.
 
-3. Elige la opción `Version Control`, lo cual hará avanzar automáticamente hacia la Ventana `Create Project from Version Control` automáticamente.
+3. Elige la opción `Version Control`, lo cual te hará avanzar automáticamente hacia la Ventana `Create Project from Version Control` automáticamente.
 
-4. En la ventana `Create Project from Version Control`, elige `Git`. Esto hará avanzar automáticamente hacia la ventana "Clone Git Repository". Para rellenar la caja `Repository URL` necesitas ir a tu repo de asignación.
+4. En la ventana `Create Project from Version Control`, elige `Git`. Esto te llevará automáticamente hacia la ventana `Clone Git Repository`. Para rellenar la caja `Repository URL` necesitas ir a tu repo de asignación.
 
 5. Ve al navegador y, en tu repo de asignación, copia la URL del repo presionando el botón verde `Clone or download` ![](../img/bt_clone_or_download.png) y luego el botón `Copiar URL del repo` ![](../img/bt_copy_repo_url.png). La URL se encuentra ahora en el clipboard.
 
-6. Regresa a RStudio. En la caja `Repository URL`, pega la URL que tienes en el portapapeles (en Linux y Windows, `Ctrl+V`). Dicho texto será algo tal que `https<i></i>://github.com/biogeografia-201902/\<nombredelrepo\>.git`. El nombre del repo normalmente termina con tu nombre de usuario, por ejemplo, `https<i></i>://github.com/biogeografia-201902/\<unidad-0-asignacion-1-preguntas-investigacion-estudianteficticio\>.git`
+6. Regresa a RStudio. En la caja `Repository URL`, pega la URL que tienes en el portapapeles (en Linux y Windows, `Ctrl+V`). Dicho texto será algo tal que `https://github.com/maestria-geotel-201902/\<nombredelrepo\>.git`. El nombr del repo normalmente termina con tu nombre de usuario, por ejemplo, https<i></i>://github.com/maestria-geotel-201902/\<unidad-0-asignacion-0-hola-mundo-estudianteficticio\>.git
 
-7. En la caja `Project directory name`, puedes dejar el valor por defecto, que será el mismo nombre del repo (por ejemplo, `unidad-0-asignacion-0`). Este será el nombre del directorio donde se clonará el repo.
+7. En la caja `Project directory name`, puedes dejar el valor por defecto, que será el mismo nombre del repo (por ejemplo, `unidad-0-asignacion-0-hola-mundo`). Este será el nombre del directorio donde se clonará el repo.
 
-8. En la caja `Create project as subdirectory of`, debes elegir el lugar donde se colocará el directorio que contendrá el repo. Si lo haces en el servidor RStudio habilitado por el profesor, puedes dejar en este cuadro la opción que te aparece por defecto, que es la virguilla (`~`), y significa `Carpeta personal`, cuya ruta global en el servidor es `/home/<nombredeusuarioenelservidor>/`. Por ejemplo, el repo quedará en la siguiente ruta: `/home/<nombredeusuarioenelservidor>/<nombredelrepo>`.
+8. En la caja `Create project as subdirectory of`, debes elegir el lugar donde se colocará el directorio que contendrá el repo. Si lo haces en el servidor RStudio habilitado por el profesor, puedes dejar en este cuadro la opción que te aparece por defecto, que es la virguilla (`~`), y significa `Carpeta personal`, cuya ruta global en el servidor (Linux) es `/home/<nombredeusuarioenelservidor>/`. Por ejemplo, el repo quedará en la siguiente ruta: `/home/<nombredeusuarioenelservidor>/<nombredelrepo>`.
 
 9. Presiona el botón `Create Project`. Automáticamente, RStudio clonará el repositorio de tu asignación localmente. Esta copia local puede ser editada mediante el editor de RStudio y sincronizada con el repo remoto.
 
@@ -67,7 +67,7 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
     1. `git config user.email "tuemailengithub"`. Presiona `<enter>`. Cambia `"tuemailengithub"` por tu email registado en GitHub. Conserva las comillas.
     2. `git config user.name "tuusuariodegithub"`. Presiona `<enter>`. Cambia `"tuusuariodegithub"` por tu usuario registrado en GitHub. Conserva las comillas.
     
-    * Si no realizas este paso, al intentar hacer `Commit`, te aparecerá el mensaje `***Please tell me who you are`, y no podrás seguir avanzando.
+    * Si no realizas este paso, al intentar hacer `Commit`, te aparecerá el mensaje `***Please tell me who you are`, y no podrás avanzar ni sincronizar tu repo local con el remoto.
 
 11. Al igual que en el interfaz web de GitHub, a partir de este punto RStudio te permite actualizar un archivo existente en tu repo o crear uno nuevo. Todo dependerá de la naturaleza de la asignación:
 
