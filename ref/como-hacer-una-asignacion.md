@@ -2,7 +2,7 @@
 
 En este documento te explico cómo crear un repositorio con tu asignación, cómo realizarla, cómo notificarme al terminarla y cómo crear un *issue* o incidencia para pedir ayuda. Recuerda que en el fondo subyace la necesidad de que hagas tus cambios con control de versiones para evitar [esto](http://phdcomics.com/comics/archive.php?comicid=1531). No olvides leer también la sección [Aclaración sobre flujos de trabajo "no lineales"](#Aclaración-sobre-flujos-de-trabajo-no-lineales)
 
-Al finalizar esta lectura, práctica, o hazlo sobre la marcha. El objetivo es que utilices con destreza Git y GitHub para realizar las asignaciones de la materia, aun si no tienes experiencia con ninguna de estas herramientas. Si sabes usarlas, podrás saltarte algunas explicaciones y concentrarte en los detalles propios de la asignatura.
+Al finalizar esta lectura (o mientras vas leyendo), practica varias veces con tu primera asignación. El objetivo es que utilices con destreza Git y GitHub para realizar las asignaciones de la materia, aun si no tienes experiencia con ninguna de estas herramientas. Si sabes usarlas, podrás saltarte algunas explicaciones y concentrarte en los detalles propios de la asignatura.
 
 ## Crea un repositorio con tu asignación
 
@@ -58,9 +58,9 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
 
 7. En la caja `Project directory name`, puedes dejar el valor por defecto, que será el mismo nombre del repo (por ejemplo, `unidad-0-asignacion-0-hola-mundo`). Este será el nombre del directorio donde se clonará el repo.
 
-8. En la caja `Create project as subdirectory of`, debes elegir el lugar donde se colocará el directorio que contendrá el repo. Si lo haces en el servidor RStudio habilitado por el profesor, puedes dejar en este cuadro la opción que te aparece por defecto, que es la virguilla (`~`), y significa `Carpeta personal`, cuya ruta global en el servidor (Linux) es `/home/<nombredeusuarioenelservidor>/`. Por ejemplo, el repo quedará en la siguiente ruta: `/home/<nombredeusuarioenelservidor>/<nombredelrepo>`.
+8. En la caja `Create project as subdirectory of`, debes elegir el lugar donde se colocará el directorio que contendrá el repo. Si lo haces en el servidor RStudio habilitado por el profesor, puedes dejar en este cuadro la opción que te aparece por defecto, que es la virguilla (`~`), y significa `Carpeta personal`, cuya ruta global en el servidor (Linux) es `/home/<nombredeusuarioenelservidor>/`. Por ejemplo, el repo quedará en la siguiente ruta: `/home/<estudianteficticio>/<unidad-0-asignacion-0-hola-mundo>`.
 
-9. Presiona el botón `Create Project`. Automáticamente, RStudio clonará el repositorio de tu asignación localmente. Esta copia local puede ser editada mediante el editor de RStudio y sincronizada con el repo remoto.
+9. Presiona el botón `Create Project`. Automáticamente, RStudio clonará el repositorio de tu asignación localmente. Esta copia local puede modificarse mediante el editor de RStudio y sincronizada posteriormente con el repo remoto.
 
 10. **Identifícate**. En la pestaña `Git` ve a la rueda dentada `More` ![](../img/bt_more.png) y presiona el comando `Shell...`. Se abrirá una ventana del intérprete de línea de órdenes (CLI). Debes ejecutar las dos sentencias siguientes, una a una.
 
@@ -69,9 +69,9 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
     
     * Si no realizas este paso, al intentar hacer `Commit`, te aparecerá el mensaje `***Please tell me who you are`, y no podrás avanzar ni sincronizar tu repo local con el remoto.
 
-11. Al igual que en el interfaz web de GitHub, a partir de este punto RStudio te permite actualizar un archivo existente en tu repo o crear uno nuevo. Todo dependerá de la naturaleza de la asignación:
+11. Al igual que en el interfaz web de GitHub, a partir de este punto RStudio te permite actualizar un archivo existente en tu repo o crear uno nuevo. Todo dependerá de si actualizas un archivo existente o si creas uno nuevo:
 
-    1. **Para actualizar un archivo existente**, abre la pestaña `Files` (revisa los distintos paneles de RStudio) y cliquea sobre el nombre del archivo que te interesa editar. Haz los cambios que correspondan, según lo asignado. **No te olvides de guardar cualquier cambio que hagas inmediatamente**, mediante el comando `File>Save` de RStudio o presionando `Ctrl+S`, pero ten en cuenta que **estarás guardando sólo una copia local**, no la del repo de GitHub (más adelante verás cómo actualizar el repo remoto). ¡IMPORTANTE! Si no guardas el documento, no podrás hacer `Commit` más adelante.
+    1. **Para actualizar un archivo existente**, abre la pestaña `Files` (revisa los distintos paneles de RStudio) y cliquea sobre el nombre del archivo que editarás. Haz los cambios que correspondan, según lo asignado. **No olvides guardar cualquier cambio que hagas inmediatamente**, mediante el comando `File>Save` de RStudio o presionando `Ctrl+S`, pero ten en cuenta que **estarás guardando sólo una copia local**, no la del repo de GitHub (más adelante verás cómo actualizar el repo remoto). ¡IMPORTANTE! Si no guardas el documento, no podrás hacer `Commit`>`Push` más adelante.
     
     2. **Para crear un archivo nuevo**, presiona el comando `File>New File>Text File` de RStudio. Se abrirá una ventana en blanco normalmente con el nombre `Untitled1`. Guárdalo inmediatamente con el comando `File>Save` o presionando `Ctrl+S`, y asegúrate que se guarda en la ruta que corresponda dentro del repo. En el documento, añade el texto que tengas que añadir y guarda frecuentemente (`Ctrl+S` te hace más eficiente).
     
@@ -83,7 +83,7 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
     
     3. En la caja `Commit message` escribe un mensaje que resuma el conjunto de cambios, por ejemplo, `actualizado archivo de asignación` o `añadido archivo de script`.
     
-    4. Presiona el botón `Commit` para que los cambios pasen al `Stage` (¡tus cambios aún no se han sincronizado con el repo remoto!). Aparecerá un cuadro de diálogo informando los cambios realizados, algo tal que ésto (variará mucho en función de los cambios realizados):
+    4. Presiona el botón `Commit` para que los cambios pasen al `Stage` (¡tus cambios aún no se han sincronizado con el repo remoto!). Aparecerá un cuadro de diálogo informando los cambios realizados, algo tal que ésto (variará mucho de un caso a otro):
     
     <figure><img src="../img/master_branch_changes.png" width="400"></figure>
     
@@ -101,9 +101,9 @@ Puedes notificarme cuando hayas realizado todos tus *commits* por medio de la in
 
 2. Presiona en la pestaña ![](../img/bt_commits.png) localizada sobre los botones del repo (el número de *commits* podría ser diferente en tu caso). Esto te llevará a la lista de *commits* del repo.
 
-3. Selecciona el botón que contiene el nombre de la revisión (*SHA-1 hash*), localizado a la derecha del *commit*, el cual luce como éste ![](../img/bt_sha_1_hash.png).
+3. Selecciona el botón que contiene el nombre de la revisión (*SHA-1 hash*), localizado a la derecha del último *commit*, el cual luce como éste ![](../img/bt_sha_1_hash.png).
 
-4. En la caja al final de la página, escribe un mensaje indicándome que terminaste o cualquier otra indicación que quieras hacerme saber. Al principio, al final o entre palabras, es imprescindible que escribas una mención a mí usando `@geofis`. Te quedaría algo tal que esto:
+4. En la caja al final de la página, escribe un mensaje indicándome que terminaste o cualquier otra indicación que quieras notificarme. Al principio, al final o entre palabras, es imprescindible que escribas una mención a mí usando `@geofis`. Te quedaría algo tal que esto:
 
     <figure><img src="../img/mention_on_comment.png" width="500"></figure>
     
