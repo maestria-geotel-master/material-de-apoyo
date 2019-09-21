@@ -54,7 +54,7 @@ Utiliza RStudio como editor o cuaderno (*notebook*) si necesitas ejecutar códig
 
 5. Ve al navegador y, en tu repo de asignación, copia la URL del repo presionando el botón verde `Clone or download` ![](../img/bt_clone_or_download.png) y luego el botón `Copiar URL del repo` ![](../img/bt_copy_repo_url.png). La URL se encuentra ahora en el clipboard.
 
-6. Regresa a RStudio. En la caja `Repository URL`, pega la URL que tienes en el portapapeles (en Linux y Windows, `Ctrl+V`). Dicho texto será algo tal que `https://github.com/maestria-geotel-201902/<nombredelrepo>.git`. El nombr del repo normalmente termina con tu nombre de usuario, por ejemplo, `https://github.com/maestria-geotel-201902/<unidad-0-asignacion-0-hola-mundo-estudianteficticio>.git`
+6. Regresa a RStudio. En la caja `Repository URL`, pega la URL que tienes en el portapapeles (en Linux y Windows, `Ctrl+V`). Dicho texto será algo tal que `https://github.com/maestria-geotel-201902/<nombredelrepo>.git`. El nombre del repo normalmente terminará con tu nombre de usuario, por ejemplo, para "estudianteficticio" `https://github.com/maestria-geotel-201902/<unidad-0-asignacion-0-hola-mundo-estudianteficticio>.git`
 
 7. En la caja `Project directory name`, puedes dejar el valor por defecto, que será el mismo nombre del repo (por ejemplo, `unidad-0-asignacion-0-hola-mundo`). Este será el nombre del directorio donde se clonará el repo.
 
