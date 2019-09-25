@@ -194,13 +194,13 @@ municipios, que cargaremos más
 adelante.
 
 ``` r
-reg.sf <- st_read(dsn = '../src/divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
+reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
 plot(reg.sf)
 ```
 
 ![](../img/regiones-1.png)<!-- -->
 
-La función `st_read` lee la capa correspondiente del GPGK y la convierte
+La función `st_read` lee la capa correspondiente del GPKG y la convierte
 a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los
 analizaremos más adelante; por lo pronto, intentemo probemos algunas
 visualizaciones más. Las regiones fueron coloreadas en función de los
@@ -209,21 +209,35 @@ aplicar estilos en función de éste.
 
 ``` r
 reg.sf$area <- st_area(reg.sf)
-plot(reg.sf['area'], col = heat.colors(10))
+plot(reg.sf['area'])
 ```
 
 ![](../img/regiones2-1.png)<!-- -->
 
+Veremos otras formas de diseñar mapas estilizados. Veamos también la
+capa de municipios contenida en el
+GPKG.
+
 ``` r
-mun.sp <- shapefile('ShapeFilesCenso2010/MUNCenso2010.shp')
-plot(mun.sp)
-mun.sf <- st_as_sf(mun.sp)
+mun.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
 plot(mun.sf)
+```
+
+![](../img/municipios-1.png)<!-- -->
+
+``` r
 mun.sf$area <- st_area(mun.sf)
 plot(mun.sf['area'])
+```
+
+![](../img/municipios-2.png)<!-- -->
+
+``` r
 nrow(mun.sf)
+## [1] 155
+```
 
-
+``` r
 pop.mun <- read_xls('pop_adm3.xls')
 pop.mun
 nrow(pop.mun)

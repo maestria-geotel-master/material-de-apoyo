@@ -7,6 +7,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "..")
 knitr::opts_chunk$set(
   echo = TRUE,
   collapse=TRUE,
@@ -96,7 +97,7 @@ Brevemente, con `sf` crearás y manipularás *simple features*, `raster` te ayud
 El siguiente bloque de código carga las regiones del país según la división de 2010, a partir de un archivo GeoPackage, originalmente *shapefiles* de la @one2015datos. Además de las regiones, este GPKG contiene dos capas adicionales, provincias y municipios, que cargaremos más adelante.
 
 ```{r regiones}
-reg.sf <- st_read(dsn = 'divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
+reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
 plot(reg.sf)
 ```
 
@@ -111,15 +112,15 @@ plot(reg.sf['area'])
 Veremos otras formas de diseñar mapas estilizados. Veamos también la capa de municipios contenida en el GPKG.
 
 ```{r municipios}
-mun.sf <- st_read(dsn = 'divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
-plot(mun.sf)
-mun.sf <- st_as_sf(mun.sp)
+mun.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
 plot(mun.sf)
 mun.sf$area <- st_area(mun.sf)
 plot(mun.sf['area'])
 nrow(mun.sf)
+```
 
 
+```{r, eval=F}
 pop.mun <- read_xls('pop_adm3.xls')
 pop.mun
 nrow(pop.mun)
