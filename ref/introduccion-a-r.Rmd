@@ -2,6 +2,8 @@
 output: github_document
 bibliography: biblio.bib
 csl: apa.csl
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -64,7 +66,7 @@ Te paso a continuación algunas fuentes (mayoritariamente en español) sobre las
 
 ### Ayuda de R
 
-```{r, eval=F}
+```{r help-in-r}
 help(package = 'base') #Ayuda sobre un paquete
 library(help = 'base') #Documentación sobre un paquete
 help(lm) #Ayuda sobre una función
@@ -76,328 +78,93 @@ help.search("matrix") #Busca la palabra clave en las ayudas de los paquetes
 
 ¡Usa los foros! Si introduces un mensaje de error de R en el buscador de tu preferencia (en inglés obtienes más resultados), encontrarás varios punteros a foros con posibles soluciones.
 
-## Análisis exploratorio de datos (EDA)
+## Análisis exploratorio de datos espaciales (ESDA)
 
-@Wickham2017R afirman que, durante la producción de resultados comunicables, subyace la necesidad de realizar el **análisis exploratorio de datos (AED o EDA)** lo más rápidamente posible, pero nunca obviarlo. Subyace la idea de que es necesario aligerar el EDA para descubrir tantos patrones como sea posible sin que haya "pelearse" con los datos para hacer simples gráficos. Esto permitirá al investigador/a concentrarse en interpretar resultados. El esquema a continuación, de la misma fuente, resume este proceso:
+Carguemos los paquetes que necesitaremos para esta breve introducción.
 
-```{r echo = FALSE, out.width = "65%"}
-knitr::include_graphics("https://es.r4ds.hadley.nz/diagrams_w_text_as_path/es/data-science-explore.svg")
-```
-
-**Las múltiples herramientas ofrecidas por los paquetes de la colección `tidyverse` te servirán para agilizar sustancialmente el EDA**. Los paquetes `dplyr`, `tidyr` y otros, te ayudarán a importar, ordenar y transformar datos, mientras `ggplot2` te ayudará a crear gráficos estilizados eficientemente. @Wickham2017R aseguran que estas herramientas mantienen la motivación en el aprendizaje por sus flujos de trabajo lineales.
-
-### El conjunto de datos `doubs`
-
-Una de las fuentes que utilizo en esta guía de referencia, es el conjunto de datos `doubs` de @verneaux1973cours. Se cargan meidante el paquete `ade4`. Estos datos se utilizan también en @borcard2018numerical.
-
-```{r}
-library(ade4)
-data(doubs)
-```
-
->**Nota**. Si no usas el servidor RStudio habilitado por el profesor, instala `ade4` (y cualquier otro paquete usado en este tutorial) con `install.packages('ade4', dependencies = T)`
-
-La sentencia anterior carga el objeto `doubs` a memoria, pero no lo imprime en pantalla. `doubs` es una lista de 4 tablas o `data.frame`, etiquetadas como `env`-matriz ambiental, `fish`-matriz de comunidad usando abundancia semi-cuantitativa (más explicación abajo), `xy`-matriz de coordenadas de las muestras y `species`-nombres de las 27 especies encontradas. Las filas de los tres primeros `data.frame` corresponden a 30 sitios muestreados a lo largo del río franco-suizo Doubs.
-
-<a name="doubs"></a>Como ves, el objeto `doubs` se compone de varios elementos, por lo que es preferible imprimirlo en pantalla por separado. Para imprimir sólo un objeto de una lista, se usa el operador `$`. Así, `doubs$env`, imprime sólo la matriz ambiental.
-
->Nota. Fíjate que tanto en estos datos de ejemplo, como en los siguientes, utilizaré una combinación de funciones y operadores para mostrar sólo una parte de las tablas. Esta operación la podemos denominar "filtrado". Si la omitimos, la consola de R se desbordaría, y se generaría un documento innecesariamente largo. Más adelante descompongo en trocitos los pasos necesarios para filtrar, porque en tus asignaciones tendrás que hacerlo.
-
-```{r}
-set.seed(98)
-doubs$env[sample(1:30, 6), ] #Sólo 6 filas mostradas, elegidas al azar
-```
-
-`doubs$env` contiene información ambiental de los 30 sitios de colecta (filas) con las siguientes variables (columnas): `dfs`-distancia desde cabecera (en km&nbsp;x&nbsp;10), `alt`-altitud (en m), `slo`-pendiente (log(x+1), donde x es la pendiente en tantos por 1000), `flo`-caudal promedio mínimo (m<sup>3</sup>/s&nbsp;100), `pH` (&nbsp;x&nbsp;10), `har`-dureza del agua (mg/l de calcio), `pho`-fostados (mg/l&nbsp;x&nbsp;100), `nit`-nitratos, `amm`-amoníaco (mg/l&nbsp;x&nbsp;100), `oxy`-oxígeno disuelto (mg/l&nbsp;x&nbsp;100), `bdo`-demanda biológica de oxígeno (mg/l&nbsp;x&nbsp;10)
-
-La tabla `doubs$fish`, asociada a la anterior, contiene la abundancia de especies por sitio. Los valores de las celdas no son individuos; la abundancia está representada en una escala semi-cuantitativa específica por especie, que va de 0 a 5, es decir, se trata de una escala de pseudo-abundancia más propiamente. Por lo tanto, los valores no pueden entenderse como estimadores insesgados de la abundancia real o de la biomasa por sitio [@borcard2018numerical].
-
-
-```{r}
-set.seed(99)
-doubs$fish[sample(1:30, 6), sample(1:27, 6)] #Sólo 6 filas y columnas mostradas, elegidas al azar
-```
-
-Determinados gráficos de ordenación se vuelven ilegibles cuando se usan los nombres completos de las especies. Por tal razón, es práctica común abreviarlos, tal como verás en los nombres de columnas, donde se usan abreviaturas de cuatro caracteres. La correspondencia entre estas abreviaturas y los nombres completos de las especies, se encuentra explicada en la tabla `doubs$species`.
-
-```{r}
-doubs$species
-```
-
-Las cuatro columnas corresponden a: `Scientific`-nombre científico, `French` y `English`-nombres comunes en francés y en inglés, `code` códigos de cuatro caracteres usados como nombres de columnas en la tabla `doubs$fish`.
-
-### El conjunto de datos `BCI`
-
-`BCI` es una matriz de comunidad, muy popular en ecología, porque se utiliza como conjunto de datos modelo en el paquete `vegan`, muy usado en ecología [@oksanen2013package]. `BCI` contiene conteos (abundancias reales) de árboles de al menos 10 cm de diámetro a la altura de pecho (DAP o *DBH*) registrados en 50 parcelas (filas de la matriz) de 1 hectárea cada una, para un total de 225 especies (columnas de la matriz). Los nombres científicos se muestran íntegramente, aunque el espacio separador entre género y especie es sustituido por un `.`. A continuación se muestra una selección aleatoria de 6 parcelas y 3 especies de la matriz de comunidad.
-
-```{r, message=FALSE}
-library(vegan)
-data(BCI)
-set.seed(10)
-BCI[sample(1:50, 6), sample(1:225, 3)] #Sólo 6 filas y 3 columnas mostradas, elegidas al azar
-```
-
-En el mismo paquete se encuentra también la matriz ambiental `BCI.env`, asociada a la anterior. `BCI.env` es un `data.frame` de 50 parcelas (filas) y nueve variables de sitio (columnas) descritas a continuación. `UTM.EW` y `UTM.NS`-coordenadas UTM de falso Este y falso Norte (zona 17N), `Precipitation`-precipitación en mm por año, `Elevation`-elevación en metros sobre el nivel del mar, `Age.cat`-categoría de edad del bosque, `Geology`-formación geológica subyacente, `Habitat`-tipo hábitat dominante predominante, `Stream`-"*Yes*" si hay un hábitat de ribera fluvial en la parcela, `EnvHet`-heterogeneidad ambiental evaluada por medio de la diversidad de frecuencia de tipos de hábitat de Simpson en 25 celdas de cuadrícula dentro de la parcela. Puedes consultar información detallada sobre cada variable en @harms2001habitat.
-
-```{r}
-data(BCI.env)
-set.seed(11)
-BCI.env[sample(1:50, 6), ] #Sólo 6 filas mostradas, elegidas al azar
-```
-
-### El conjunto de datos `mite`
-
-`mite` es un conjunto de tres `data.frame` sobre ácaros oribatidos y sus variables ambientales, colectados en 70 sitios mediante núcleos de suelo en una parcela de 2.5&nbsp;x&nbsp;10&nbsp;m, los cuales fueron publicados en dos trabajos [@borcard1992partialling; @borcard1994environmental]. Al igual que los anteriores, este conjunto de datos se carga a través del paquete `vegan`. El primero, `mite` propiamente, contiene la matriz de comunidad con los datos de abundancia de 35 especies (columnas) de ácaros oribátidos para cada uno de los 70 sitios (filas).
-
-```{r}
-data(mite)
-set.seed(40)
-mite[sample(1:70, 6), sample(1:35, 6)] #Sólo 6 filas y 6 columnas mostradas, elegidas al azar
-```
-
-`mite.env` contiene datos ambientales de los sitios de colecta, que incluye `SubsDens`-densidad del sustrato (g/L); `WatrCont`-contenido de agua del substrato (g/L); `Substrate`-tipo de substrato, pudiendo tomar los valores `Sphagn1`, `Sphagn2`, `Sphagn3`, `Sphagn`, `Litter`, `Barepeat` e `Interface`; `Shrub`-que indica la densidad de arbustos, pudieno tomar tres posibles niveles `None` (ninguno), `Few` (pocos) o `Many` (muchos); finalmente la variable `Topo`-que puede tomar los valores `Blanket` y `Hummock`.
-
-```{r}
-data(mite.env)
-set.seed(30)
-mite.env[sample(1:70,6),] #Sólo 6 filas mostradas, elegidas al azar
-```
-
-Finalmente, `mite.xy` contiene las coordenadas (con origen arbitrario) de los 70 sitios.
-
-```{r}
-data(mite.xy)
-set.seed(50)
-mite.xy[sample(1:70,6),] #Sólo 6 filas mostradas, elegidas al azar
-```
-
-### Un **"detallito"** sobre matrices de comunidad y ambientales en R
-
-**La mayoría de los paquetes para análisis en ecología asumen que el orden de las filas de las matrices de comunidad y ambiental es consistente**. Por ejemplo, `vegan` asume que la fila `n` de las matrices de comunidad y ambiental se refiere al mismo "sitio". Es decir, la fila `n` informa por un lado del mismo sitio sobre las especies, y por otro sobre las variables ambientales. Si por accidente, o deliberadamente, las filas se reordenaran en una matriz, sin hacerlo igualmente en la otra, cualquier análisis que intente poner en relación datos composicionales con ambientales será fútil e inconsistente.
-
-Se trata de un **pequeño detalle a tener muy presente** al momento de manipular datos ecológicos. Una medida para evitar posibles errores, sería crear columnas de nombres de sitios a partir de los nombres de filas en ambas matrices, justo después de cargarlas. Si se perdiera la integridad entre ambas siempre se podrían hacer uniones a partir de dichas columnas.
-
-### Una pequeña parada para explicar cómo filtrar
-
-Habrás notado en las sentencias anteriores que utilicé una combinación de funciones (`set.seed` y `sample`) y el operador `[`. Aunque con la colección `tidyverse` verás una sintaxis más "fluida" para filtrar `data.frame`, en este apartado lo haré usando los operadores `[` y `<-`, así como las funciones `subset`, `set.seed`, `sample` y `nrow`, todas del paquete `base`.
-
-Supón que el tali te pide que separes, de la matriz de comunidad `BCI`, un subconjunto aleatorio de 15 muestras (cada muestra es una fila). Primero crearé un objeto que contenga el número de filas de `BCI` y, posteriormente, de ese número total pediré que tome una muestra de 15 números.
-
-El primer paso, crear el objeto con el número de filas de `BCI`, lo realizo con la función `nrow` (*number of rows*), asignando su resultado a un nuevo objeto, que denomino `nfbci`. Fíjate que, para crear dicho objeto es necesario incluir el operador de asignación (`<-`); míralo como una flecha, hacia donde apunta es el nombre del objeto nuevo que deseo crear (`nfbci`), mientras que el lado contrario contiene el valor que asumirá dicho objeto, `nrow(BCI)`. Cuando el objeto `nfbci` es impreso en pantalla devuelve el valor 50, que es el número de filas de `BCI`.
-
-Bien, ahora que tenemos el número de filas de `BCI`, hay que seleccionar 15 números aleatorios entre el 1 y el 50. El objeto `quincefilas` toma el valor del resultado de la función `sample(1:nfbci, 15)`. Los argumentos de esta función se explican así: el primer argumento es `1:nfbci`, que devuelve un vector de 50 números, del 1 al 50, en orden secuencial. El segundo argumento de la función es el número de valores a seleccionar del vector, que en este caso es 15. Así, `quincefilas` es un vector de 15 elementos, cuyos valores se encuentran entre 1 y 50.
-
->Nota. La función `set.seed` sirve para garantizar que este ejemplo sea reproducible, porque fija una "semilla" (forma de colectar datos en el generador de números aleatorios). El número dentro de dicha función es arbitrario. Así, con independencia de las veces que ejeuctes este ejemplo, `set.seed` garantizará que siempre se elijan los mismo 15 números. Prueba excluyendo la función, y notarás que en cada corrida obtienes conjuntos diferentes de 15 números diferentes.
-
-Finalmente, introducimos el vector `quincefilas` dentro de los corchetes luego de `BCI` y lo asignamos a `miBCI`. Veamos dicha línea descompuesta en partes. Denominemos `x` a un `data.frame`. Podemos filtrar a `x` mediante índices de extracción de filas `i` y columnas `j`, de la siguiente manera: `x[i,j]`. Como ves, el índice de filas corresponde a la primera parte dentro de los corchetes, y el índice de columnas a la segunda. Así, si necesito la fila 1 de `x`, con todas sus columnas, sólo escribo `x[1,]`; si sólo necesito la fila 1 columna 1 ejecuto `x[1,1]`. En el caso que nos ocupa abajo, `BCI` es el `data.frame`, y el índice de filas es el objeto `quincefilas`. Dado que no especifico columnas, las devuelve todas. Así, el nuevo `miBCI` es un subconjunto de `BCI`, con quince filas elegidas aleatoriamente. Nota que al asignar no se especifican columnas, pero al imprimir sí especifico columnas (`miBCI[,1:3]`), concretamente las tres primeras, para así evitar desbordar el documento. A continuación te explico cómo explorar la estructura básica de la matriz de comunidad.
-
-```{r}
-nfbci <- nrow(BCI)
-nfbci
-set.seed(300)
-quincefilas <- sample(1:nfbci, 15)
-quincefilas
-miBCI <- BCI[quincefilas,]
-miBCI[,1:3]
-```
-
-### Básicos de una matriz de comunidad
-
-Una de las primeras tareas en el EDA consiste en saber cuántos sitios y cuántas especies tiene nuestra muestra. Veamos todas las matrices comunidad,  compáremoslas. El número de sitios es equivalente al número de filas, por lo que se puede determinar con la siguiente sentencia:
-
->Nota. Recuerda que la matriz de comunidad del conjunto de datos `doubs` es un `data.frame` dentro de una lista, y se obtiene por medio de `doubs$fish`.
-
-```{r}
-nrow(doubs$fish)
-```
-
-El número de especies por sitio se cuenta con la función `specnumber` del paquete `vegan`. La función sólo cuenta aquellas columnas que no tengan ceros.
-
-```{r}
-specnumber(doubs$fish)
-```
-
-Nota que la parte superior del resultado es el nombre del sitio, y la inferior es el número de especies. Por ejemplo, el sitio 1 tiene 1 especie, el 2 tiene 3, el 3 tiene 4, el 4 tiene 8, ..., el 30 tiene 21.
-
-Notarás que los sitios están ordenados según el orden secuencial de filas, y por ello no vemos claramente cuál sitio tiene mayor riqueza y cuál tiene la menor. Mejor ordenamos el resultado...
-
-```{r}
-sort(specnumber(doubs$fish))
-```
-
-...y nos damos cuenta rápidamente que el sitio 29 es el de mayor riqueza numérica, y que en el sitio 8 no se registró ninguna especie. Si aplicamos estas mismas sentencias a los demás conjntos de datos veremos resultados interesantes.
-
-```{r}
-#BCI
-nrow(BCI)
-sort(specnumber(BCI))
-
-#mite
-nrow(mite)
-sort(specnumber(mite))
-```
-
-Un resultado que también debe salir del EDA es la riqueza de la toda la muestra. Para ello necesitamos que `vegan` vea nuestra matriz de forma combinada (*pooled*), lo cual haremos con la función `colSums`. Así, generamos un vector que contiene las sumas de individuos por especie (en el caso del conjunto `doubs` no, por tratarse de una matriz de escala semi-cuantitativa). A dicha matriz le podemos calcular su riqueza numérica con `specnumber`.
-
-```{r}
-# doubs
-doubs_comb <- colSums(doubs$fish)
-doubs_comb
-specnumber(doubs_comb)
-
-# BCI
-BCI_comb <- colSums(BCI)
-BCI_comb[1:20] #Dado que son tantas especies, imprimo sólo las primeras 20
-specnumber(BCI_comb)
-
-# mite
-mite_comb <- colSums(mite)
-mite_comb
-specnumber(mite_comb)
-```
-
-### Diagrama de dispersión
-
-Lee sobre el [diagrama de dispersión](https://es.wikipedia.org/wiki/Diagrama_de_dispersi%C3%B3n). Si observas detenidamente las variables `dfs` y `flo` de la [tabla `doubs$env`](#doubs), quizá no detectes a golpe de vista que existe correlación entre ambas; es precisamente en este punto donde los gráficos te pueden ayudar.
-
-```{r, message=FALSE}
+```{r, warning=F, message=F}
+library(sf)
+library(raster)
+library(rgdal)
 library(tidyverse)
+library(readxl)
+library(tmap)
 ```
 
->**Nota**. Si no realizas tu asignación en el servidor RStudio habilitado por el profesor, debes asegurarte de instalar la colección `tidyverse` (`install.packages(tidyverse, dependencies=T)`).
+Brevemente, con `sf` crearás y manipularás *simple features*, `raster` te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal` tendrás varias funciones *wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una colección de paquetes para manipular, limpiar y organizar datos de `data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap` crearás mapas y los personalizarás. Busca más información sobre estos paquetes, y comprobarás las múltiples capacidades de R para manipular información espacial.
 
-El gráfico de dispersión a continuación muestra que existe  correlación positiva entre las variables seleccionadas.
+El siguiente bloque de código carga las regiones del país según la división de 2010, a partir de un archivo GeoPackage, originalmente *shapefiles* de la @one2015datos. Además de las regiones, este GPKG contiene dos capas adicionales, provincias y municipios, que cargaremos más adelante.
 
-```{r intro-doubscatter}
-ggplot(data = doubs$env) +
-  geom_point(mapping = aes(x = dfs, y = flo))
+```{r regiones}
+reg.sf <- st_read(dsn = 'divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
+plot(reg.sf)
 ```
 
-Lógicamente, como es de esperar, a mayor distancia de la cabecera, mayor el caudal. Destacan también dos observaciones atípicas en el extremo superior derecho del gráfico, que corresponden a dos puntos de colecta que obtuvieron valores de flujo muy altos. Volveré sobre estos valores extremos (*outliers*) maś adelante.
+La función `st_read` lee la capa correspondiente del GPKG y la convierte a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los analizaremos más adelante; por lo pronto, intentemo probemos algunas visualizaciones más. Las regiones fueron coloreadas en función de los campos `REG` y `TOPONIMIA`, pero podemos crear un campo de área y aplicar estilos en función de éste.
 
-`ggplot` crea el sistema de coordenadas a partir del objeto introducido en el argumento `data`, es decir, a partir del conjunto de datos (`ggplot` convierte este objeto a un `data.frame` si al entrar en la función aún no lo es). Por lo tanto, si ejecutaras `ggplot(data = dfs_flo)` obtendrás un gráfico vacío.
 
-A partir de este punto, se pueden añadir una o más capas. En este caso, se añadió una de puntos mediante `geom_point`. Las capas usan el argumento `mapping` para definir la posición y el rol de cada variable en el gráfico. Por lo tanto, los elementos básicos son crear el sistema de coordenadas (`ggplot`), especificar los datos, crear una capa (e.g. `geom_point`) y decclarar cómo se posicionarán las variables. [Aquí](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) tienes una guía de referencia sobre las capas más comunes.
-
-Puedes editar la forma y el tamaño de todos los elementos del gráfico: rótulos, simbología, cuadrícula, ejes, etc. Existen múltiples argumentos disponibles para gráficos estéticos, que encontrarás en guías de `ggplot2` en línea, como [ésta](https://www.rdocumentation.org/packages/ggplot2/versions/3.2.1) y [esta](https://swcarpentry.github.io/r-novice-gapminder-es/08-plot-ggplot2/index.html). También puedes ver [esta galería](http://www.ggplot2-exts.org/gallery/) para conocer distintas formas de visualizar datos. Puedes también consultar @wickham2016ggplot2, un material de contenido exhaustivo y de referencia, donde verás las distintas capas y configuraciones estéticas.
-
-Mostraré los puntos en función de su condición de *outliers*, utilizando distintos colores y formas. No prestes mucha atención a la primera línea de código, sino al gráfico resultante
-
-```{r, fig.keep='none'}
-flo_outlier <- ifelse(
-  doubs$env$flo %in% invisible(boxplot(doubs$env$flo)$out),
-  'outlier', 'no outlier')
+```{r regiones2}
+reg.sf$area <- st_area(reg.sf)
+plot(reg.sf['area'])
 ```
 
-```{r intro-doubscatter-out}
-ggplot(data = doubs$env) +
-  geom_point(mapping = aes(x = dfs, y = flo, colour = flo_outlier))
-ggplot(data = doubs$env) +
-  geom_point(mapping = aes(x = dfs, y = flo, size = flo_outlier))
-ggplot(data = doubs$env) +
-  geom_point(mapping = aes(x = dfs, y = flo, shape = flo_outlier))
+Veremos otras formas de diseñar mapas estilizados. Veamos también la capa de municipios contenida en el GPKG.
+
+```{r municipios}
+mun.sf <- st_read(dsn = 'divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
+plot(mun.sf)
+mun.sf <- st_as_sf(mun.sp)
+plot(mun.sf)
+mun.sf$area <- st_area(mun.sf)
+plot(mun.sf['area'])
+nrow(mun.sf)
+
+
+pop.mun <- read_xls('pop_adm3.xls')
+pop.mun
+nrow(pop.mun)
+pop.mun <- pop.mun %>%
+  mutate(ENLACE = ifelse(
+    nchar(Code)==5,
+    paste0('0', Code),
+    Code)
+  )
+match(mun.sf$ENLACE, pop.mun$ENLACE)
+
+mun.sf.sex <- mun.sf %>% 
+  inner_join(pop.mun) %>% 
+  select(Hombres, Mujeres, TOPONIMIA) %>% 
+  mutate(Total=Hombres+Mujeres)
+plot(mun.sf.sex, breaks = 'jenks')
+pop.mun.hom <- plot(mun.sf.sex['Hombres'], breaks = 'jenks')
+
+dev.new()
+mun.sf.sex %>%
+  select(-TOPONIMIA) %>% 
+  gather(variable, value, -geometry) %>%
+  ggplot(aes(fill=value)) +
+  geom_sf() +
+  facet_wrap(~variable)
+
+p1 <- tm_shape(mun.sf.sex) +
+  tm_fill(col = "Hombres", style = 'jenks') +
+  tm_borders()
+p2 <- tm_shape(mun.sf.sex) +
+  tm_fill(col = "Mujeres", style = 'jenks') +
+  tm_borders()
+p3 <- tm_shape(mun.sf.sex) +
+  tm_fill(col = "Total", style = 'jenks') +
+  tm_borders()
+tmap_arrange(p1, p2, p3)
+
+p1text <- tm_shape(mun.sf.sex) +
+  tm_fill(col = "Hombres", style = 'jenks') +
+  tm_borders() +
+  tm_text('TOPONIMIA', size = 0.4)
+tmap_arrange(p1text)
 ```
 
-El estético `size` admite variables cuantitativas. El gráfico a continuación nos informa con bastante propiedad sobre una combinación de variables, usando la elevación como estético de tamaño y dureza del dureza del agua como color. Nótese, por ejemplo, que la elevación y están inversamente relacionados, a menor elevación (círculos más pequeños) mayor dureza (rellenos más azules).
 
-```{r intro-doubscatter-comb}
-ggplot(data = doubs$env) +
-  geom_point(mapping = aes(x = dfs, y = flo, size = alt, colour = har))
-```
-
-Aunque no son muy informativos sin barras de error, los diagramas de barras pueden ser útiles en determinados contextos. Utilizaré la escala semi-cuantitativa de abundancia (pseudo-abundancia) para responder a la pregunta: ¿Cuál es el nivel de pseudo-abundancia predominante de `Salmo trutta fario` en la muestra?
-
-```{r intro-doubsbarplot}
-ggplot(data = doubs$fish) + geom_bar(mapping = aes(x=Satr))
-```
-
-Este gráfico "informa" que el nivel de de pseudo-abundancia más común es 0, es decir, la subespecie está ausente en 13 de los 30 sitios, con lo que es más común no encontrarla. Si ordenásemos las pseudo-abundancias de `Satr` de menor a mayor, podríamos igualmente notar este patrón, lo cual sugiere que el gráfico no aporta mucho más que lo que lo haría un vector ordenado.
-
-```{r}
-sort(doubs$fish[,2])
-```
-
-Fíjate en este otro gráfico de barras usando el conjunto de datos `BCI`. El argumento `fill` en el segundo gráfico rellena las barras de manera que se pueden diferencias los distintos hábitat con mayor facilidad. Es posible configurar los colores en cada caso con la funcipon `scale_fill_discrete`
-
-```{r intro-bcibarplot}
-ggplot(data = BCI.env) +  geom_bar(mapping = aes(x = Habitat))
-
-ggplot(data = BCI.env) +
-  geom_bar(mapping = aes(x = Habitat, fill = Habitat))
-```
-
-Nota que hay dos hábitats escasamente representados, que son *Swamp* y *Young*. El EDA está informando que, en determinados análisis, estos grupos no aportarían efectos sistemáticos o, en su defecto, harían que determinados supuestos no se cumplieran. No entraré en detalles del filtro que apliqué a los datos para excluir ambos grupos (más adelante verás cómo usar `tidyverse` para filtrar datos y otras tareas), así que ignora la parte "fea" del código y fíjate en el gráfico. 
-
-```{r intro-bcibarplot2}
-grupos_numerosos <- droplevels(
-  BCI.env[!BCI.env$Habitat %in% c('Swamp', 'Young'), ]
-)
-ggplot(data = grupos_numerosos) +
-  geom_bar(mapping = aes(x = Habitat, fill = Habitat))
-```
-
-Para variables cuantitativas, el diagrama de cajas, mejor conocido como *boxplot*, es sin duda un apoyo fundamental. Te recomiendo la [entrada de Wikipedia](https://es.wikipedia.org/wiki/Diagrama_de_caja) sobre este útil gráfico. A golpe de vista, verás a continuación la variable "heterogeneidad ambiental" según hábitats, utilizando el objeto `grupos_numerosos` creado en el trozo de código anterior (excluye los hábitats poco representados).
-
-```{r intro-bciboxplots}
-ggplot(data = grupos_numerosos) +
-  geom_boxplot(mapping = aes(x = Habitat, y = EnvHet, fill = Habitat))
-```
-
-¿Qué patrón percibes? Compara la heterogeneidad ambiental en los bosques viejos sobre vertiente (`OldSlope`) con la de los demás hábitats. ¿Qué diferencias notas?
-
-El histograma es otra herramienta gráfica utilizada en el EDA. Nos informa sobre las características de la distribución (sesgo, varianza, etc.) de la muestra respecto de una variable cuantativa. Te recomiendo que estudies sobre los conceptos y la interpretación del histograma, comenzando si lo deseas por [Wikipedia](https://es.wikipedia.org/wiki/Histograma), pero no olvides utilizar referencias sobre su uso en ecología [@borcard2018numerical]. El siguiente histograma muestra la distribución de dos variables ambientales del conjunto de datos `mite`. El primero muestra la densidad de substrato, el segundo el contenido de agua.
-
-```{r intro-mitehist1}
-ggplot(data = mite.env) +
-  geom_histogram(mapping = aes(x = SubsDens))
-
-ggplot(data = mite.env) +
-  geom_histogram(mapping = aes(x = WatrCont))
-```
-
-El gráfico es informativo, y de hecho se observan patrones, pero las barras están separadas; mientras más pequeña es la muestra, peor se verá el resultado. Antes de interpretarlo es preferible corregirlo. Para ello, se podría usar el consejo que aparece en la advertencia devuelta por la consola (elegir una anchura de intervalo mejor), aunque por simplicidad es reduciré el número de intervalos. Los gráficos siguientes muestran un mejor resultado:
-
-```{r intro-mitehist2}
-ggplot(data = mite.env) +
-  geom_histogram(mapping = aes(x = SubsDens), bins = 15)
-
-ggplot(data = mite.env) +
-  geom_histogram(mapping = aes(x = WatrCont), bins = 15)
-```
-
-El resultado es más legible ahora. En ambos casos podemos ver que existe un sesgo a la derecha (o positivo), más acentuado en la variable `SubsDens` que en `WatrCont`. Esto significa que la media probablemente está a la derecha del intervalo modal, es decir, los valores extremos "tiran" de ella hacia la derecha, un hecho evidente especialmente en el histograma de la densidad de substrato. Notarás igualmente que el histograma de la variable `WatrCont` se aproxima más a una forma acampanada, mientras que el histograma de `SubsDens` está un poco más alejado de dicha forma. En ecología, la mayoría de los datos no muestran distribución normal, por lo que las técnicas de estadística paramétrica en muchos casos son inútiles [@borcard2018numerical]. El histograma es el primer paso para descubrir este fenómeno, y es sin duda de gran ayuda para elegir apropiadamente las técnicas a utilizar. A modo de referencia, incluyo a continuación un histograma con forma acampanada de una muestra ficticia de 5000 elementos construida a partir de desviaciones aleatorias usando la distribución normal.
-
-```{r intro-campana}
-set.seed(500)
-alenorm <- data.frame(alenorm = rnorm(5000))
-ggplot(data = alenorm) +
-  geom_histogram(mapping = aes(x = alenorm), bins = 50)
-```
-
-Finalmente, introduzco a continuación los gráficos de facetas o paneles, una herramienta muy potente de `ggplot2`. Para ello, utilizaré el conjunto de datos `mite`. Supón que necesitas mostrar el comportamiento de una variable en un único panel, para tener una idea rápida de tu muestra  (también se pueden hacer paneles de muchas variables, previa reorganización de los datos con `tidyr`, pero eso lo veremos más adelante). La función `facet_grid` es tu aliada. Supongamos que necesitamos ver diagramas de dispersión de la densidad de substrato y el contenido de agua para cada uno de los subconjuntos de muestra según densidad de arbustos (recordemos que existen tres tipos de densidades de arbustos: `None<Few<Many`). Esto podría ser útil para evaluar si existe algún grado de asociación diferente entre los distintos subconjuntos. Veamos el gráfico
-
-```{r intro-facet}
-ggplot(mite.env) +
-  geom_point(aes(x = SubsDens, y = WatrCont)) +
-  facet_wrap(~Shrub)
-```
-
-El panel está mostrando que existe correlación entre las variables densidad de substrato y contenido de agua para los subconjuntos de sitios donde hay pocos o nulos arbustos. En los sitios donde hay muchos arbustos, la correlación se difumina ligeramente, porque aparecen valores atípicos que habría que tratar de manera especial.
-
-### BONUS: panel de correlaciones
-
-El paquete `ez`, apoyándose en `ggplot2`, construye gráficos de dispersión, gráficos de densidad e imprime a su vez el valor del coeficiente `r`. Muy útil cuando se quiere explorar muchas variables al mismo tiempo. Fíjate en este útil panel de correlaciones usando el conjunto `doubs`.
-
-```{r intro-doubsezscatter}
-library(ez)
-ezCor(
-  doubs$env,
-  r_size_lims = c(3,6),
-  label_size = 5
-)
-```
-
->**Nota**. la función `ezCor` sólo admite `data.frame` de columnas numéricas.
 
 ## Conclusión
 
