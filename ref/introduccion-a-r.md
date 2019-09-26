@@ -25,6 +25,7 @@ reproducibilidad.
 
 </figure>
 
+Diferencias en énfasis entre software SIG con interfaz gráfico y R.
 Fuente: Lovelace, Nowosad, & Muenchow (2019)
 
 ## Introducción a R
@@ -226,10 +227,10 @@ plot(reg.sf)
 
 La función `st_read` lee la capa correspondiente del GPKG y la convierte
 a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los
-analizaremos más adelante; por lo pronto, intentemo probemos algunas
+analizaremos más adelante; por lo pronto, probemos algunas
 visualizaciones más. Las regiones fueron coloreadas en función de los
-campos `REG` y `TOPONIMIA`, pero podemos crear un campo de área y
-aplicar estilos en función de éste.
+campos `REG` y `TOPONIMIA`, pero se puede crear un campo de área
+(simple, en m<sup>2</sup>) y aplicar estilos al mapa en función de éste.
 
 ``` r
 reg.sf$area <- st_area(reg.sf)
@@ -262,6 +263,23 @@ plot(mun.sf['area'])
 nrow(mun.sf)
 ## [1] 155
 ```
+
+Veamos cuestiones básicas sobre el formato usado. *Simple features* es
+un estándar abierto y jerárquico del Open Geospatial Consortium
+(organización sin ánimo de lucro que agrupa a entidades públicas y
+privadas comprometida con la creación de estándares abiertos). *Simple
+features* representa al menos 17 tipos de geometría, de las que 7 son
+ampliamente usadas en análisis espacial (ver figura a continuación).
+Este estándar es manejado en R con el paquete `sf` (Pebesma, 2018).
+
+<figure>
+
+<img src="../img/tipos_geometria_sf.png">
+
+</figure>
+
+Tipos de *simple features* admitidos por el paquete `sf`. Fuente:
+Lovelace et al. (2019)
 
 ``` r
 pop.mun <- read_xls('pop_adm3.xls')
@@ -352,6 +370,14 @@ R*. CRC Press.
 Oficina Nacional de Estadística (ONE). (2015). *Datos
 georreferenciados*.
 <https://www.one.gob.do/informaciones-cartograficas/shapefiles>.
+
+</div>
+
+<div id="ref-pebesma2018simple">
+
+Pebesma, E. (2018). Simple Features for R: Standardized Support for
+Spatial Vector Data. *The R Journal*, *10*(1), 439–446.
+<https://doi.org/10.32614/RJ-2018-009>
 
 </div>
 

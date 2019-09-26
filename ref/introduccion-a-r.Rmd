@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 **En detalle**: R cuenta con un "ecosistema" de paquetes para análisis de datos espaciales [muy nutrido](https://cran.r-project.org/web/views/Spatial.html), dispone de una amplia gama de paquetes para análisis estadísticos avanzados, cuenta con [múltiples herramientas de visualización potentes y versátiles](https://www.r-graph-gallery.com/), dispone de un entorno de desarrollo integrado (IDE) orientado a la reproducibilidad y el control de versiones (e.g. [RStudio](https://rstudio.com/)) Y ES LIBRE. Los programas basados en interfaz gráfico difícilmente garantizan reproducibilidad.
 
 <figure><img src="../img/diferencias_en_enfasis_software.png"></figure>
-Fuente: @lovelace2019geocomputation
+Diferencias en énfasis entre software SIG con interfaz gráfico y R. Fuente: @lovelace2019geocomputation
 
 
 ## Introducción a R
@@ -111,7 +111,7 @@ reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = 
 plot(reg.sf)
 ```
 
-La función `st_read` lee la capa correspondiente del GPKG y la convierte a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los analizaremos más adelante; por lo pronto, intentemo probemos algunas visualizaciones más. Las regiones fueron coloreadas en función de los campos `REG` y `TOPONIMIA`, pero podemos crear un campo de área y aplicar estilos en función de éste.
+La función `st_read` lee la capa correspondiente del GPKG y la convierte a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los analizaremos más adelante; por lo pronto, probemos algunas visualizaciones más. Las regiones fueron coloreadas en función de los campos `REG` y `TOPONIMIA`, pero se puede crear un campo de área (simple, en m<sup>2</sup>) y aplicar estilos al mapa en función de éste.
 
 
 ```{r regiones2}
@@ -131,6 +131,10 @@ plot(mun.sf['area'])
 nrow(mun.sf)
 ```
 
+Veamos cuestiones básicas sobre el formato usado. *Simple features* es un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con la creación de estándares abiertos). *Simple features* representa al menos 17 tipos de geometría, de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación). Este estándar es manejado en R con el paquete `sf` [@pebesma2018simple].
+
+<figure><img src="../img/tipos_geometria_sf.png"></figure>
+Tipos de *simple features* admitidos por el paquete `sf`. Fuente: @lovelace2019geocomputation
 
 
 ```{r, eval=F}
