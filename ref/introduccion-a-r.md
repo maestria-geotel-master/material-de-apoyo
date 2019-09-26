@@ -270,7 +270,7 @@ un estándar abierto y jerárquico del Open Geospatial Consortium
 privadas comprometida con la creación de estándares abiertos). *Simple
 features* representa al menos 17 tipos de geometría, de las que 7 son
 ampliamente usadas en análisis espacial (ver figura a continuación).
-Este estándar es manejado en R con el paquete `sf` (Pebesma, 2018).
+Este estándar se integra en R con el paquete `sf` (Pebesma, 2018).
 
 <figure>
 

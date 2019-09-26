@@ -131,7 +131,7 @@ plot(mun.sf['area'])
 nrow(mun.sf)
 ```
 
-Veamos cuestiones básicas sobre el formato usado. *Simple features* es un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con la creación de estándares abiertos). *Simple features* representa al menos 17 tipos de geometría, de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación). Este estándar es manejado en R con el paquete `sf` [@pebesma2018simple].
+Veamos cuestiones básicas sobre el formato usado. *Simple features* es un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con la creación de estándares abiertos). *Simple features* representa al menos 17 tipos de geometría, de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación). Este estándar se integra en R con el paquete `sf` [@pebesma2018simple].
 
 <figure><img src="../img/tipos_geometria_sf.png"></figure>
 Tipos de *simple features* admitidos por el paquete `sf`. Fuente: @lovelace2019geocomputation
