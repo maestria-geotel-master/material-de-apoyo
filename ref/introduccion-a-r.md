@@ -25,7 +25,6 @@ reproducibilidad.
 
 </figure>
 
-  
 Fuente: Lovelace, Nowosad, & Muenchow (2019)
 
 ## Introducción a R

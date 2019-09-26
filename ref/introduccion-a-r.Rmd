@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
 **En detalle**: R cuenta con un "ecosistema" de paquetes para análisis de datos espaciales [muy nutrido](https://cran.r-project.org/web/views/Spatial.html), dispone de una amplia gama de paquetes para análisis estadísticos avanzados, cuenta con [múltiples herramientas de visualización potentes y versátiles](https://www.r-graph-gallery.com/), dispone de un entorno de desarrollo integrado (IDE) orientado a la reproducibilidad y el control de versiones (e.g. [RStudio](https://rstudio.com/)) Y ES LIBRE. Los programas basados en interfaz gráfico difícilmente garantizan reproducibilidad.
 
-<figure><img src="../img/diferencias_en_enfasis_software.png"></figure>\
+<figure><img src="../img/diferencias_en_enfasis_software.png"></figure>
 Fuente: @lovelace2019geocomputation
 
 
