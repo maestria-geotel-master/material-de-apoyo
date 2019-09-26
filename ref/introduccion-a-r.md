@@ -1,7 +1,32 @@
 
 <!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
 
-# Introducción a R y análisis exploratorio de datos (EDA)
+# Introducción a R y análisis exploratorio de datos espaciales (ESDA)
+
+## ¿Por qué R?
+
+**En corto**: R cuenta con múltiples herramientas de análisis espacial y
+geoestadística para crear flujos de trabajo reproducibles.
+
+**En detalle**: R cuenta con un “ecosistema” de paquetes para análisis
+de datos espaciales [muy
+nutrido](https://cran.r-project.org/web/views/Spatial.html), dispone de
+una amplia gama de paquetes para análisis estadísticos avanzados, cuenta
+con [múltiples herramientas de visualización potentes y
+versátiles](https://www.r-graph-gallery.com/), dispone de un entorno de
+desarrollo integrado (IDE) orientado a la reproducibilidad y el control
+de versiones (e.g. [RStudio](https://rstudio.com/)) Y ES LIBRE. Los
+programas basados en interfaz gráfico difícilmente garantizan
+reproducibilidad.
+
+<figure>
+
+<img src="../img/diferencias_en_enfasis_software.png">
+
+</figure>
+
+  
+Fuente: Lovelace, Nowosad, & Muenchow (2019)
 
 ## Introducción a R
 
@@ -214,8 +239,10 @@ plot(reg.sf['area'])
 
 ![](../img/regiones2-1.png)<!-- -->
 
-Veremos otras formas de diseñar mapas estilizados. Veamos también la
-capa de municipios contenida en el
+> Este mapa es mejorable en muchos aspectos. En este mismo tutorial,
+> probarás formas de diseñar mapas estilizados.
+
+El bloque de código a continuación carga la capa de municipios desde el
 GPKG.
 
 ``` r
@@ -313,6 +340,13 @@ esta novela.
 ## Referencias
 
 <div id="refs" class="references">
+
+<div id="ref-lovelace2019geocomputation">
+
+Lovelace, R., Nowosad, J., & Muenchow, J. (2019). *Geocomputation with
+R*. CRC Press.
+
+</div>
 
 <div id="ref-one2015datos">
 
