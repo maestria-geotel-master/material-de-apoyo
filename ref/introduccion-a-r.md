@@ -127,11 +127,13 @@ servicios que manejarás.
 
 ### Instalación y ejecución de R y RStudio
 
-  - Puedes usar el servidor RStudio habilitado por el profesor. Habrás
-    recibido un correo electrónico con los detalles de acceso.
+  - Puedes usar el servidor RStudio habilitado por el profesor. Revisa
+    tu buzón de correo electrónico (también el *spam*), y localiza un
+    mensaje donde te explico los detalles de acceso.
 
-  - Si prefieres trabajar en tu propia PC, instala R y RStudio. La guía
-    de instalación varía mucho según el sistema
+  - Si prefieres trabajar en tu propia PC, instala R y RStudio, y los
+    paquetes requeridos en las asignaciones. La guía de instalación
+    varía mucho según el sistema
         operativo:
     
       - [R](https://cloud.r-project.org/)
@@ -140,19 +142,20 @@ servicios que manejarás.
   - Igualmente, la forma de ejecutar estas aplicaciones dependerá del
     sistema operativo.
     
-      - En GNU/Linux es posible ejecutar aplicaciones tanto desde el
-        gestor de ventanas como desde el intérprete de línea de órdenes
-        (CLI) o “terminal” (por ejemplo, para ejecutar R, presiona
-        `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
+      - En GNU/Linux puedes ejecutar aplicaciones tanto desde el gestor
+        de ventanas como desde el intérprete de línea de órdenes (CLI) o
+        “terminal” (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`,
+        escribe `R` y presiona `<enter>`).
       - En Windows y MacOS la ejecución se realiza desde el GUI.
 
 ### CRAN (Comprehensive R Archive Network)
 
   - [¿Qué es
     CRAN?](https://cran.r-project.org/doc/FAQ/R-FAQ.html#What-is-CRAN_003f)
-  - Instalar paquetes: Ejemplo: `install.packages('vegan', dependencies
-    = T)`. Si realizas tus asignaciones en el servidor RStudio
-    habilitado por el profesor, no necesitarás instalar paquetes.
+  - Instalar paquetes: Ejemplo: `install.packages(pkgs = 'sf',
+    dependencies = T)`. Si realizas tus asignaciones en el servidor
+    RStudio habilitado por el profesor, no necesitarás instalar
+    paquetes.
 
 ### Ayuda de R
 
@@ -162,49 +165,9 @@ library(help = 'base') #Documentación sobre un paquete
 help(lm) #Ayuda sobre una función
 ?lm #Ídem
 example(lm) #Ejemplo(s) sobre una función
-## 
-## lm> require(graphics)
-## 
-## lm> ## Annette Dobson (1990) "An Introduction to Generalized Linear Models".
-## lm> ## Page 9: Plant Weight Data.
-## lm> ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
-## 
-## lm> trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
-## 
-## lm> group <- gl(2, 10, 20, labels = c("Ctl","Trt"))
-## 
-## lm> weight <- c(ctl, trt)
-## 
-## lm> lm.D9 <- lm(weight ~ group)
-## 
-## lm> lm.D90 <- lm(weight ~ group - 1) # omitting intercept
-## 
-## lm> ## No test: 
-## lm> ##D anova(lm.D9)
-## lm> ##D summary(lm.D90)
-## lm> ## End(No test)
-## lm> opar <- par(mfrow = c(2,2), oma = c(0, 0, 1.1, 0))
-## 
-## lm> plot(lm.D9, las = 1)      # Residuals, Fitted, ...
+help.search("matrix") #Busca la palabra clave en las ayudas de los paquetes
+??matrix #Ídem
 ```
-
-![](../img/help-in-r-1.png)<!-- -->
-
-    ## 
-    ## lm> par(opar)
-    ## 
-    ## lm> ## Don't show: 
-    ## lm> ## model frame :
-    ## lm> stopifnot(identical(lm(weight ~ group, method = "model.frame"),
-    ## lm+                     model.frame(lm.D9)))
-    ## 
-    ## lm> ## End(Don't show)
-    ## lm> ### less simple examples in "See Also" above
-    ## lm> 
-    ## lm> 
-    ## lm>
-    help.search("matrix") #Busca la palabra clave en las ayudas de los paquetes
-    ??matrix #Ídem
 
 ¡Usa los foros\! Si introduces un mensaje de error de R en el buscador
 de tu preferencia (en inglés obtienes más resultados), encontrarás
@@ -212,7 +175,7 @@ varios punteros a foros con posibles soluciones.
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-Carguemos los paquetes que necesitaremos para esta breve introducción.
+Carguemos los paquetes que necesitaremos en esta introducción.
 
 ``` r
 library(sf)
@@ -235,9 +198,11 @@ información espacial.
 
 El siguiente bloque de código carga las regiones del país según la
 división de 2010, a partir de un archivo GeoPackage, originalmente
-*shapefiles* de la Oficina Nacional de Estadística (ONE) (2015). Además
-de las regiones, este GPKG contiene dos capas adicionales, provincias y
-municipios, que cargaremos más
+*shapefiles* de la Oficina Nacional de Estadística (ONE) (2015) (de la
+capa municipios, la geometría correspondiente al municipio “Guayubín”
+resultó ser no válida y fue arreglada). Además de las regiones, este
+GPKG contiene dos capas adicionales, provincias y municipios, que
+cargaremos más
 adelante.
 
 ``` r
@@ -261,8 +226,8 @@ plot(reg.sf['area'])
 
 ![](../img/regiones2-1.png)<!-- -->
 
-> Este mapa es mejorable en muchos aspectos. En este mismo tutorial,
-> probarás formas de diseñar mapas estilizados.
+> El mapa anterior es mejorable en muchos aspectos. En este mismo
+> tutorial, probarás formas de diseñar mapas estilizados.
 
 El bloque de código a continuación carga la capa de municipios desde el
 GPKG.
@@ -286,13 +251,13 @@ nrow(mun.sf)
 ## [1] 155
 ```
 
-Veamos aspectos básicos de los objetos *simple features*. Se trata de un
-estándar abierto y jerárquico del Open Geospatial Consortium
+Veamos lo básico sobre el modelo de datos *simple features*. Se trata de
+un estándar abierto y jerárquico del Open Geospatial Consortium
 (organización sin ánimo de lucro que agrupa a entidades públicas y
-privadas comprometida con este tipo de estándares). *Simple features*
-representa al menos 17 tipos de geometría (sólo admite vectoriales, para
-los rásters se usan otros modelos), de las que 7 son ampliamente usadas
-en análisis espacial (ver figura a continuación).
+privadas comprometida con este tipo de estándares). Mediante *simple
+features* se representan al menos 17 tipos de geometrías (sólo admite
+vectoriales), de las que 7 son ampliamente usadas en análisis espacial
+(ver figura a continuación).
 
 <figure>
 
@@ -302,6 +267,50 @@ en análisis espacial (ver figura a continuación).
 
 Tipos de *simple features* admitidos por el paquete `sf`. Fuente:
 Lovelace et al. (2019)
+
+Por ejemplo, exploremos el objeto `mun.sf` en la consola; basta con
+escribir su nombre para obtener un resumen que muestra el tipo de
+geometría y otras características espaciales, como el sistema de
+coordenadas de referencia (CRS). A continuación, mostrará los atributos
+de los primeros 10 objetos (explicados más adelante).
+
+``` r
+mun.sf
+## Simple feature collection with 155 features and 6 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: 182215.8 ymin: 1933512 xmax: 571429.3 ymax: 2205216
+## epsg (SRID):    32619
+## proj4string:    +proj=utm +zone=19 +datum=WGS84 +units=m +no_defs
+## First 10 features:
+##    PROV MUN REG               TOPONIMIA ENLACE
+## 1    01  01  10 SANTO DOMINGO DE GUZMÁN 100101
+## 2    02  01  05                    AZUA 050201
+## 3    02  02  05             LAS CHARCAS 050202
+## 4    02  03  05    LAS YAYAS DE VIAJAMA 050203
+## 5    02  04  05         PADRE LAS CASAS 050204
+## 6    02  05  05                 PERALTA 050205
+## 7    02  06  05            SABANA YEGUA 050206
+## 8    02  07  05            PUEBLO VIEJO 050207
+## 9    02  08  05           TÁBARA ARRIBA 050208
+## 10   02  09  05                GUAYABAL 050209
+##                              geom            area
+## 1  MULTIPOLYGON (((397122.7 20...  91517576 [m^2]
+## 2  MULTIPOLYGON (((318830.5 20... 416324302 [m^2]
+## 3  MULTIPOLYGON (((333950.3 20... 246669929 [m^2]
+## 4  MULTIPOLYGON (((288107.3 20... 431079179 [m^2]
+## 5  MULTIPOLYGON (((303931.9 21... 573880948 [m^2]
+## 6  MULTIPOLYGON (((307770.9 20... 129370697 [m^2]
+## 7  MULTIPOLYGON (((304091.3 20... 113799233 [m^2]
+## 8  MULTIPOLYGON (((314474 2040...  48117190 [m^2]
+## 9  MULTIPOLYGON (((302204.4 20... 274667489 [m^2]
+## 10 MULTIPOLYGON (((313520.7 20... 235625110 [m^2]
+```
+
+Nos informa que se trata de un `Simple feature collection with 155
+features and 6 fields` de tipo `MULTIPOLYGON` con dimensiones `XY y una
+extensión mostrada en la línea`bbox\`. Igualmente, nos indica que el CRS
+es EPSG:32619, o WGS84 UTM zona 19.
 
 El modelo de datos de los *simple features* se basa en estructuras
 similares a las que usan bases de datos espaciales, como PostGIS,
@@ -314,9 +323,10 @@ colección `tidyverse`.
 
 Los *simple features* se integran en R mediante el paquete `sf`
 (Pebesma, 2018). El paquete `sf` supera significativamente a su
-predecesor, `sp`, sobre todo porque depende de potentes paquetes, tanto
-de R como externos mantenidos por una comunidad muy amplia (como GDAL,
-GEOS y PROJ). A continuación se muestra un gráfico de las dependencias.
+predecesor, `sp` en eficiencia y facilidad de uso. Asimismo, `sf`
+depende de otros paquetes de R muy eficientes, y también de paquetes
+externos mantenidos por una comunidad muy amplia (como GDAL, GEOS y
+PROJ). A continuación se muestra un gráfico de las dependencias.
 
 <figure>
 
@@ -330,78 +340,97 @@ Pebesma & Bivand (2019)
 
 Los *simple features* se almacenan en…tablas. Sí, sí, tablas,
 denominadas `data.frames` en R, que en el caso concreto serían “tablas
-especiales” (*spatial data frames*). Por ejemplo, exploremos el objeto
-`reg.sf` mediante la función `str`, que muestra su estructura como
-`Classes 'sf' and data.frame: 10 obs. of 4 variables` (10 observaciones
-o geometrías, que en este caso son regiones dominicanas, y 4 variables o
+espaciales” (*spatial data frames*). Exploremos la estructura del objeto
+`mun.sf` mediante la función `str`, la cual lo muestra como `Classes
+'sf' and data.frame: 10 obs. of 4 variables` (155 observaciones o
+geometrías, que en este caso son municipios dominicanas, y 4 variables o
 atributos).
 
 ``` r
-str(reg.sf)
-## Classes 'sf' and 'data.frame':   10 obs. of  4 variables:
-##  $ REG      : Factor w/ 10 levels "01","02","03",..: 1 2 3 4 5 6 7 8 9 10
-##  $ TOPONIMIA: Factor w/ 10 levels "REGIÓN CIBAO NORDESTE",..: 3 4 1 2 9 6 5 10 7 8
-##  $ geom     :sfc_MULTIPOLYGON of length 10; first list element: List of 2
+str(mun.sf)
+## Classes 'sf' and 'data.frame':   155 obs. of  7 variables:
+##  $ PROV     : Factor w/ 32 levels "01","02","03",..: 1 2 2 2 2 2 2 2 2 2 ...
+##  $ MUN      : Factor w/ 11 levels "01","02","03",..: 1 1 2 3 4 5 6 7 8 9 ...
+##  $ REG      : Factor w/ 10 levels "01","02","03",..: 10 5 5 5 5 5 5 5 5 5 ...
+##  $ TOPONIMIA: Factor w/ 155 levels "ALTAMIRA","ARENOSO",..: 133 3 65 71 92 99 118 105 138 43 ...
+##  $ ENLACE   : Factor w/ 155 levels "010901","010902",..: 148 68 69 70 71 72 73 74 75 76 ...
+##  $ geom     :sfc_MULTIPOLYGON of length 155; first list element: List of 1
 ##   ..$ :List of 1
-##   .. ..$ : num [1:11, 1:2] 317783 317729 317664 317643 317687 ...
-##   ..$ :List of 2
-##   .. ..$ : num [1:14787, 1:2] 291169 291270 291348 291408 291486 ...
-##   .. ..$ : num [1:42, 1:2] 277547 277496 277444 277385 277323 ...
+##   .. ..$ : num [1:3521, 1:2] 397123 397142 397176 397202 397239 ...
 ##   ..- attr(*, "class")= chr  "XY" "MULTIPOLYGON" "sfg"
 ##  $ area     :Object of class units:
-##  num  5.45e+09 4.47e+09 4.15e+09 4.88e+09 5.56e+09 ...
+##  num  9.15e+07 4.16e+08 2.47e+08 4.31e+08 5.74e+08 ...
 ##   ..- attr(*, "units")=List of 2
 ##   .. ..$ numerator  : chr  "m" "m"
 ##   .. ..$ denominator: chr 
 ##   .. ..- attr(*, "class")= chr "symbolic_units"
 ##  - attr(*, "sf_column")= chr "geom"
-##  - attr(*, "agr")= Factor w/ 3 levels "constant","aggregate",..: NA NA NA
-##   ..- attr(*, "names")= chr  "REG" "TOPONIMIA" "area"
+##  - attr(*, "agr")= Factor w/ 3 levels "constant","aggregate",..: NA NA NA NA NA NA
+##   ..- attr(*, "names")= chr  "PROV" "MUN" "REG" "TOPONIMIA" ...
 ```
 
 Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de
 manera fluida y sin necesidad de extraer los datos a archivos externos.
 Así, por ejemplo, la función `summary`, muy empleada en R para obtener
-estadísticos descriptivos de variables en columnas, devuelve en el acto
-estadísticos de las columnas de atributos (incluida la de geometría o
-`geom`):
+estadísticos descriptivos, devuelve en el acto estadísticos de todas las
+columnas de atributos (incluida la de geometría, nombrada como `geom` en
+este caso):
 
 ``` r
-summary(reg.sf)
-##       REG                    TOPONIMIA            geom   
-##  01     :1   REGIÓN CIBAO NORDESTE:1   MULTIPOLYGON :10  
-##  02     :1   REGIÓN CIBAO NOROESTE:1   epsg:32619   : 0  
-##  03     :1   REGIÓN CIBAO NORTE   :1   +proj=utm ...: 0  
-##  04     :1   REGIÓN CIBAO SUR     :1                     
-##  05     :1   REGIÓN EL VALLE      :1                     
-##  06     :1   REGIÓN ENRIQUILLO    :1                     
-##  (Other):4   (Other)              :4                     
-##       area          
-##  Min.   :1.393e+09  
-##  1st Qu.:4.543e+09  
-##  Median :5.026e+09  
-##  Mean   :4.807e+09  
-##  3rd Qu.:5.450e+09  
-##  Max.   :6.796e+09  
-## 
+summary(mun.sf)
+##       PROV          MUN          REG              TOPONIMIA  
+##  04     : 11   01     :32   06     :24   ALTAMIRA      :  1  
+##  02     : 10   02     :31   05     :23   ARENOSO       :  1  
+##  18     :  9   03     :27   01     :22   AZUA          :  1  
+##  25     :  9   04     :19   03     :17   BAJOS DE HAINA:  1  
+##  21     :  8   05     :15   04     :17   BANÍ          :  1  
+##  06     :  7   06     :12   09     :14   BÁNICA        :  1  
+##  (Other):101   (Other):19   (Other):38   (Other)       :149  
+##      ENLACE               geom          area          
+##  010901 :  1   MULTIPOLYGON :155   Min.   :1.794e+07  
+##  010902 :  1   epsg:32619   :  0   1st Qu.:1.220e+08  
+##  010903 :  1   +proj=utm ...:  0   Median :2.117e+08  
+##  010904 :  1                       Mean   :3.101e+08  
+##  011801 :  1                       3rd Qu.:4.129e+08  
+##  011802 :  1                       Max.   :2.016e+09  
+##  (Other):149
 ```
 
-Igual se puede obtener un resumen sólo de una columna filtrando el
-objeto `sf`.
+La función `summary` actúa igualmente sobre una columna filtrada desde
+el objeto `reg.sf`, en este caso `area`.
 
 ``` r
-summary(reg.sf['area'])
-##       area                      geom   
-##  Min.   :1.393e+09   MULTIPOLYGON :10  
-##  1st Qu.:4.543e+09   epsg:32619   : 0  
-##  Median :5.026e+09   +proj=utm ...: 0  
-##  Mean   :4.807e+09                     
-##  3rd Qu.:5.450e+09                     
-##  Max.   :6.796e+09
+summary(mun.sf['area'])
+##       area                      geom    
+##  Min.   :1.794e+07   MULTIPOLYGON :155  
+##  1st Qu.:1.220e+08   epsg:32619   :  0  
+##  Median :2.117e+08   +proj=utm ...:  0  
+##  Mean   :3.101e+08                      
+##  3rd Qu.:4.129e+08                      
+##  Max.   :2.016e+09
 ```
 
 > Nota que la columna `geom` se mantiene en el resumen, puesto que
-> siempre acompaña al objeto a menos que le indiquemos lo contrario.
+> siempre acompaña al objeto a menos que le indiquemos lo contrario
+> (*sticky column*).
+
+Normalmente, los datos espaciales se crean en aplicaciones con GUI
+(e.g. como QGIS), o los obtienes de terceros. Sin embargo, para fines
+didácticos, crearemos algunos objestos conteniendo los tipos de
+geometrías más básicos. Primero, crearemos un `mun.sf.ll` en EPSG:4326
+a partir de `mun.sf`, luego crearemos un punto en coordenadas
+geográficas sobre la ciudad de Santo Domingo y finalmente los
+representaremos a ambos.
+
+``` r
+mun.sf.ll <- st_transform(mun.sf, crs = 4326)
+pt1 <- st_sfc(st_point(c(-69.9172, 18.4594)), crs = 4326) #Un punto sobre la ciudad de SD. ¿Dónde?
+tmap_options(max.categories = 155)
+tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', palette = ) +
+  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+```
+
+![](../img/munpt-1.png)<!-- -->
 
 ``` r
 pop.mun <- read_xls('pop_adm3.xls')

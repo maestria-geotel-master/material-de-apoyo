@@ -64,22 +64,22 @@ Verás a continuación algunas fuentes de referencia sobre los programas y servi
 
 ### Instalación y ejecución de R y RStudio
 
-* Puedes usar el servidor RStudio habilitado por el profesor. Habrás recibido un correo electrónico con los detalles de acceso.
+* Puedes usar el servidor RStudio habilitado por el profesor. Revisa tu buzón de correo electrónico (también el *spam*), y localiza un mensaje donde te explico los detalles de acceso.
 
-* Si prefieres trabajar en tu propia PC, instala R y RStudio. La guía de instalación varía mucho según el sistema operativo:
+* Si prefieres trabajar en tu propia PC, instala R y RStudio, y los paquetes requeridos en las asignaciones. La guía de instalación varía mucho según el sistema operativo:
     * [R](https://cloud.r-project.org/)
     * [RStudio](https://www.rstudio.com/products/rstudio/download/#download)
 * Igualmente, la forma de ejecutar estas aplicaciones dependerá del sistema operativo.
-    * En GNU/Linux es posible ejecutar aplicaciones tanto desde el gestor de ventanas como desde el intérprete de línea de órdenes (CLI) o "terminal" (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
+    * En GNU/Linux puedes ejecutar aplicaciones tanto desde el gestor de ventanas como desde el intérprete de línea de órdenes (CLI) o "terminal" (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
     * En Windows y MacOS la ejecución se realiza desde el GUI.
 
 ### CRAN (Comprehensive R Archive Network)
 * [¿Qué es CRAN?](https://cran.r-project.org/doc/FAQ/R-FAQ.html#What-is-CRAN_003f)
-* Instalar paquetes: Ejemplo: `install.packages('vegan', dependencies = T)`. Si realizas tus asignaciones en el servidor RStudio habilitado por el profesor, no necesitarás instalar paquetes.
+* Instalar paquetes: Ejemplo: `install.packages(pkgs = 'sf', dependencies = T)`. Si realizas tus asignaciones en el servidor RStudio habilitado por el profesor, no necesitarás instalar paquetes.
 
 ### Ayuda de R
 
-```{r help-in-r}
+```{r help-in-r, eval=F}
 help(package = 'base') #Ayuda sobre un paquete
 library(help = 'base') #Documentación sobre un paquete
 help(lm) #Ayuda sobre una función
@@ -93,7 +93,7 @@ help.search("matrix") #Busca la palabra clave en las ayudas de los paquetes
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-Carguemos los paquetes que necesitaremos para esta breve introducción.
+Carguemos los paquetes que necesitaremos en esta introducción.
 
 ```{r, warning=F, message=F}
 library(sf)
@@ -106,7 +106,7 @@ library(tmap)
 
 Brevemente, con `sf` crearás y manipularás *simple features* (más detalles a continuación), `raster` te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal` tendrás varias funciones *wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una colección de paquetes para manipular, limpiar y organizar datos de `data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap` crearás mapas y los personalizarás. Busca más información sobre estos paquetes, y comprobarás las múltiples capacidades de R para manipular información espacial.
 
-El siguiente bloque de código carga las regiones del país según la división de 2010, a partir de un archivo GeoPackage, originalmente *shapefiles* de la @one2015datos. Además de las regiones, este GPKG contiene dos capas adicionales, provincias y municipios, que cargaremos más adelante.
+El siguiente bloque de código carga las regiones del país según la división de 2010, a partir de un archivo GeoPackage, originalmente *shapefiles* de la @one2015datos (de la capa municipios, la geometría correspondiente al municipio "Guayubín" resultó ser no válida y fue arreglada). Además de las regiones, este GPKG contiene dos capas adicionales, provincias y municipios, que cargaremos más adelante.
 
 ```{r regiones}
 reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
@@ -116,12 +116,12 @@ plot(reg.sf)
 La función `st_read` lee la capa correspondiente del GPKG y la convierte a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los analizaremos más adelante; por lo pronto, probemos algunas visualizaciones más. Las regiones fueron coloreadas en función de los campos `REG` y `TOPONIMIA`, pero se puede crear un campo de área (simple, en m<sup>2</sup>) y aplicar estilos al mapa en función de éste.
 
 
-```{r regiones2}
+```{r regiones2, results='asis'}
 reg.sf$area <- st_area(reg.sf)
 plot(reg.sf['area'])
 ```
 
->Este mapa es mejorable en muchos aspectos. En este mismo tutorial, probarás formas de diseñar mapas estilizados.
+>El mapa anterior es mejorable en muchos aspectos. En este mismo tutorial, probarás formas de diseñar mapas estilizados.
 
 El bloque de código a continuación carga la capa de municipios desde el GPKG.
 
@@ -133,38 +133,55 @@ plot(mun.sf['area'])
 nrow(mun.sf)
 ```
 
-Veamos aspectos básicos de los objetos *simple features*. Se trata de un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con este tipo de estándares). *Simple features* representa al menos 17 tipos de geometría (sólo admite vectoriales, para los rásters se usan otros modelos), de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación).
+Veamos lo básico sobre el modelo de datos *simple features*. Se trata de un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con este tipo de estándares). Mediante *simple features* se representan al menos 17 tipos de geometrías (sólo admite vectoriales), de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación).
 
 <figure><img src="../img/tipos_geometria_sf.png"></figure>
 Tipos de *simple features* admitidos por el paquete `sf`. Fuente: @lovelace2019geocomputation
 
+Por ejemplo, exploremos el objeto `mun.sf` en la consola; basta con escribir su nombre para obtener un resumen que muestra el tipo de geometría y otras características espaciales, como el sistema de coordenadas de referencia (CRS). A continuación, mostrará los atributos de los primeros 10 objetos (explicados más adelante).
+
+```{r}
+mun.sf
+```
+
+Nos informa que se trata de un `Simple feature collection with 155 features and 6 fields` de tipo `MULTIPOLYGON` con dimensiones `XY y una extensión mostrada en la línea `bbox`. Igualmente, nos indica que el CRS es EPSG:32619, o WGS84 UTM zona 19.
+
 El modelo de datos de los *simple features* se basa en estructuras similares a las que usan bases de datos espaciales, como PostGIS, favoreciendo así la interoperabilidad. Otras ventajas que se señalan en su favor son: mejor rendimiento para lectura, escritura y representación ("ploteado") de datos espaciales, maneja objetos tipo `data.frame` (ver más abajo) y, no menos importante, las operaciones geométricas y de atributos se pueden realizar mediante tuberías (*pipelines*) de la colección `tidyverse`.
 
-Los *simple features* se integran en R mediante el paquete `sf` [@pebesma2018simple]. El paquete `sf` supera significativamente a su predecesor, `sp`, sobre todo porque depende de potentes paquetes, tanto de R como externos mantenidos por una comunidad muy amplia (como GDAL, GEOS y PROJ). A continuación se muestra un gráfico de las dependencias.
+Los *simple features* se integran en R mediante el paquete `sf` [@pebesma2018simple]. El paquete `sf` supera significativamente a su predecesor, `sp` en eficiencia y facilidad de uso. Asimismo, `sf` depende de otros paquetes de R muy eficientes, y también de paquetes externos mantenidos por una comunidad muy amplia (como GDAL, GEOS y PROJ). A continuación se muestra un gráfico de las dependencias.
 
 <figure><img src="../img/sf_y_sus_dependencias.png"></figure>
 El paquete `sf` y sus dependencias. Las flechas sólidas indican dependencia fuerte; las de trazo discontinuo, dependencia débil. Fuente: @pebesma2019spatial
 
-
-Los *simple features* se almacenan en...tablas. Sí, sí, tablas, denominadas `data.frames` en R, que en el caso concreto serían "tablas especiales" (*spatial data frames*). Por ejemplo, exploremos el objeto `reg.sf` mediante la función `str`, que muestra su estructura como `Classes 'sf' and data.frame: 10 obs. of 4 variables` (10 observaciones o geometrías, que en este caso son regiones dominicanas, y 4 variables o atributos).
-
-```{r}
-str(reg.sf)
-```
-
-Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de manera fluida y sin necesidad de extraer los datos a archivos externos. Así, por ejemplo, la función `summary`, muy empleada en R para obtener estadísticos descriptivos de variables en columnas, devuelve en el acto estadísticos de las columnas de atributos (incluida la de geometría o `geom`):
+Los *simple features* se almacenan en...tablas. Sí, sí, tablas, denominadas `data.frames` en R, que en el caso concreto serían "tablas espaciales" (*spatial data frames*). Exploremos la estructura del objeto `mun.sf` mediante la función `str`, la cual lo muestra como `Classes 'sf' and data.frame: 10 obs. of 4 variables` (155 observaciones o geometrías, que en este caso son municipios dominicanas, y 4 variables o atributos).
 
 ```{r}
-summary(reg.sf)
+str(mun.sf)
 ```
 
-Igual se puede obtener un resumen sólo de una columna filtrando el objeto `sf`.
+Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de manera fluida y sin necesidad de extraer los datos a archivos externos. Así, por ejemplo, la función `summary`, muy empleada en R para obtener estadísticos descriptivos, devuelve en el acto estadísticos de todas las columnas de atributos (incluida la de geometría, nombrada como `geom` en este caso):
 
 ```{r}
-summary(reg.sf['area'])
+summary(mun.sf)
 ```
 
->Nota que la columna `geom` se mantiene en el resumen, puesto que siempre acompaña al objeto a menos que le indiquemos lo contrario.
+La función `summary` actúa igualmente sobre una columna filtrada desde el objeto `reg.sf`, en este caso `area`.
+
+```{r}
+summary(mun.sf['area'])
+```
+
+>Nota que la columna `geom` se mantiene en el resumen, puesto que siempre acompaña al objeto a menos que le indiquemos lo contrario (*sticky column*).
+
+Normalmente, los datos espaciales se crean en aplicaciones con GUI (e.g. como QGIS), o los obtienes de terceros. Sin embargo, para fines didácticos, crearemos algunos objestos conteniendo los tipos de geometrías más básicos. Primero, crearemos un `mun.sf.ll` en EPSG:4326 a partir de `mun.sf`, luego crearemos un punto en coordenadas geográficas sobre la ciudad de Santo Domingo y finalmente los representaremos a ambos.
+
+```{r munpt}
+mun.sf.ll <- st_transform(mun.sf, crs = 4326)
+pt1 <- st_sfc(st_point(c(-69.9172, 18.4594)), crs = 4326) #Un punto sobre la ciudad de SD. ¿Dónde?
+tmap_options(max.categories = 155)
+tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', palette = ) +
+  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+```
 
 
 
