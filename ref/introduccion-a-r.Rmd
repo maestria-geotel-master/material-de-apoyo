@@ -108,7 +108,7 @@ library(tmap)
 
 Brevemente, con `sf` crearás y manipularás *simple features*, `raster` te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal` tendrás varias funciones *wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una colección de paquetes para manipular, limpiar y organizar datos de `data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap` crearás mapas y los personalizarás. Busca más información sobre estos paquetes, y comprobarás las múltiples capacidades de R para manipular información espacial.
 
-### Mi primer mapa
+### Mi primer mapa con *simple features*
 
 El siguiente bloque de código carga las regiones de República Dominicana según la división de 2010, a partir de un archivo GeoPackage que contiene 3 capas (regiones propiamente, provincias y municipios^[De la capa municipios, la geometría correspondiente al municipio "Guayubín" resultó ser no válida y fue arreglada]), originalmente *shapefiles* de la @one2015datos.
 
@@ -166,7 +166,7 @@ Los *simple features* se almacenan en...tablas. Sí, sí, tablas, denominadas `d
 str(mun.sf)
 ```
 
-Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de manera fluida y sin necesidad de extraer los datos a archivos externos. Así, por ejemplo, la función `summary`, muy empleada en R para obtener estadísticos descriptivos, devuelve en el acto estadísticos de todas las columnas de atributos (incluida la de geometría, nombrada como `geom` en este caso):
+Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de manera fluida y sin necesidad de extraer los datos a archivos externos. Así, por ejemplo, la función `summary`, muy empleada en R para obtener estadísticos descriptivos, devuelve estadísticos de todas las columnas de atributos (incluida la de geometría, nombrada como `geom` en este caso):
 
 ```{r}
 summary(mun.sf)
@@ -234,27 +234,109 @@ colec2.sfg <- st_geometrycollection(list(mpto.sfg, mlin.sfg, mpol.sfg))
 plot(colec2.sfg, col = 'red'); box()
 ```
 
-Recordemos que, hasta este punto, hemos creado elementos basados en geometrías simples (*simple feature geometries*, `sfg`). Un objeto `sfg` contiene sólo un elemento, que puede ser sencillo, multi\* o una colección. Además, aunque las `sfg` se construyen a partir de coordenadas, éstas no disponen de sistema de referencia espacial (CRS). La *simple feature column* (`sfc`), al ser una lista, permite alojar varios elementos, y al mismo tiempo admite la definición de CRS. La `sfc` es también importante porque representa la columna geométrica de un *simple feature* (`sf`), por lo que debemos reconocerla para comprender el modelo de un `sf`. Generaremos un `sfc` a partir de algunos de los `sfg` del objeto `pto` anterior (se podrían utilizar los otros igualmente, o combinarlos), sin asignar por el momento CRS alguno.
+Recordemos que, hasta este punto, hemos creado elementos basados en geometrías simples (*simple feature geometries*, `sfg`). Un objeto `sfg` contiene sólo un elemento, que puede ser sencillo, multi\* o una colección. Además, aunque las `sfg` se construyen usando coordenadas, éstas no cuentan con sistema de referencia espacial (CRS). La *simple feature column* (`sfc`), al ser una lista, permite alojar varios elementos y también admite la definición de CRS. La `sfc` es importante porque representa la columna geométrica de un *simple feature* (`sf`), por lo que debemos reconocerla para comprender el modelo de un `sf`. Generaremos una `sfc` a partir de algunos de los `sfg` del objeto `pto.sfg` creado anteriormente (se podrían utilizar los otros igualmente, o combinarlos), y no asignaremos por el momento CRS alguno.
 
-```{r sfc}
+```{r ptosfc}
 pto.sfc <- st_sfc(pto.sfg)
 pto.sfc
 plot(pto.sfc, col = 'red'); box()
 ```
 
+Aunque la representación gráfica de `pto.sfc` es idéntica a la de su homólogo `pto.sfg`, la diferencia radica en la clase del objeto.
 
+```{r}
+class(pto.sfg)
+class(pto.sfc)
+```
 
+Ahora creemos `sfc` de geometrías basadas en línea y polígono,
 
+```{r linpolsfc, out.width=c('50%', '50%'), fig.show='hold'}
+lin.sfc <- st_sfc(lin.sfg)
+lin.sfc
+plot(lin.sfc, col = 'red'); box()
+pol.sfc <- st_sfc(pol.sfg)
+pol.sfc
+plot(pol.sfc, col = 'red'); box()
+mpol.sfc <- st_sfc(mpol.sfg)
+mpol.sfc
+plot(mpol.sfc, col = 'red'); box()
+colec1.sfc <- st_sfc(colec1.sfg)
+colec1.sfc
+plot(colec1.sfc, col = 'red'); box()
+```
+Los dos de arriba representan `sfc` de líneas y polígonos, respectivamente. En la franja inferior: izquierda multipolígono, derecha colección.
 
-Para fines de consistencia, transformaremos a `mun.sf` al CRS EPSG:4326, generando el objeto `mun.sf.ll`, el cual será el mapa de fondo.
+En el resumen de cada objeto podemos notar que no se ha definido ningún CRS. En cualquier caso, para consultar el CRS de cualquier `sfc` utilizamos la función `st_crs`.
+
+```{r}
+st_crs(pto.sfc)
+```
+
+Todas las geometrías dentro de una `sfc` deben tener el mismo CRS. Podemos definir el CRS de un objeto al crear la `sfc`, o alternativamente lo definimos luego de creado el objeto.
+
+```{r}
+#Al crear el objeto, argumento crs de la función st_sfc
+pto.sfc <- st_sfc(pto.sfg, crs = 4326)
+pto.sfc
+#Alternativamente, usando la función st_crs()
+st_crs(lin.sfc) <- 4326
+lin.sfc
+#También admite cadenas de texto proj4string:
+st_crs(pol.sfc) <- '+proj=longlat +datum=WGS84 +no_defs'
+pol.sfc
+```
+
+Finalmente, construyamos un *simple feature* `sf`. Disponemos de una columna geométrica pero necesitamos atributos. Por lo tanto, primero que crearemos atributos y luego `sf`.
+
+```{r}
+#Primero el atributo
+pto.atr <- data.frame(nombre='pto')
+#Luego creamos el sf
+pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
+```
+
+¿Cómo se ve el proceso si lo desarrollamos desde cero? Primero creemos la geometría para el punto, luego la columna geométrica, luego los atributos y finalmente el *simple feature*.
+
+```{r}
+#Geometría simple
+pto.sfg <- st_point(c(-70.3, 19))
+#Columna de geometría simple
+pto.sfc <- st_sfc(pto.sfg, crs = 4326)
+#Atributo
+pto.atr <- data.frame(nombre='Mi punto')
+pto.atr##Sólo un objeto, por lo tanto, sólo un atributo
+#Simple feature
+pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
+pto.sf
+#La clase es la misma que para mun.sf
+class(pto.sf)
+class(mun.sf)
+```
+
+Creemos `sf` a partir de la colección `pto.sfc`, `lin.sfc` y `pol.sfc`. Necesitaremos crearles atributos y generar el `sf`.
+
+```{r}
+lin.sfc
+lin.atr <- data.frame(nombre = 'Mi línea')
+lin.sf <- st_sf(lin.atr, lin.sfc)
+lin.sf
+pol.sfc
+pol.atr <- data.frame(nombre = 'Mi polígono')
+pol.sf <- st_sf(pol.atr, pol.sfc)
+pol.sf
+```
+
+Finalmente, representemos `colec1.sf` sobre el mapa de municipios de RD. Para fines de consistencia, transformaremos `mun.sf` al CRS EPSG:4326, generando el objeto `mun.sf.ll`, el cual será el mapa de fondo (se podría realizar la operación contraria, es decir, convertir `colec1.sf` a EPSG:32619).
 
 ```{r munpt, eval=F}
 mun.sf.ll <- st_transform(mun.sf, crs = 4326) #Transformación a EPSG:4326
 tmap_options(max.categories = 155) #Aumentando el máx. número de categorías para tmap
-tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +
-  tm_borders('grey') +  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey') +
+  tm_shape(shp = pto.sf) + tm_dots('black', size = 0.5) +
+  tm_shape(shp = lin.sf) + tm_lines(col='black') +
+  tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
-
 
 
 

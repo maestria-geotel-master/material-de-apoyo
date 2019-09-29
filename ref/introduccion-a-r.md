@@ -198,7 +198,7 @@ Excel, y con `tmap` crearás mapas y los personalizarás. Busca más
 información sobre estos paquetes, y comprobarás las múltiples
 capacidades de R para manipular información espacial.
 
-### Mi primer mapa
+### Mi primer mapa con *simple features*
 
 El siguiente bloque de código carga las regiones de República Dominicana
 según la división de 2010, a partir de un archivo GeoPackage que
@@ -381,9 +381,9 @@ str(mun.sf)
 Al tratarse de un `data.frame`, los análisis estadísticos se ejecutan de
 manera fluida y sin necesidad de extraer los datos a archivos externos.
 Así, por ejemplo, la función `summary`, muy empleada en R para obtener
-estadísticos descriptivos, devuelve en el acto estadísticos de todas las
-columnas de atributos (incluida la de geometría, nombrada como `geom` en
-este caso):
+estadísticos descriptivos, devuelve estadísticos de todas las columnas
+de atributos (incluida la de geometría, nombrada como `geom` en este
+caso):
 
 ``` r
 summary(mun.sf)
@@ -522,15 +522,15 @@ plot(colec2.sfg, col = 'red'); box()
 Recordemos que, hasta este punto, hemos creado elementos basados en
 geometrías simples (*simple feature geometries*, `sfg`). Un objeto `sfg`
 contiene sólo un elemento, que puede ser sencillo, multi\* o una
-colección. Además, aunque las `sfg` se construyen a partir de
-coordenadas, éstas no disponen de sistema de referencia espacial (CRS).
-La *simple feature column* (`sfc`), al ser una lista, permite alojar
-varios elementos, y al mismo tiempo admite la definición de CRS. La
-`sfc` es también importante porque representa la columna geométrica de
-un *simple feature* (`sf`), por lo que debemos reconocerla para
-comprender el modelo de un `sf`. Generaremos un `sfc` a partir de
-algunos de los `sfg` del objeto `pto` anterior (se podrían utilizar los
-otros igualmente, o combinarlos), sin asignar por el momento CRS alguno.
+colección. Además, aunque las `sfg` se construyen usando coordenadas,
+éstas no cuentan con sistema de referencia espacial (CRS). La *simple
+feature column* (`sfc`), al ser una lista, permite alojar varios
+elementos y también admite la definición de CRS. La `sfc` es importante
+porque representa la columna geométrica de un *simple feature* (`sf`),
+por lo que debemos reconocerla para comprender el modelo de un `sf`.
+Generaremos una `sfc` a partir de algunos de los `sfg` del objeto
+`pto.sfg` creado anteriormente (se podrían utilizar los otros
+igualmente, o combinarlos), y no asignaremos por el momento CRS alguno.
 
 ``` r
 pto.sfc <- st_sfc(pto.sfg)
@@ -545,17 +545,215 @@ pto.sfc
 plot(pto.sfc, col = 'red'); box()
 ```
 
-![](../img/sfc-1.png)<!-- -->
+![](../img/ptosfc-1.png)<!-- -->
 
-Para fines de consistencia, transformaremos a `mun.sf` al CRS EPSG:4326,
-generando el objeto `mun.sf.ll`, el cual será el mapa de
-fondo.
+Aunque la representación gráfica de `pto.sfc` es idéntica a la de su
+homólogo `pto.sfg`, la diferencia radica en la clase del objeto.
+
+``` r
+class(pto.sfg)
+## [1] "XY"    "POINT" "sfg"
+class(pto.sfc)
+## [1] "sfc_POINT" "sfc"
+```
+
+Ahora creemos `sfc` de geometrías basadas en línea y polígono,
+
+``` r
+lin.sfc <- st_sfc(lin.sfg)
+lin.sfc
+## Geometry set for 1 feature 
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -71.5 ymin: 18 xmax: -71.2 ymax: 18.4
+## epsg (SRID):    NA
+## proj4string:    NA
+## LINESTRING (-71.5 18, -71.2 18, -71.2 18.4, -71...
+plot(lin.sfc, col = 'red'); box()
+pol.sfc <- st_sfc(pol.sfg)
+pol.sfc
+## Geometry set for 1 feature 
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -70.7 ymin: 18.6 xmax: -70.4 ymax: 18.9
+## epsg (SRID):    NA
+## proj4string:    NA
+## POLYGON ((-70.7 18.6, -70.4 18.6, -70.4 18.9, -...
+plot(pol.sfc, col = 'red'); box()
+mpol.sfc <- st_sfc(mpol.sfg)
+mpol.sfc
+## Geometry set for 1 feature 
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -70.7 ymin: 18.6 xmax: -70 ymax: 18.9
+## epsg (SRID):    NA
+## proj4string:    NA
+## MULTIPOLYGON (((-70.7 18.6, -70.4 18.6, -70.4 1...
+plot(mpol.sfc, col = 'red'); box()
+colec1.sfc <- st_sfc(colec1.sfg)
+colec1.sfc
+## Geometry set for 1 feature 
+## geometry type:  GEOMETRYCOLLECTION
+## dimension:      XY
+## bbox:           xmin: -71.5 ymin: 18 xmax: -70.3 ymax: 19
+## epsg (SRID):    NA
+## proj4string:    NA
+## GEOMETRYCOLLECTION (POINT (-70.3 19), LINESTRIN...
+plot(colec1.sfc, col = 'red'); box()
+```
+
+<img src="../img/linpolsfc-1.png" width="50%" /><img src="../img/linpolsfc-2.png" width="50%" /><img src="../img/linpolsfc-3.png" width="50%" /><img src="../img/linpolsfc-4.png" width="50%" />
+Los dos de arriba representan `sfc` de líneas y polígonos,
+respectivamente. En la franja inferior: izquierda multipolígono, derecha
+colección.
+
+En el resumen de cada objeto podemos notar que no se ha definido ningún
+CRS. En cualquier caso, para consultar el CRS de cualquier `sfc`
+utilizamos la función `st_crs`.
+
+``` r
+st_crs(pto.sfc)
+## Coordinate Reference System: NA
+```
+
+Todas las geometrías dentro de una `sfc` deben tener el mismo CRS.
+Podemos definir el CRS de un objeto al crear la `sfc`, o
+alternativamente lo definimos luego de creado el objeto.
+
+``` r
+#Al crear el objeto, argumento crs de la función st_sfc
+pto.sfc <- st_sfc(pto.sfg, crs = 4326)
+pto.sfc
+## Geometry set for 1 feature 
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: -70.3 ymin: 19 xmax: -70.3 ymax: 19
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## POINT (-70.3 19)
+#Alternativamente, usando la función st_crs()
+st_crs(lin.sfc) <- 4326
+lin.sfc
+## Geometry set for 1 feature 
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -71.5 ymin: 18 xmax: -71.2 ymax: 18.4
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## LINESTRING (-71.5 18, -71.2 18, -71.2 18.4, -71...
+#También admite cadenas de texto proj4string:
+st_crs(pol.sfc) <- '+proj=longlat +datum=WGS84 +no_defs'
+pol.sfc
+## Geometry set for 1 feature 
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -70.7 ymin: 18.6 xmax: -70.4 ymax: 18.9
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## POLYGON ((-70.7 18.6, -70.4 18.6, -70.4 18.9, -...
+```
+
+Finalmente, construyamos un *simple feature* `sf`. Disponemos de una
+columna geométrica pero necesitamos atributos. Por lo tanto, primero que
+crearemos atributos y luego `sf`.
+
+``` r
+#Primero el atributo
+pto.atr <- data.frame(nombre='pto')
+#Luego creamos el sf
+pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
+```
+
+¿Cómo se ve el proceso si lo desarrollamos desde cero? Primero creemos
+la geometría para el punto, luego la columna geométrica, luego los
+atributos y finalmente el *simple feature*.
+
+``` r
+#Geometría simple
+pto.sfg <- st_point(c(-70.3, 19))
+#Columna de geometría simple
+pto.sfc <- st_sfc(pto.sfg, crs = 4326)
+#Atributo
+pto.atr <- data.frame(nombre='Mi punto')
+pto.atr##Sólo un objeto, por lo tanto, sólo un atributo
+##     nombre
+## 1 Mi punto
+#Simple feature
+pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
+pto.sf
+## Simple feature collection with 1 feature and 1 field
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: -70.3 ymin: 19 xmax: -70.3 ymax: 19
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+##     nombre         geometry
+## 1 Mi punto POINT (-70.3 19)
+#La clase es la misma que para mun.sf
+class(pto.sf)
+## [1] "sf"         "data.frame"
+class(mun.sf)
+## [1] "sf"         "data.frame"
+```
+
+Creemos `sf` a partir de la colección `pto.sfc`, `lin.sfc` y `pol.sfc`.
+Necesitaremos crearles atributos y generar el `sf`.
+
+``` r
+lin.sfc
+## Geometry set for 1 feature 
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -71.5 ymin: 18 xmax: -71.2 ymax: 18.4
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## LINESTRING (-71.5 18, -71.2 18, -71.2 18.4, -71...
+lin.atr <- data.frame(nombre = 'Mi línea')
+lin.sf <- st_sf(lin.atr, lin.sfc)
+lin.sf
+## Simple feature collection with 1 feature and 1 field
+## geometry type:  LINESTRING
+## dimension:      XY
+## bbox:           xmin: -71.5 ymin: 18 xmax: -71.2 ymax: 18.4
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+##     nombre                        lin.sfc
+## 1 Mi línea LINESTRING (-71.5 18, -71.2...
+pol.sfc
+## Geometry set for 1 feature 
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -70.7 ymin: 18.6 xmax: -70.4 ymax: 18.9
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## POLYGON ((-70.7 18.6, -70.4 18.6, -70.4 18.9, -...
+pol.atr <- data.frame(nombre = 'Mi polígono')
+pol.sf <- st_sf(pol.atr, pol.sfc)
+pol.sf
+## Simple feature collection with 1 feature and 1 field
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: -70.7 ymin: 18.6 xmax: -70.4 ymax: 18.9
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+##        nombre                        pol.sfc
+## 1 Mi polígono POLYGON ((-70.7 18.6, -70.4...
+```
+
+Finalmente, representemos `colec1.sf` sobre el mapa de municipios de RD.
+Para fines de consistencia, transformaremos `mun.sf` al CRS EPSG:4326,
+generando el objeto `mun.sf.ll`, el cual será el mapa de fondo (se
+podría realizar la operación contraria, es decir, convertir `colec1.sf`
+a
+EPSG:32619).
 
 ``` r
 mun.sf.ll <- st_transform(mun.sf, crs = 4326) #Transformación a EPSG:4326
 tmap_options(max.categories = 155) #Aumentando el máx. número de categorías para tmap
-tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +
-  tm_borders('grey') +  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey') +
+  tm_shape(shp = pto.sf) + tm_dots('black', size = 0.5) +
+  tm_shape(shp = lin.sf) + tm_lines(col='black') +
+  tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
 
 ## Análisis exploratorio de datos espaciales (ESDA)
