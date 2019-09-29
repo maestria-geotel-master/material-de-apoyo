@@ -249,7 +249,7 @@ class(pto.sfg)
 class(pto.sfc)
 ```
 
-Ahora creemos `sfc` de geometrías basadas en línea y polígono,
+Ahora creemos `sfc` basadas en las geometrías línea (`lin.sfg`), polígono (`pol.sfg`), multipolígono (`mpol.sfg`) y colección (`colec.sfg`).
 
 ```{r linpolsfc, out.width=c('50%', '50%'), fig.show='hold'}
 lin.sfc <- st_sfc(lin.sfg)
@@ -265,9 +265,10 @@ colec1.sfc <- st_sfc(colec1.sfg)
 colec1.sfc
 plot(colec1.sfc, col = 'red'); box()
 ```
-Los dos de arriba representan `sfc` de líneas y polígonos, respectivamente. En la franja inferior: izquierda multipolígono, derecha colección.
 
-En el resumen de cada objeto podemos notar que no se ha definido ningún CRS. En cualquier caso, para consultar el CRS de cualquier `sfc` utilizamos la función `st_crs`.
+Los dos gráficos de arriba representan `sfc` de líneas y polígonos, respectivamente. En la franja inferior: izquierda multipolígono, derecha colección.
+
+En el resumen de cada objeto podemos notar que no se ha definido ningún CRS (`epsg (SRID): NA` y `proj4string: NA`. En cualquier caso, para consultar el CRS de cualquier `sfc` utilizamos la función `st_crs`.
 
 ```{r}
 st_crs(pto.sfc)
@@ -296,7 +297,7 @@ pto.atr <- data.frame(nombre='pto')
 pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
 ```
 
-¿Cómo se ve el proceso si lo desarrollamos desde cero? Primero creemos la geometría para el punto, luego la columna geométrica, luego los atributos y finalmente el *simple feature*.
+¿Cuál sería el proceso si lo desarrolláramos desde cero? Primero creemos la geometría para el punto, luego la columna geométrica, luego los atributos y finalmente el *simple feature*.
 
 ```{r}
 #Geometría simple
@@ -329,7 +330,7 @@ pol.sf
 
 Finalmente, representemos `pto.sfc`, `lin.sfc` y `pol.sfc` sobre el mapa de municipios de RD. Para fines de consistencia, transformaremos `mun.sf` al CRS EPSG:4326, generando el objeto `mun.sf.ll`, el cual será el mapa de fondo (se podría realizar la operación contraria, es decir, convertir `pto.sfc`, `lin.sfc` y `pol.sfc` a EPSG:32619, pero sería más trabajoso). Para la representación utilizaremos el paquete `tmap`, el cual requiere, como mínimo, un objeto fuente y, posteriormente, uno o varios elementos o capas de símbolos. Así, mediante la función `tm_shape`, se especifica el objeto que contiene la geometría, y las funciones `tm_dots`, `tm_lines`, `tm_borders` y `tm_fill` (entre otras) definen cómo se representan las geometrías.
 
-```{r munptlinpol}
+```{r tmmunptlinpol}
 mun.sf.ll <- st_transform(mun.sf, crs = 4326) #Transformación a EPSG:4326
 tmap_options(max.categories = 155) #Aumentando el máx. número de categorías para tmap
 tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey') +
@@ -337,10 +338,6 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
   tm_shape(shp = lin.sf) + tm_lines(col='black') +
   tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
-
-
-
-
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 

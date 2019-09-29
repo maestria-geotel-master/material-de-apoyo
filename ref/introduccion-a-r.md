@@ -557,7 +557,9 @@ class(pto.sfc)
 ## [1] "sfc_POINT" "sfc"
 ```
 
-Ahora creemos `sfc` de geometrías basadas en línea y polígono,
+Ahora creemos `sfc` basadas en las geometrías línea (`lin.sfg`),
+polígono (`pol.sfg`), multipolígono (`mpol.sfg`) y colección
+(`colec.sfg`).
 
 ``` r
 lin.sfc <- st_sfc(lin.sfg)
@@ -603,13 +605,14 @@ plot(colec1.sfc, col = 'red'); box()
 ```
 
 <img src="../img/linpolsfc-1.png" width="50%" /><img src="../img/linpolsfc-2.png" width="50%" /><img src="../img/linpolsfc-3.png" width="50%" /><img src="../img/linpolsfc-4.png" width="50%" />
-Los dos de arriba representan `sfc` de líneas y polígonos,
+
+Los dos gráficos de arriba representan `sfc` de líneas y polígonos,
 respectivamente. En la franja inferior: izquierda multipolígono, derecha
 colección.
 
 En el resumen de cada objeto podemos notar que no se ha definido ningún
-CRS. En cualquier caso, para consultar el CRS de cualquier `sfc`
-utilizamos la función `st_crs`.
+CRS (`epsg (SRID): NA` y `proj4string: NA`. En cualquier caso, para
+consultar el CRS de cualquier `sfc` utilizamos la función `st_crs`.
 
 ``` r
 st_crs(pto.sfc)
@@ -664,7 +667,7 @@ pto.atr <- data.frame(nombre='pto')
 pto.sf <- st_sf(pto.atr, geometry = pto.sfc)
 ```
 
-¿Cómo se ve el proceso si lo desarrollamos desde cero? Primero creemos
+¿Cuál sería el proceso si lo desarrolláramos desde cero? Primero creemos
 la geometría para el punto, luego la columna geométrica, luego los
 atributos y finalmente el *simple feature*.
 
@@ -762,7 +765,7 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
   tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
 
-![](../img/munptlinpol-1.png)<!-- -->
+![](../img/tmmunptlinpol-1.png)<!-- -->
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
