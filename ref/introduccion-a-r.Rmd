@@ -329,7 +329,7 @@ pol.sf
 
 Finalmente, representemos `pto.sfc`, `lin.sfc` y `pol.sfc` sobre el mapa de municipios de RD. Para fines de consistencia, transformaremos `mun.sf` al CRS EPSG:4326, generando el objeto `mun.sf.ll`, el cual será el mapa de fondo (se podría realizar la operación contraria, es decir, convertir `pto.sfc`, `lin.sfc` y `pol.sfc` a EPSG:32619, pero sería más trabajoso). Para la representación utilizaremos el paquete `tmap`, el cual requiere, como mínimo, un objeto fuente y, posteriormente, uno o varios elementos o capas de símbolos. Así, mediante la función `tm_shape`, se especifica el objeto que contiene la geometría, y las funciones `tm_dots`, `tm_lines`, `tm_borders` y `tm_fill` (entre otras) definen cómo se representan las geometrías.
 
-```{r munpt, eval=F}
+```{r munptlinpol}
 mun.sf.ll <- st_transform(mun.sf, crs = 4326) #Transformación a EPSG:4326
 tmap_options(max.categories = 155) #Aumentando el máx. número de categorías para tmap
 tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey') +

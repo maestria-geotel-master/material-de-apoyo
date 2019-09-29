@@ -762,6 +762,8 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
   tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
 
+![](../img/munptlinpol-1.png)<!-- -->
+
 ## Análisis exploratorio de datos espaciales (ESDA)
 
 ``` r
