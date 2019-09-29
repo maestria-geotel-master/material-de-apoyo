@@ -1,7 +1,7 @@
 
 <!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
 
-# Introducción a R y análisis exploratorio de datos espaciales (ESDA)
+# Introducción a R, *simple features* y análisis exploratorio de datos espaciales (ESDA)
 
 ## ¿Por qué R?
 
@@ -95,14 +95,15 @@ servicios que manejarás.
     para desarrolladores y desarrolladoras. Luce bien explicado
     [aquí](https://www.deustoformacion.com/blog/programacion-diseno-web/que-es-para-que-sirve-github).
     Recomiendo también el libro web [“*Happy Git and GitHub for the
-    useR*”](https://happygitwithr.com/), de Jenny Bryan (Bryan, the STAT
-    545 TAs, & Hester, 2019).
+    useR*”](https://happygitwithr.com/) (Bryan, the STAT 545 TAs, &
+    Hester, 2019).
   - [GitHub Classroom](https://github.com/education/classroom%5D). En
     [esta
     web](https://www.genbeta.com/desarrollo/classroom-for-github-ayudando-a-los-profesores-a-gestionar-los-ejercicios-de-sus-clases)
     te explican para qué sirve. Con este servicio estoy asignándote
     trabajo. También te recomiendo que leas [ésta
-    afirmación](https://github.com/education/classroom#who-is-classroom-for).
+    afirmación](https://github.com/education/classroom#who-is-github-classroom-for)
+    sobre “Who is GitHub classroom for?”.
   - Foros de ayuda y listas de distribución, entre los que destacan
     [R-help](https://stat.ethz.ch/mailman/listinfo/r-help),
     [R-devel](https://stat.ethz.ch/mailman/listinfo/r-devel),
@@ -169,11 +170,13 @@ help.search("matrix") #Busca la palabra clave en las ayudas de los paquetes
 ??matrix #Ídem
 ```
 
-¡Usa los foros\! Si introduces un mensaje de error de R en el buscador
-de tu preferencia (en inglés obtienes más resultados), encontrarás
-varios punteros a foros con posibles soluciones.
+¡Usa los foros\! Si introduces un mensaje de error (preferiblemente en
+inglés) de R en el buscador de tu preferencia, encontrarás varios
+punteros a foros con posibles soluciones.
 
-## Análisis exploratorio de datos espaciales (ESDA)
+## *Simple features*
+
+### Paquetes
 
 Carguemos los paquetes que necesitaremos en esta introducción.
 
@@ -186,24 +189,22 @@ library(readxl)
 library(tmap)
 ```
 
-Brevemente, con `sf` crearás y manipularás *simple features* (más
-detalles a continuación), `raster` te ayudará a manipular y analizar
-imágenes de dicho modelo, con `rgdal` tendrás varias funciones
-*wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una
-colección de paquetes para manipular, limpiar y organizar datos de
-`data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap`
-crearás mapas y los personalizarás. Busca más información sobre estos
-paquetes, y comprobarás las múltiples capacidades de R para manipular
-información espacial.
+Brevemente, con `sf` crearás y manipularás *simple features*, `raster`
+te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal`
+tendrás varias funciones *wrapper* para trabajar con `gdal`desde R,
+`tidyverse` carga una colección de paquetes para manipular, limpiar y
+organizar datos de `data.frame`, `readxl` te permitirá cargar archivos
+Excel, y con `tmap` crearás mapas y los personalizarás. Busca más
+información sobre estos paquetes, y comprobarás las múltiples
+capacidades de R para manipular información espacial.
 
-El siguiente bloque de código carga las regiones del país según la
-división de 2010, a partir de un archivo GeoPackage, originalmente
-*shapefiles* de la Oficina Nacional de Estadística (ONE) (2015) (de la
-capa municipios, la geometría correspondiente al municipio “Guayubín”
-resultó ser no válida y fue arreglada). Además de las regiones, este
-GPKG contiene dos capas adicionales, provincias y municipios, que
-cargaremos más
-adelante.
+### Mi primer mapa
+
+El siguiente bloque de código carga las regiones de República Dominicana
+según la división de 2010, a partir de un archivo GeoPackage que
+contiene 3 capas (regiones propiamente, provincias y municipios\[1\]),
+originalmente *shapefiles* de la Oficina Nacional de Estadística (ONE)
+(2015).
 
 ``` r
 reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = T)
@@ -213,11 +214,18 @@ plot(reg.sf)
 ![](../img/regiones-1.png)<!-- -->
 
 La función `st_read` lee la capa correspondiente del GPKG y la convierte
-a un `simple features` de tipo `MULTIPOLYGON`. Este tipo de objetos los
-analizaremos más adelante; por lo pronto, probemos algunas
-visualizaciones más. Las regiones fueron coloreadas en función de los
-campos `REG` y `TOPONIMIA`, pero se puede crear un campo de área
-(simple, en m<sup>2</sup>) y aplicar estilos al mapa en función de éste.
+a un `simple features` de tipo `MULTIPOLYGON` (este tipo de objetos los
+analizaremos más adelante).
+
+Notar que la capa `REGCenso2010`, cuenta con dos campos, por lo que la
+función `plot` representa a los municipios aplicándoles distintos
+estilos en función del campo representado. Las regiones fueron
+coloreadas en función de los campos `REG` y `TOPONIMIA`. Probemos una
+visualización cuantitativa. Crearemos un campo de área mediante la
+función `st_area` (en m<sup>2</sup>, que son las unidades del CRS, que
+es EPSG:32619), representaremos el objeto `reg.sf` usando sólo dicho
+campo (`reg.sf['area']`) y le aplicaremos estilos al mapa en función de
+éste.
 
 ``` r
 reg.sf$area <- st_area(reg.sf)
@@ -230,7 +238,11 @@ plot(reg.sf['area'])
 > tutorial, probarás formas de diseñar mapas estilizados.
 
 El bloque de código a continuación carga la capa de municipios desde el
-GPKG.
+GPKG y la representa. Al igual que con la capa regional, dado que tiene
+múltiples campos (en este caso, 3 adicionales), la función `plot`
+representa a los municipios aplicándoles distintos estilos en función
+del campo
+representado.
 
 ``` r
 mun.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
@@ -246,10 +258,7 @@ plot(mun.sf['area'])
 
 ![](../img/municipios-2.png)<!-- -->
 
-``` r
-nrow(mun.sf)
-## [1] 155
-```
+### ¿Qué son *simple features*?
 
 Veamos lo básico sobre el modelo de datos *simple features*. Se trata de
 un estándar abierto y jerárquico del Open Geospatial Consortium
@@ -271,8 +280,8 @@ Lovelace et al. (2019)
 Por ejemplo, exploremos el objeto `mun.sf` en la consola; basta con
 escribir su nombre para obtener un resumen que muestra el tipo de
 geometría y otras características espaciales, como el sistema de
-coordenadas de referencia (CRS). A continuación, mostrará los atributos
-de los primeros 10 objetos (explicados más adelante).
+referencia espacial (CRS). A continuación, mostrará los atributos de los
+primeros 10 objetos (explicados más adelante).
 
 ``` r
 mun.sf
@@ -308,8 +317,8 @@ mun.sf
 ```
 
 Nos informa que se trata de un `Simple feature collection with 155
-features and 6 fields` de tipo `MULTIPOLYGON` con dimensiones `XY y una
-extensión mostrada en la línea`bbox\`. Igualmente, nos indica que el CRS
+features and 6 fields` de tipo `MULTIPOLYGON` con dimensiones `XY` y una
+extensión mostrada en la línea `bbox`. Igualmente, nos indica que el CRS
 es EPSG:32619, o WGS84 UTM zona 19.
 
 El modelo de datos de los *simple features* se basa en estructuras
@@ -343,7 +352,7 @@ denominadas `data.frames` en R, que en el caso concreto serían “tablas
 espaciales” (*spatial data frames*). Exploremos la estructura del objeto
 `mun.sf` mediante la función `str`, la cual lo muestra como `Classes
 'sf' and data.frame: 10 obs. of 4 variables` (155 observaciones o
-geometrías, que en este caso son municipios dominicanas, y 4 variables o
+geometrías, que en este caso son municipios dominicanos, y 4 variables o
 atributos).
 
 ``` r
@@ -414,23 +423,142 @@ summary(mun.sf['area'])
 > siempre acompaña al objeto a menos que le indiquemos lo contrario
 > (*sticky column*).
 
+### *Simple features*, de abajo a arriba
+
 Normalmente, los datos espaciales se crean en aplicaciones con GUI
-(e.g. como QGIS), o los obtienes de terceros. Sin embargo, para fines
-didácticos, crearemos algunos objestos conteniendo los tipos de
-geometrías más básicos. Primero, crearemos un `mun.sf.ll` en EPSG:4326
-a partir de `mun.sf`, luego crearemos un punto en coordenadas
-geográficas sobre la ciudad de Santo Domingo y finalmente los
-representaremos a ambos.
+(e.g. QGIS), o los obtienes de terceros. Sin embargo, para fines
+didácticos, crearemos algunos objetos conteniendo los tipos de
+geometrías básicos en la forma de *simple feature geometries* (`sfg`)
+en el siguiente bloque de código. Las crearemos utilizando **coordenadas
+geográficas**, aunque no podremos definir un CRS, puesto que la clase
+`sfg` no admite dicha funcionalidad. Las funciones que utilizaremos para
+cada geometría serán punto `st_point`, línea `st_linestring` y polígono
+`st_polygon`.
 
 ``` r
-mun.sf.ll <- st_transform(mun.sf, crs = 4326)
-pt1 <- st_sfc(st_point(c(-69.9172, 18.4594)), crs = 4326) #Un punto sobre la ciudad de SD. ¿Dónde?
-tmap_options(max.categories = 155)
-tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', palette = ) +
-  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+pto.sfg <- st_point(c(-70.3, 19))
+pto.sfg
+## POINT (-70.3 19)
+plot(pto.sfg, col = 'red'); box()
+matrizlin <- rbind(c(-71.5, 18), c(-71.2, 18),
+                   c(-71.2, 18.4), c(-71.5, 18.4))
+matrizlin
+##       [,1] [,2]
+## [1,] -71.5 18.0
+## [2,] -71.2 18.0
+## [3,] -71.2 18.4
+## [4,] -71.5 18.4
+lin.sfg <- st_linestring(matrizlin)
+lin.sfg
+## LINESTRING (-71.5 18, -71.2 18, -71.2 18.4, -71.5 18.4)
+plot(lin.sfg, col = 'red'); box()
+matrizpol <- list(
+  rbind(c(-70.7, 18.6), c(-70.4, 18.6),
+        c(-70.4, 18.9), c(-70.7, 18.9),
+        c(-70.7, 18.6)))
+pol.sfg <- st_polygon(matrizpol)
+pol.sfg
+## POLYGON ((-70.7 18.6, -70.4 18.6, -70.4 18.9, -70.7 18.9, -70.7 18.6))
+plot(pol.sfg, col = 'red'); box()
 ```
 
-![](../img/munpt-1.png)<!-- -->
+<img src="../img/geoms-1.png" width="33%" /><img src="../img/geoms-2.png" width="33%" /><img src="../img/geoms-3.png" width="33%" />
+
+Si combinamos varios puntos generamos un elemento multipunto
+(*multipoint*). Lo mismo aplica para las líneas (multilínea,
+*multilinestring*) y los polígonos (multipolígono, *multipolygon*). El
+siguiente bloque de código muestra cómo
+crearlos.
+
+``` r
+mpto.sfg <- st_multipoint(rbind(c(-70.3, 19), c(-70.4, 19), c(-70.4, 19.1), c(-70.3, 19.1)))
+mpto.sfg
+## MULTIPOINT (-70.3 19, -70.4 19, -70.4 19.1, -70.3 19.1)
+plot(mpto.sfg, col = 'red'); box()
+matrizmlin <- list(rbind(c(-71.5, 18), c(-71.2, 18), c(-71.2, 18.4), c(-71.5, 18.4)),
+                  rbind(c(-70.9, 18), c(-70.5, 18), c(-70.7, 18.4)))
+matrizmlin
+## [[1]]
+##       [,1] [,2]
+## [1,] -71.5 18.0
+## [2,] -71.2 18.0
+## [3,] -71.2 18.4
+## [4,] -71.5 18.4
+## 
+## [[2]]
+##       [,1] [,2]
+## [1,] -70.9 18.0
+## [2,] -70.5 18.0
+## [3,] -70.7 18.4
+mlin.sfg <- st_multilinestring(matrizmlin)
+mlin.sfg
+## MULTILINESTRING ((-71.5 18, -71.2 18, -71.2 18.4, -71.5 18.4), (-70.9 18, -70.5 18, -70.7 18.4))
+plot(mlin.sfg, col = 'red'); box()
+matrizmpol <- list(
+  list(rbind(c(-70.7, 18.6), c(-70.4, 18.6), c(-70.4, 18.9), c(-70.7, 18.9), c(-70.7, 18.6))),
+  list(rbind(c(-70, 18.6), c(-70.3, 18.6), c(-70.2, 18.9), c(-70, 18.6)))
+)
+mpol.sfg <- st_multipolygon(matrizmpol)
+mpol.sfg
+## MULTIPOLYGON (((-70.7 18.6, -70.4 18.6, -70.4 18.9, -70.7 18.9, -70.7 18.6)), ((-70 18.6, -70.3 18.6, -70.2 18.9, -70 18.6)))
+plot(mpol.sfg, col = 'red'); box()
+```
+
+<img src="../img/geomsm-1.png" width="33%" /><img src="../img/geomsm-2.png" width="33%" /><img src="../img/geomsm-3.png" width="33%" />
+
+Finalmente, combinaremos varios elementos en una colección, para lo cual
+usaremos los elementos creados anteriormente.
+
+``` r
+# colec <- c(pto, lin, pol)
+colec1.sfg <- st_geometrycollection(list(pto.sfg, lin.sfg, pol.sfg))
+plot(colec1.sfg, col = 'red'); box()
+colec2.sfg <- st_geometrycollection(list(mpto.sfg, mlin.sfg, mpol.sfg))
+plot(colec2.sfg, col = 'red'); box()
+```
+
+<img src="../img/colec-1.png" width="50%" /><img src="../img/colec-2.png" width="50%" />
+
+Recordemos que, hasta este punto, hemos creado elementos basados en
+geometrías simples (*simple feature geometries*, `sfg`). Un objeto `sfg`
+contiene sólo un elemento, que puede ser sencillo, multi\* o una
+colección. Además, aunque las `sfg` se construyen a partir de
+coordenadas, éstas no disponen de sistema de referencia espacial (CRS).
+La *simple feature column* (`sfc`), al ser una lista, permite alojar
+varios elementos, y al mismo tiempo admite la definición de CRS. La
+`sfc` es también importante porque representa la columna geométrica de
+un *simple feature* (`sf`), por lo que debemos reconocerla para
+comprender el modelo de un `sf`. Generaremos un `sfc` a partir de
+algunos de los `sfg` del objeto `pto` anterior (se podrían utilizar los
+otros igualmente, o combinarlos), sin asignar por el momento CRS alguno.
+
+``` r
+pto.sfc <- st_sfc(pto.sfg)
+pto.sfc
+## Geometry set for 1 feature 
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: -70.3 ymin: 19 xmax: -70.3 ymax: 19
+## epsg (SRID):    NA
+## proj4string:    NA
+## POINT (-70.3 19)
+plot(pto.sfc, col = 'red'); box()
+```
+
+![](../img/sfc-1.png)<!-- -->
+
+Para fines de consistencia, transformaremos a `mun.sf` al CRS EPSG:4326,
+generando el objeto `mun.sf.ll`, el cual será el mapa de
+fondo.
+
+``` r
+mun.sf.ll <- st_transform(mun.sf, crs = 4326) #Transformación a EPSG:4326
+tmap_options(max.categories = 155) #Aumentando el máx. número de categorías para tmap
+tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +
+  tm_borders('grey') +  tm_shape(shp = pt1) + tm_dots('black', size = 0.5)
+```
+
+## Análisis exploratorio de datos espaciales (ESDA)
 
 ``` r
 pop.mun <- read_xls('pop_adm3.xls')
@@ -569,3 +697,6 @@ transform, visualize, and model data* (1st ed.). Retrieved from
 </div>
 
 </div>
+
+1.  De la capa municipios, la geometría correspondiente al municipio
+    “Guayubín” resultó ser no válida y fue arreglada
