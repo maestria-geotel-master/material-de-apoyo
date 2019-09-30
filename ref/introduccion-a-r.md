@@ -767,7 +767,123 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-WIP
+Cerremos esta introducción a R con un ligero análisis exploratorio de
+datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el
+ESDA en profundidad, en este cierre veremos los pasos básicos para hacer
+que las geometrías “brillen” con atributos reales. Tendremos que unir
+los datos espaciales con atributos externos (la unión tradicional, o
+*join*)
+
+No hace falta abordar el problema de la unidad de área modificable en
+este punto. Baste decir por el momento que cualquier división que
+utilicemos es y será arbitraria. Si bien la mayoría de las agencias
+nacionales de estadística sirven sus datos a nivel de términos
+municipales, regiones o provincias (u otras unidades), no olvidemos que
+existe un sesgo inherente por no garantizarse la independencia de
+observaciones. Dado que trabajaremos con mapas, valga esta advertencia
+tomada de Bivand, Pebesma, & Gomez-Rubio (2013):
+
+> Trying to detect pattern in maps of residuals visually is not an
+> acceptable choice, although one sometimes hears comments explaining
+> the lack of formal analysis such as ‘they looked random’, or
+> alternatively ‘I can see the clusters’.
+
+> Tratar de detectar un patrón visualmente en mapas de residuos no es
+> una opción aceptable, aunque algunas veces se escuchan comentarios que
+> explican la falta de análisis formal, tales como ‘la variable se veía
+> aleatoria’, o, alternativamente, ‘veo grupos/conglomerados’.
+
+Tómese también en cuenta el mito de John Snow (Brody, Rip,
+Vinten-Johansen, Paneth, & Rachman, 2000). Demos a los mapas su justa
+valoración, no los mitifiquemos ni los ignoremos. Hoy en día “cualquiera
+puede hacer mapas”, pero no cualquiera puede interpretarlos.
+Exploraremos los datos de población a nivel municipal del IX Censo
+Nacional de Población y Vivienda 2010, algo que probablemente has
+realizado previamente en paquete SIG. La fuente es la [Oficina Nacional
+de Estadística](https://www.one.gob.do/), a través de la [plataforma
+REDATAM](https://www.one.gob.do/recursos-automatizados/consulta-en-linea-redatam).
+Descargué una consulta con algunas variables, incluyendo agregados de
+población totales y por sexo. La plataforma ofrece formatos Excel y PDF.
+Descargué un archivo Excel y lo convertí a formato “valores separados
+por coma”, que no es propietario. El archivo resultante está alojado en
+el repo, concretamente en
+`data/pop_adm3.csv`.
+
+``` r
+pop.mun <- read_csv('data/pop_adm3.csv') #read_csv pertenece al paquete readr, de la colección tidyverse
+## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   `Municipio de residencia` = col_character()
+## )
+## See spec(...) for full column specifications.
+pop.mun
+## # A tibble: 155 x 256
+##     Code `Municipio de r… `Jefa o jefe` `Esposo (a) o c… `Hijo (a)`
+##    <dbl> <chr>                    <dbl>            <dbl>      <dbl>
+##  1 10901 Municipio Moca           48032            28717      67964
+##  2 10902 Municipio Cayet…          2095             1118       2461
+##  3 10903 Municipio Gaspa…         11270             6144      13433
+##  4 10904 Municipio Jamao…          2330             1248       2646
+##  5 11801 Municipio Puert…         48041            25936      56957
+##  6 11802 Municipio Altam…          5875             3130       6073
+##  7 11803 Municipio Guana…          2010             1097       1900
+##  8 11804 Municipio Imbert          6937             3524       7487
+##  9 11805 Municipio Los H…          3653             2033       3997
+## 10 11806 Municipio Luper…          5170             2841       5177
+## # … with 145 more rows, and 251 more variables: `Hijo (a) de
+## #   crianza` <dbl>, `Padre o madre` <dbl>, `Nieto (a)` <dbl>, `Suegro
+## #   (a)` <dbl>, `Abuelo (a)` <dbl>, `Hermano (a)` <dbl>, `Empleado (a)
+## #   doméstico (a)` <dbl>, `Otro pariente` <dbl>, `Yerno o nuera` <dbl>,
+## #   `No pariente` <dbl>, `Miembro de un hogar colectivo` <dbl>,
+## #   Hombres <dbl>, Mujeres <dbl>, `0` <dbl>, `1` <dbl>, `2` <dbl>,
+## #   `3` <dbl>, `4` <dbl>, `5` <dbl>, `6` <dbl>, `7` <dbl>, `8` <dbl>,
+## #   `9` <dbl>, `10` <dbl>, `11` <dbl>, `12` <dbl>, `13` <dbl>, `14` <dbl>,
+## #   `15` <dbl>, `16` <dbl>, `17` <dbl>, `18` <dbl>, `19` <dbl>,
+## #   `20` <dbl>, `21` <dbl>, `22` <dbl>, `23` <dbl>, `24` <dbl>,
+## #   `25` <dbl>, `26` <dbl>, `27` <dbl>, `28` <dbl>, `29` <dbl>,
+## #   `30` <dbl>, `31` <dbl>, `32` <dbl>, `33` <dbl>, `34` <dbl>,
+## #   `35` <dbl>, `36` <dbl>, `37` <dbl>, `38` <dbl>, `39` <dbl>,
+## #   `40` <dbl>, `41` <dbl>, `42` <dbl>, `43` <dbl>, `44` <dbl>,
+## #   `45` <dbl>, `46` <dbl>, `47` <dbl>, `48` <dbl>, `49` <dbl>,
+## #   `50` <dbl>, `51` <dbl>, `52` <dbl>, `53` <dbl>, `54` <dbl>,
+## #   `55` <dbl>, `56` <dbl>, `57` <dbl>, `58` <dbl>, `59` <dbl>,
+## #   `60` <dbl>, `61` <dbl>, `62` <dbl>, `63` <dbl>, `64` <dbl>,
+## #   `65` <dbl>, `66` <dbl>, `67` <dbl>, `68` <dbl>, `69` <dbl>,
+## #   `70` <dbl>, `71` <dbl>, `72` <dbl>, `73` <dbl>, `74` <dbl>,
+## #   `75` <dbl>, `76` <dbl>, `77` <dbl>, `78` <dbl>, `79` <dbl>,
+## #   `80` <dbl>, `81` <dbl>, `82` <dbl>, `83` <dbl>, `84` <dbl>,
+## #   `85` <dbl>, `86` <dbl>, …
+nrow(pop.mun)
+## [1] 155
+```
+
+Lamentablmente, el código de enlace en el archivo fuente suprime el ‘0’
+a la izquierda en el código de municipio, contenido en el campo
+`ENLACE`. Exploremos di
+
+Aprovechemos esta inconsistencia para introducir las tuberías de
+`tidyverse`, concretamente en `dplyr`.
+
+``` r
+pop.mun <- pop.mun %>%
+  mutate(ENLACE = ifelse(
+    nchar(Code)==5,
+    paste0('0', Code),
+    Code)
+  )
+match(mun.sf$ENLACE, pop.mun$ENLACE)
+##   [1] 148  68  69  70  71  72  73  74  75  76  77  91  92  93  94  95  96
+##  [18]  97  98  99 100 101 102 103 104 105 106  51  52  53  54  55  34  35
+##  [35]  36  37  38  39  40 115 116 117 118 119 120 127 128   1   2   3   4
+##  [52] 107 108 109 110 111 112 129 130 131 132 133  23  24  25  26  41  42
+##  [69]  43  44  56  57  58  59  60  61 113 114  78  79   5   6   7   8   9
+##  [86]  10  11  12  13  45  46  47  48  49  50  80  81  82  83  84  85  86
+## [103]  87 121 122 123 124 125 126 134 135 136 137 138 139  27  28  29  30
+## [120]  14  15  16  17  18  19  20  21  22  62  63  64  65  66  67  31  32
+## [137]  33 140 141 142 143 144 145 146 147  88  89  90 149 150 151 152 153
+## [154] 154 155
+```
 
 ## Conclusión
 
@@ -799,6 +915,21 @@ de esta potente colección de paquetes.
 ## Referencias
 
 <div id="refs" class="references">
+
+<div id="ref-bivand2013applied">
+
+Bivand, R. S., Pebesma, E. J., & Gomez-Rubio, V. (2013). *Applied
+spatial data analysis with R*. Springer.
+
+</div>
+
+<div id="ref-brody2000map">
+
+Brody, H., Rip, M. R., Vinten-Johansen, P., Paneth, N., & Rachman, S.
+(2000). Map-making and myth-making in broad street: The london cholera
+epidemic, 1854. *The Lancet*, *356*(9223), 64–68.
+
+</div>
 
 <div id="ref-bryan2019happy">
 

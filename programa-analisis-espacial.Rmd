@@ -33,7 +33,7 @@ Octubre 2019 <br/>
 
 Waldo Tobler se auto-atribuyó la denominada "primera ley de la geografía":
 
->"...I invoke the first law of geography: everything is related to everything else, but near things are more related than distant things." [@tobler1970computer]. En español sería: "Invoco la primera de la geografía: todo está relacionado con todo, pero las cosas próximas entre sí están más relacionadas que las distantes".
+>"...I invoke the first law of geography: everything is related to everything else, but near things are more related than distant things." [@tobler1970computer]. En español sería: "Invoco la primera ley de la geografía: todo está relacionado con todo, pero las cosas próximas entre sí están más relacionadas que las distantes".
 
 El propio Tobler añadía en su artículo que "El hecho de que un proceso parezca complicado, no es motivo para suponer que es el resultado de reglas complicadas...". A partir de este punto, el autor dedica su trabajo a explicar un modelo de crecimiento urbano en Detroit basado en la densidad de población de las localidades que según él, podía aplicarse a otras ciudades. Basó sus aportes precisamente en que lo próximo es más parecido que lo distante, algo que conocemos hoy como autocorrelación espacial. Con independencia de la eficiencia de su modelo, Tobler continuó el camino de descomplicar las reglas, dando cuerpo matemático a este hecho.
 

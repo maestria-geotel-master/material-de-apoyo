@@ -341,11 +341,28 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-WIP 
-```{r, eval=F, echo=F}
-pop.mun <- read_xls('pop_adm3.xls')
+Cerremos esta introducción a R con un ligero análisis exploratorio de datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en este cierre veremos los pasos básicos para hacer que las geometrías "brillen" con atributos reales. Tendremos que unir los datos espaciales con atributos externos (la unión tradicional, o *join*)
+
+No hace falta abordar el problema de la unidad de área modificable en este punto. Baste decir por el momento que cualquier división que utilicemos es y será arbitraria. Si bien la mayoría de las agencias nacionales de estadística sirven sus datos a nivel de términos municipales, regiones o provincias (u otras unidades), no olvidemos que existe un sesgo inherente por no garantizarse la independencia de observaciones. Dado que trabajaremos con mapas, valga esta advertencia tomada de @bivand2013applied:
+
+>Trying to detect pattern in maps of residuals visually is not an acceptable choice, although one sometimes hears comments explaining the lack of formal analysis such as ‘they looked random’, or alternatively ‘I can see the clusters’.
+
+>Tratar de detectar un patrón visualmente en mapas de residuos no es una opción aceptable, aunque algunas veces se escuchan comentarios que explican la falta de análisis formal, tales como 'la variable se veía aleatoria', o, alternativamente, 'veo grupos/conglomerados'.
+
+Tómese también en cuenta el mito de John Snow [@brody2000map]. Demos a los mapas su justa valoración, no los mitifiquemos ni los ignoremos. Hoy en día "cualquiera puede hacer mapas", pero no cualquiera puede interpretarlos. Exploraremos los datos de población a nivel municipal del IX Censo Nacional de Población y Vivienda 2010, algo que probablemente has realizado previamente en paquete SIG. La fuente es la [Oficina Nacional de Estadística](https://www.one.gob.do/), a través de la [plataforma REDATAM](https://www.one.gob.do/recursos-automatizados/consulta-en-linea-redatam). Descargué una consulta con algunas variables, incluyendo agregados de población totales y por sexo. La plataforma ofrece formatos Excel y PDF. Descargué un archivo Excel y lo convertí a formato "valores separados por coma", que no es propietario. El archivo resultante está alojado en el repo, concretamente en `data/pop_adm3.csv`.
+
+
+```{r}
+pop.mun <- read_csv('data/pop_adm3.csv') #read_csv pertenece al paquete readr, de la colección tidyverse
 pop.mun
 nrow(pop.mun)
+```
+
+Lamentablmente, el código de enlace en el archivo fuente suprime el '0' a la izquierda en el código de municipio, contenido en el campo `ENLACE`. Exploremos di
+
+Aprovechemos esta inconsistencia para introducir las tuberías de `tidyverse`, concretamente en `dplyr`.
+
+```{r}
 pop.mun <- pop.mun %>%
   mutate(ENLACE = ifelse(
     nchar(Code)==5,
@@ -353,7 +370,10 @@ pop.mun <- pop.mun %>%
     Code)
   )
 match(mun.sf$ENLACE, pop.mun$ENLACE)
+```
 
+
+```{r, eval=F, echo=F}
 mun.sf.sex <- mun.sf %>% 
   inner_join(pop.mun) %>% 
   select(Hombres, Mujeres, TOPONIMIA) %>% 
