@@ -37,17 +37,17 @@ Diferencias en énfasis entre software SIG con interfaz gráfico y R. Fuente: @l
 Verás a continuación algunas fuentes de referencia sobre los programas y servicios que manejarás.
 
 * Sobre [R](https://www.r-project.org/)
-    * [Vídeo corto sobre la historia de R](https://es.coursera.org/lecture/intro-data-science-programacion-estadistica-r/historia-e-introduccion-a-r-alNk0), donde aprenderás algunas características de R y el software libre en general, ventajas y desventajas de R, así como algunas aplicaciones.
-    * [Libro R4DS, R for Data Science](https://r4ds.had.co.nz/), una fuente muy completa realizada principalmente por @Wickham2017R, con apoyo de la comunidad R. [Fue traducido recientemente a español como "R para Ciencia de Datos"](https://es.r4ds.hadley.nz/) por la comunidad R de Latinoamérica, con el objetivo hacer R más accesible en la región. Es un buen punto de partida. La organización del libro, que prioriza el aparato gráfico sobre la parte programática, ayuda a mantener la motivación en el aprendizaje de R.
+    * [Vídeo corto sobre la historia de R](https://es.coursera.org/lecture/intro-data-science-programacion-estadistica-r/historia-e-introduccion-a-r-alNk0), donde aprenderás algunas características de este lenguaje y del software libre en general. Verás también ventajas y desventajas de R, así como algunas aplicaciones.
+    * [Libro R4DS, R for Data Science](https://r4ds.had.co.nz/), una fuente muy completa realizada principalmente por @Wickham2017R, con apoyo de la comunidad R. [Fue traducido recientemente a español como "R para Ciencia de Datos"](https://es.r4ds.hadley.nz/) por la comunidad R de Latinoamérica, con el objetivo de hacer R más accesible en la región. Es un buen punto de partida. La organización del libro, que prioriza el aparato gráfico sobre la parte programática, ayuda a mantener la motivación en el aprendizaje de R.
     * [Este es un manual de R](https://cran.r-project.org/doc/contrib/rdebuts_es.pdf) con enfoque orientado a la programación, y es todo un clásico [@paradis2003r].
     * [Esta web](https://oscarperpinan.github.io/R/) es bastante completa para un nivel introductorio a R, y es a la vez un buen lugar de referencia [@perpinan2019intro].
-    * [Geocomputation with R](https://geocompr.robinlovelace.net/) [@lovelace2019geocomputation], el cual, como aseguran sus autores, trata sobre **hacer cosas con datos espaciales usando R**, enseñando destrezas como lectura y escrituras de datos espaciales, hacer mapas, modelizar fenómenos geográficos, entre otras.
+    * [Geocomputation with R](https://geocompr.robinlovelace.net/) [@lovelace2019geocomputation], el cual, como aseguran sus autores, trata sobre **hacer cosas con datos espaciales usando R**, enseñando destrezas como lectura y escritura de datos espaciales, elaboración de mapas, modelización de fenómenos geográficos, entre otras.
     * [R-spatial](https://www.r-spatial.org/). Es un sitio web y blog dirigido a personas interesadas en usar R para anlizar datos espaciales y espacio-temporales. Además de publicar entradas periódicas sobre herramientas de análisis espacial con R, el sitio aloja el libro [Spatial Data Science](https://keen-swartz-3146c4.netlify.com/) [@pebesma2019spatial], que explica los conceptos que subyacen a los datos espaciales: puntos, líneas, polígonos, rásters, cubos de datos, entre otros. Aborda también conceptos de mayor nivel, por ejemplo, cómo afectan los atributos y las geometrías en el análisis espacial.
     * La existencia de una diversa y activa comunidad R incentiva a muchos/as usuarios/as a usar este entorno de programación. [A continuación](#twitter) verás algunas cuentas de Twitter, donde podrás observar en vivo una mínima parte de la actividad de la comunidad R. Hay muchas otras cuentas, foros, sitios web e incluso reuniones periódicas donde podrás interactuar con la comunidad. Te animo a descubrirlas.
-    * [RStudio](https://www.rstudio.com/). Tanto la página de Wikipedia como [este vídeo](https://www.youtube.com/watch?v=5XeFFoTf2IY) explican muy bien en qué consiste este entorno de desarrollo integrado, además de que hace una breve introducción a qué es R.
+    * [RStudio](https://www.rstudio.com/). Tanto la página de Wikipedia como [este vídeo](https://www.youtube.com/watch?v=5XeFFoTf2IY) explican muy bien en qué consiste este entorno de desarrollo integrado.
 * [Git](https://git-scm.com/). Bueno, esta es una larga historia, que parece estar bien resumida en [Wikipedia](https://es.wikipedia.org/wiki/Git). Busca en YouTube, y verás otros aportes. 
 * [GitHub](https://github.com/). Se erige como un servicio público para desarrolladores y desarrolladoras. Luce bien explicado [aquí](https://www.deustoformacion.com/blog/programacion-diseno-web/que-es-para-que-sirve-github). Recomiendo también el libro web ["*Happy Git and GitHub for the useR*"](https://happygitwithr.com/) [@bryan2019happy].
-* [GitHub Classroom](https://github.com/education/classroom]). En [esta web](https://www.genbeta.com/desarrollo/classroom-for-github-ayudando-a-los-profesores-a-gestionar-los-ejercicios-de-sus-clases) te explican para qué sirve. Con este servicio estoy asignándote trabajo. También te recomiendo que leas  [ésta afirmación](https://github.com/education/classroom#who-is-github-classroom-for) sobre "Who is GitHub classroom for?".
+* [GitHub Classroom](https://github.com/education/classroom]). En [esta web](https://www.genbeta.com/desarrollo/classroom-for-github-ayudando-a-los-profesores-a-gestionar-los-ejercicios-de-sus-clases) te explican para qué sirve. Con este servicio estoy asignándote trabajo. También te recomiendo que leas  [ésta afirmación](https://github.com/education/classroom#who-is-github-classroom-for) sobre "Who is GitHub Classroom for?".
 * Foros de ayuda y listas de distribución, entre los que destacan [R-help](https://stat.ethz.ch/mailman/listinfo/r-help), [R-devel](https://stat.ethz.ch/mailman/listinfo/r-devel), [Stackoverflow](https://stackoverflow.com/). Las preguntas deben plantearse con un ejemplo reproducible. Si vas a plantear una, lee antes las guías de publicación. Existe una [lista de distribución de R-help en español](https://stat.ethz.ch/mailman/listinfo/r-help-es), así como de [Stackoverflow en español](https://es.stackoverflow.com/).
 * <a name="twitter"></a>Twitter:
     * [The R Foundation](https://twitter.com/_r_foundation)
@@ -62,16 +62,16 @@ Verás a continuación algunas fuentes de referencia sobre los programas y servi
     * [UseR! 2020](https://twitter.com/useR2020stl)
     * [UseR! 2019](https://twitter.com/UseR2019_Conf)
 
-### Instalación y ejecución de R y RStudio
+### Servidor RStudio habilitado por el profesor, o instalación y ejecución de R y RStudio en tu propia PC
 
 * Puedes usar el servidor RStudio habilitado por el profesor. Revisa tu buzón de correo electrónico (también el *spam*), y localiza un mensaje donde te explico los detalles de acceso.
 
 * Si prefieres trabajar en tu propia PC, instala R y RStudio, y los paquetes requeridos en las asignaciones. La guía de instalación varía mucho según el sistema operativo:
     * [R](https://cloud.r-project.org/)
     * [RStudio](https://www.rstudio.com/products/rstudio/download/#download)
-* Igualmente, la forma de ejecutar estas aplicaciones dependerá del sistema operativo.
-    * En GNU/Linux puedes ejecutar aplicaciones tanto desde el gestor de ventanas como desde el intérprete de línea de órdenes (CLI) o "terminal" (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
-    * En Windows y MacOS la ejecución se realiza desde el GUI.
+    * Igualmente, la forma de ejecutar estas aplicaciones dependerá del sistema operativo.
+        * En GNU/Linux puedes ejecutar aplicaciones tanto desde el gestor de ventanas como desde el intérprete de línea de órdenes (CLI) o "terminal" (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
+        * En Windows y MacOS la ejecución se realiza desde el GUI.
 
 ### CRAN (Comprehensive R Archive Network)
 * [¿Qué es CRAN?](https://cran.r-project.org/doc/FAQ/R-FAQ.html#What-is-CRAN_003f)
@@ -341,7 +341,8 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-```{r, eval=F}
+WIP 
+```{r, eval=F, echo=F}
 pop.mun <- read_xls('pop_adm3.xls')
 pop.mun
 nrow(pop.mun)
@@ -390,9 +391,9 @@ tmap_arrange(p1text)
 
 ## Conclusión
 
-Conociste las herramientas básicas para realizar un EDA ágilmente y generando gráficos informativos. **El EDA es un paso imprescindible en cualquier investigación**, así que, ya que no te lo podrás saltar, es necesario que practiques con los datos de ejemplo mostrados aquí, o con los tuyos propiamente.
+Conociste las herramientas básicas sobre creación y gestión de *simple features*. También te introduciste en la realización de ESDA, incluyendo soporte gráfico. **El ESDA es un paso imprescindible en cualquier investigación**, así que, ya que no te lo podrás saltar, es necesario que practiques con los datos de ejemplo mostrados aquí, o con los tuyos propiamente.
 
-Aunque los paquetes de análisis de datos ecológicos no están "saborizados" al estilo `tidyverse`, al menos el EDA lo podrás realizar utilizando tuberías de esta potente colección de paquetes. Conocerás más herramientas de `tidyverse` en el siguiente capítulo de esta novela.
+El paquete `sf` tiene la ventaja de que está "saborizado" al estilo `tidyverse`, y esto te ayudará a realizar tu ESDA mediante las tuberías de esta potente colección de paquetes.
 
 ## Situaciones comunes
 * R es sensible a las mayúsculas. No es lo mismo `Mi_objeto` que `mi_objeto`.

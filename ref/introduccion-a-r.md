@@ -39,15 +39,15 @@ servicios que manejarás.
   - Sobre [R](https://www.r-project.org/)
       - [Vídeo corto sobre la historia de
         R](https://es.coursera.org/lecture/intro-data-science-programacion-estadistica-r/historia-e-introduccion-a-r-alNk0),
-        donde aprenderás algunas características de R y el software
-        libre en general, ventajas y desventajas de R, así como algunas
-        aplicaciones.
+        donde aprenderás algunas características de este lenguaje y del
+        software libre en general. Verás también ventajas y desventajas
+        de R, así como algunas aplicaciones.
       - [Libro R4DS, R for Data Science](https://r4ds.had.co.nz/), una
         fuente muy completa realizada principalmente por Wickham &
         Grolemund (2017), con apoyo de la comunidad R. [Fue traducido
         recientemente a español como “R para Ciencia de
         Datos”](https://es.r4ds.hadley.nz/) por la comunidad R de
-        Latinoamérica, con el objetivo hacer R más accesible en la
+        Latinoamérica, con el objetivo de hacer R más accesible en la
         región. Es un buen punto de partida. La organización del libro,
         que prioriza el aparato gráfico sobre la parte programática,
         ayuda a mantener la motivación en el aprendizaje de R.
@@ -61,9 +61,9 @@ servicios que manejarás.
       - [Geocomputation with R](https://geocompr.robinlovelace.net/)
         (Lovelace et al., 2019), el cual, como aseguran sus autores,
         trata sobre **hacer cosas con datos espaciales usando R**,
-        enseñando destrezas como lectura y escrituras de datos
-        espaciales, hacer mapas, modelizar fenómenos geográficos, entre
-        otras.
+        enseñando destrezas como lectura y escritura de datos
+        espaciales, elaboración de mapas, modelización de fenómenos
+        geográficos, entre otras.
       - [R-spatial](https://www.r-spatial.org/). Es un sitio web y blog
         dirigido a personas interesadas en usar R para anlizar datos
         espaciales y espacio-temporales. Además de publicar entradas
@@ -85,8 +85,7 @@ servicios que manejarás.
       - [RStudio](https://www.rstudio.com/). Tanto la página de
         Wikipedia como [este
         vídeo](https://www.youtube.com/watch?v=5XeFFoTf2IY) explican
-        muy bien en qué consiste este entorno de desarrollo integrado,
-        además de que hace una breve introducción a qué es R.
+        muy bien en qué consiste este entorno de desarrollo integrado.
   - [Git](https://git-scm.com/). Bueno, esta es una larga historia, que
     parece estar bien resumida en
     [Wikipedia](https://es.wikipedia.org/wiki/Git). Busca en YouTube, y
@@ -103,7 +102,7 @@ servicios que manejarás.
     te explican para qué sirve. Con este servicio estoy asignándote
     trabajo. También te recomiendo que leas [ésta
     afirmación](https://github.com/education/classroom#who-is-github-classroom-for)
-    sobre “Who is GitHub classroom for?”.
+    sobre “Who is GitHub Classroom for?”.
   - Foros de ayuda y listas de distribución, entre los que destacan
     [R-help](https://stat.ethz.ch/mailman/listinfo/r-help),
     [R-devel](https://stat.ethz.ch/mailman/listinfo/r-devel),
@@ -122,11 +121,12 @@ servicios que manejarás.
       - [Hadley Wickham](https://twitter.com/hadleywickham)
       - [Gabriela de Queiroz](https://twitter.com/gdequeiroz)
       - [Jenny Bryan](https://twitter.com/JennyBryan)
-      - [R Consortium](https://twitter.com/rconsortium)
+      - [R
+Consortium](https://twitter.com/rconsortium)
       - [UseR\! 2020](https://twitter.com/useR2020stl)
       - [UseR\! 2019](https://twitter.com/UseR2019_Conf)
 
-### Instalación y ejecución de R y RStudio
+### Servidor RStudio habilitado por el profesor, o instalación y ejecución de R y RStudio en tu propia PC
 
   - Puedes usar el servidor RStudio habilitado por el profesor. Revisa
     tu buzón de correo electrónico (también el *spam*), y localiza un
@@ -139,15 +139,13 @@ servicios que manejarás.
     
       - [R](https://cloud.r-project.org/)
       - [RStudio](https://www.rstudio.com/products/rstudio/download/#download)
-
-  - Igualmente, la forma de ejecutar estas aplicaciones dependerá del
-    sistema operativo.
-    
-      - En GNU/Linux puedes ejecutar aplicaciones tanto desde el gestor
-        de ventanas como desde el intérprete de línea de órdenes (CLI) o
-        “terminal” (por ejemplo, para ejecutar R, presiona `CRTL+ALT+T`,
-        escribe `R` y presiona `<enter>`).
-      - En Windows y MacOS la ejecución se realiza desde el GUI.
+      - Igualmente, la forma de ejecutar estas aplicaciones dependerá
+        del sistema operativo.
+          - En GNU/Linux puedes ejecutar aplicaciones tanto desde el
+            gestor de ventanas como desde el intérprete de línea de
+            órdenes (CLI) o “terminal” (por ejemplo, para ejecutar R,
+            presiona `CRTL+ALT+T`, escribe `R` y presiona `<enter>`).
+          - En Windows y MacOS la ejecución se realiza desde el GUI.
 
 ### CRAN (Comprehensive R Archive Network)
 
@@ -769,64 +767,20 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-``` r
-pop.mun <- read_xls('pop_adm3.xls')
-pop.mun
-nrow(pop.mun)
-pop.mun <- pop.mun %>%
-  mutate(ENLACE = ifelse(
-    nchar(Code)==5,
-    paste0('0', Code),
-    Code)
-  )
-match(mun.sf$ENLACE, pop.mun$ENLACE)
-
-mun.sf.sex <- mun.sf %>% 
-  inner_join(pop.mun) %>% 
-  select(Hombres, Mujeres, TOPONIMIA) %>% 
-  mutate(Total=Hombres+Mujeres)
-plot(mun.sf.sex, breaks = 'jenks')
-pop.mun.hom <- plot(mun.sf.sex['Hombres'], breaks = 'jenks')
-
-dev.new()
-mun.sf.sex %>%
-  select(-TOPONIMIA) %>% 
-  gather(variable, value, -geometry) %>%
-  ggplot(aes(fill=value)) +
-  geom_sf() +
-  facet_wrap(~variable)
-
-p1 <- tm_shape(mun.sf.sex) +
-  tm_fill(col = "Hombres", style = 'jenks') +
-  tm_borders()
-p2 <- tm_shape(mun.sf.sex) +
-  tm_fill(col = "Mujeres", style = 'jenks') +
-  tm_borders()
-p3 <- tm_shape(mun.sf.sex) +
-  tm_fill(col = "Total", style = 'jenks') +
-  tm_borders()
-tmap_arrange(p1, p2, p3)
-
-p1text <- tm_shape(mun.sf.sex) +
-  tm_fill(col = "Hombres", style = 'jenks') +
-  tm_borders() +
-  tm_text('TOPONIMIA', size = 0.4)
-tmap_arrange(p1text)
-```
+WIP
 
 ## Conclusión
 
-Conociste las herramientas básicas para realizar un EDA ágilmente y
-generando gráficos informativos. **El EDA es un paso imprescindible en
-cualquier investigación**, así que, ya que no te lo podrás saltar, es
-necesario que practiques con los datos de ejemplo mostrados aquí, o con
-los tuyos propiamente.
+Conociste las herramientas básicas sobre creación y gestión de *simple
+features*. También te introduciste en la realización de ESDA, incluyendo
+soporte gráfico. **El ESDA es un paso imprescindible en cualquier
+investigación**, así que, ya que no te lo podrás saltar, es necesario
+que practiques con los datos de ejemplo mostrados aquí, o con los tuyos
+propiamente.
 
-Aunque los paquetes de análisis de datos ecológicos no están
-“saborizados” al estilo `tidyverse`, al menos el EDA lo podrás
-realizar utilizando tuberías de esta potente colección de paquetes.
-Conocerás más herramientas de `tidyverse` en el siguiente capítulo de
-esta novela.
+El paquete `sf` tiene la ventaja de que está “saborizado” al estilo
+`tidyverse`, y esto te ayudará a realizar tu ESDA mediante las tuberías
+de esta potente colección de paquetes.
 
 ## Situaciones comunes
 
