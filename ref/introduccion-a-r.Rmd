@@ -11,7 +11,8 @@ knitr::opts_knit$set(root.dir = "..")
 knitr::opts_chunk$set(
   echo = TRUE,
   collapse=TRUE,
-  fig.path = "../img/"
+  fig.path = "../img/",
+  out.width='100%'
 )
 ```
 
@@ -104,6 +105,7 @@ library(rgdal)
 library(tidyverse)
 library(readxl)
 library(tmap)
+library(RColorBrewer)
 ```
 
 Brevemente, con `sf` crearás y manipularás *simple features*, `raster` te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal` tendrás varias funciones *wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una colección de paquetes para manipular, limpiar y organizar datos de `data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap` crearás mapas y los personalizarás. Busca más información sobre estos paquetes, y comprobarás las múltiples capacidades de R para manipular información espacial.
@@ -217,8 +219,7 @@ mlin.sfg
 plot(mlin.sfg, col = 'red'); box()
 matrizmpol <- list(
   list(rbind(c(-70.7, 18.6), c(-70.4, 18.6), c(-70.4, 18.9), c(-70.7, 18.9), c(-70.7, 18.6))),
-  list(rbind(c(-70, 18.6), c(-70.3, 18.6), c(-70.2, 18.9), c(-70, 18.6)))
-)
+  list(rbind(c(-70, 18.6), c(-70.3, 18.6), c(-70.2, 18.9), c(-70, 18.6))))
 mpol.sfg <- st_multipolygon(matrizmpol)
 mpol.sfg
 plot(mpol.sfg, col = 'red'); box()
@@ -341,54 +342,100 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-Cerremos esta introducción a R con un ligero análisis exploratorio de datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en este cierre veremos los pasos básicos para hacer que las geometrías "brillen" con atributos reales. Tendremos que unir los datos espaciales con atributos externos (la unión tradicional, o *join*)
+Cerremos esta introducción a R con un ligero análisis exploratorio de datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en este cierre veremos los pasos básicos para hacer que las geometrías "brillen" con atributos reales. Tendremos que unir los datos espaciales con atributos externos (la unión tradicional, o *join*), utilizando un campo común entre ambos. Como suele ocurrir en cualquier flujo de trabajo de análisis de datos, el 80% del esfuerzo lo dedicamos a limpiar y organizar; en este caso no será diferente.
 
-No hace falta abordar el problema de la unidad de área modificable en este punto. Baste decir por el momento que cualquier división que utilicemos es y será arbitraria. Si bien la mayoría de las agencias nacionales de estadística sirven sus datos a nivel de términos municipales, regiones o provincias (u otras unidades), no olvidemos que existe un sesgo inherente por no garantizarse la independencia de observaciones. Dado que trabajaremos con mapas, valga esta advertencia tomada de @bivand2013applied:
+No hace falta abordar el problema de la unidad de área modificable en este punto. Baste decir por el momento que cualquier división que utilicemos es y será arbitraria. Si bien la mayoría de las agencias nacionales de estadística sirven sus datos a nivel de términos municipales, regiones o provincias (u otras unidades), no olvidemos que existe un sesgo inherente, puesto que una división arbitraria no garantiza la independencia de observaciones.
+
+A modo de justificación del análisis exploratorio de datos espaciales, y dado que trabajaremos con mapas, valga esta advertencia tomada de @bivand2013applied:
 
 >Trying to detect pattern in maps of residuals visually is not an acceptable choice, although one sometimes hears comments explaining the lack of formal analysis such as ‘they looked random’, or alternatively ‘I can see the clusters’.
 
 >Tratar de detectar un patrón visualmente en mapas de residuos no es una opción aceptable, aunque algunas veces se escuchan comentarios que explican la falta de análisis formal, tales como 'la variable se veía aleatoria', o, alternativamente, 'veo grupos/conglomerados'.
 
-Tómese también en cuenta el mito de John Snow [@brody2000map]. Demos a los mapas su justa valoración, no los mitifiquemos ni los ignoremos. Hoy en día "cualquiera puede hacer mapas", pero no cualquiera puede interpretarlos. Exploraremos los datos de población a nivel municipal del IX Censo Nacional de Población y Vivienda 2010, algo que probablemente has realizado previamente en paquete SIG. La fuente es la [Oficina Nacional de Estadística](https://www.one.gob.do/), a través de la [plataforma REDATAM](https://www.one.gob.do/recursos-automatizados/consulta-en-linea-redatam). Descargué una consulta con algunas variables, incluyendo agregados de población totales y por sexo. La plataforma ofrece formatos Excel y PDF. Descargué un archivo Excel y lo convertí a formato "valores separados por coma", que no es propietario. El archivo resultante está alojado en el repo, concretamente en `data/pop_adm3.csv`.
+Tómese también en cuenta el mito de John Snow [@brody2000map]. En definitiva, demos a los mapas su justa valoración, no los mitifiquemos, pero tampoco los ignoremos. Hoy en día "cualquiera puede hacer mapas", pero no cualquiera puede interpretarlos.
 
+Exploraremos los datos de población a nivel municipal del IX Censo Nacional de Población y Vivienda 2010, algo que probablemente has realizado previamente en paquete SIG. La fuente es la [Oficina Nacional de Estadística (ONE)](https://www.one.gob.do/), a través de la [plataforma REDATAM](https://www.one.gob.do/recursos-automatizados/consulta-en-linea-redatam). Descargué una consulta con algunas variables, incluyendo agregados de población totales y por sexo. La plataforma ofrece formatos Excel y PDF. Descargué un archivo Excel y lo convertí a formato "valores separados por coma", que no es propietario. El archivo resultante está alojado en el repo, concretamente en `data/pop_adm3.csv`.
 
 ```{r}
 pop.mun <- read_csv('data/pop_adm3.csv') #read_csv pertenece al paquete readr, de la colección tidyverse
 pop.mun
 nrow(pop.mun)
+ncol(pop.mun)
 ```
 
-Lamentablmente, el código de enlace en el archivo fuente suprime el '0' a la izquierda en el código de municipio, contenido en el campo `ENLACE`. Exploremos di
+Recordemos que para hacer la unión necesitamos un campo común entre los objetos que se unirán. Lamentablemente, el campo `Código` en el archivo fuente suprime el `0` a la izquierda en el código del municipio, por lo que no es comparable con su homólogo en el objeto de geometrías. El campo `Código` es de tipo "heredado": cada nivel de la división del país deja su impronta en el campo `Código` del municipio. Así, los dos primeros dígitos corresponden a la región (por ejemplo, `01`, `02`, ..., `10`), los dos siguientes a la provincia y los últimos al municipio. Por lo tanto, para el nivel municipal, cada `Código` debe componerse por 6 dígitos, tal como aparece en el campo homólogo del objeto `mun.sf.ll`, el cual se denomina `ENLACE`. Veamos el caso en detalle.
 
-Aprovechemos esta inconsistencia para introducir las tuberías de `tidyverse`, concretamente en `dplyr`.
+>Los distritos municipales se analizan como parte del municipio correspondiente.
 
 ```{r}
-pop.mun <- pop.mun %>%
-  mutate(ENLACE = ifelse(
-    nchar(Code)==5,
-    paste0('0', Code),
-    Code)
-  )
-match(mun.sf$ENLACE, pop.mun$ENLACE)
+pop.mun$Código #Campo código de pop.mun
+mun.sf.ll$ENLACE #Campo ENLACE de mun.sf.ll
+match(pop.mun$Código, mun.sf.ll$ENLACE) #Prueba de emparejamiento. Los "NA" son casos sin emparejamiento
 ```
+
+Notamos que sólo los municipios con seis dígitos de `pop.mun$Código` tienen un "parejo" (hacen `match`) con los de `mun.sf.ll$ENLACE`. Si los campos no son comparables es imposible hacer unión. Por lo tanto, el primer paso consiste en corregir este problema. Aprovecho esta inconsistencia para introducir los flujos de trabajo (tuberías) de `tidyverse`, concretamente de `dplyr`.
+
+El código a continuación toma el objeto `pop.mun`, genera una columna denominada `ENLACE` (como la de `mun.sf.ll`), que evalúa en cada "celda" del campo `Código` si hay 5 caracteres, en cuyo caso le añade un `0` por delante; en caso contrario, lo deja tal cual.
+
+```{r}
+pop.mun <- pop.mun %>% mutate(ENLACE = ifelse(nchar(Código)==5, paste0('0', Código),Código))
+pop.mun$ENLACE #Muestra la nueva variable creada
+match(mun.sf$ENLACE, pop.mun$ENLACE) #Prueba si hay emparejamiento. Todos emparejados, no hay "NA"
+```
+
+La tubería `dplyr` se compone de dos tipos de elementos: acción/es y un "empalme/s". La acción en este caso es la función `mutate` y el empalme es el operador `%>%` (*pipe*, pipa), que pertenece al paquete `magrittr`. El *pipe* "entuba" el resultado hacia adelante en una función o una llamada. En otras palabras, la pipa envía como valor del primer argumento de la función a su derecha lo que se encuentre a su derecha. Si lo prefieres, traduce `%>%` a "...entonces...". Así, el valor del primer agrumento de `mutate` es `pop.mun`. La acción `mutate` significa en este ejemplo "añadir una variable".
+
+Si lo leemos en lenguaje humano, le estamos ordenando a R lo siguiente: "Toma `pop.mun` como fuente de datos, y añade la variable `ENLACE` (nos conviene usar el mismo nombre que aparece en el objeto `mun.sf.ll`), que obtendrá su valor de la variable `Código` con una condición: si `Código` tiene 5 caracteres, pon un cero a la izquierda, de lo contrario, toma el valor de la variable `Código`".
+
+Es importante notar que no se añadirá una variable propiamente a `pop.mun`, sino que en RAM se creará una réplica de `pop.mun` que contendrá una nueva variable. Si no lo asignásemos, mediante `<-`, la réplica no quedará disponible en la RAM para ser llamada nuevamente en el futuro. En este caso, se sobreescribe el objeto `pop.mun`.
+
+Ahora usemos una función para unir ambas tablas. Recordemos que `mun.sf.ll` es un `data.frame` con columna de geometría (`sf`). Igualmente, `pop.mun` es un `data.frame`, por lo que estaremos uniendo dos `data.frame`, de tal forma que los datos de población quedarán disponibles en objeto que crearemos a partir de dicha unión al que nombraremos `mun.sf.pop`.
+
+```{r}
+mun.sf.pop <- mun.sf.ll %>% #El objeto sf como fuente, al que le uniremos pop.mun
+  inner_join(pop.mun, by = 'ENLACE') #Unión con pop.mun a través del campo ENLACE
+mun.sf.pop
+```
+
+Notemos que el objeto `mun.sf.pop` conserva las columnas que contenía inicialmente `mun.sf.ll` y se añaden todas las columnas `pop.mun`. El resumen del objeto `mun.sf.pop`, en el encabezado indica `Simple feature collection with 155 features and 262 fields`, lo que supone que se han conservado todos los municipios (cada fila un municipio) y se han añadido 256 columnas de las 257 disponibles (`ENLACE` no se añade, por tratarse del campo de unión).
+
+Creemos un objeto nuevo al que llamaremos `mun.sf.sex`, seleccionando de `mun.sf.pop` las columnas de `ENLACE`, `TOPONIMIA`, `Hombres` y `Mujeres` (número de hombres y mujeres, respectivamente). Al mismo tiempo, crearemos la columna `Total`, que contendrá la suma de la población de hombres y mujeres.
+
+```{r}
+mun.sf.sex <- mun.sf.pop %>%
+  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
+  mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
+mun.sf.sex
+```
+
+El objeto `mun.sf.sex` tiene los mismo 155 municipios, pero sólo 5 campos. Representemos la población por sexo y total en un panel (la función `plot` representa la misma geometría según cada uno de los campos disponibles)
+
+```{r plotmunsfsex}
+plot(mun.sf.sex, breaks = 'jenks') #Panel
+```
+
+Hagamos lo propio sólo para la población de mujeres.
+
+```{r plotmunsfmujeres}
+plot(mun.sf.sex['Mujeres'], breaks = 'jenks') #Población de mujeres
+```
+
+Tal como indiqué arriba, los mapas generados con la función `plot` son muy mejorables. En R no es fácil cumplir con los estándares propios de un mapa cartográficamente apropiado. Por ejemplo, eliminar el "efecto isla" requeriría retoques manuales, y rotular objetos de referencia en el mapa requeriría también acciones manuales. Sin embargo, no podemos olvidar que en R lo que más nos interesa es explorar e interpretar patrones, por lo que la simbología y está orientada a actuar sobre la o las variables de nuestro interés. En tal sentido, los paquetes `ggplot2` (parte de `tidyverse`) y `tmap` ofrecen herramientas versátiles para conseguir mapas informativos, al menos en lo que respecta a la variable de interés.
+
+
+```{r ggplot}
+mun.sf.sex %>%
+  dplyr::select(Mujeres, Hombres) %>% 
+  gather(variable, value, -geom) %>%
+  ggplot(aes(fill=value)) +
+  geom_sf(lwd=0.2) +
+  facet_wrap(~variable) +
+  scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+```
+
 
 
 ```{r, eval=F, echo=F}
-mun.sf.sex <- mun.sf %>% 
-  inner_join(pop.mun) %>% 
-  select(Hombres, Mujeres, TOPONIMIA) %>% 
-  mutate(Total=Hombres+Mujeres)
-plot(mun.sf.sex, breaks = 'jenks')
-pop.mun.hom <- plot(mun.sf.sex['Hombres'], breaks = 'jenks')
-
-dev.new()
-mun.sf.sex %>%
-  select(-TOPONIMIA) %>% 
-  gather(variable, value, -geometry) %>%
-  ggplot(aes(fill=value)) +
-  geom_sf() +
-  facet_wrap(~variable)
-
 p1 <- tm_shape(mun.sf.sex) +
   tm_fill(col = "Hombres", style = 'jenks') +
   tm_borders()

@@ -185,6 +185,7 @@ library(rgdal)
 library(tidyverse)
 library(readxl)
 library(tmap)
+library(RColorBrewer)
 ```
 
 Brevemente, con `sf` crearás y manipularás *simple features*, `raster`
@@ -209,7 +210,7 @@ reg.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'REGCenso2010', quiet = 
 plot(reg.sf)
 ```
 
-![](../img/regiones-1.png)<!-- -->
+<img src="../img/regiones-1.png" width="100%" />
 
 La función `st_read` lee la capa correspondiente del GPKG y la convierte
 a un `simple features` de tipo `MULTIPOLYGON` (este tipo de objetos los
@@ -230,7 +231,7 @@ reg.sf$area <- st_area(reg.sf)
 plot(reg.sf['area'])
 ```
 
-![](../img/regiones2-1.png)<!-- -->
+<img src="../img/regiones2-1.png" width="100%" />
 
 > El mapa anterior es mejorable en muchos aspectos. En este mismo
 > tutorial, probarás formas de diseñar mapas estilizados.
@@ -247,14 +248,14 @@ mun.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'MUNCenso2010', quiet = 
 plot(mun.sf)
 ```
 
-![](../img/municipios-1.png)<!-- -->
+<img src="../img/municipios-1.png" width="100%" />
 
 ``` r
 mun.sf$area <- st_area(mun.sf)
 plot(mun.sf['area'])
 ```
 
-![](../img/municipios-2.png)<!-- -->
+<img src="../img/municipios-2.png" width="100%" />
 
 ### ¿Qué son *simple features*?
 
@@ -494,8 +495,7 @@ mlin.sfg
 plot(mlin.sfg, col = 'red'); box()
 matrizmpol <- list(
   list(rbind(c(-70.7, 18.6), c(-70.4, 18.6), c(-70.4, 18.9), c(-70.7, 18.9), c(-70.7, 18.6))),
-  list(rbind(c(-70, 18.6), c(-70.3, 18.6), c(-70.2, 18.9), c(-70, 18.6)))
-)
+  list(rbind(c(-70, 18.6), c(-70.3, 18.6), c(-70.2, 18.9), c(-70, 18.6))))
 mpol.sfg <- st_multipolygon(matrizmpol)
 mpol.sfg
 ## MULTIPOLYGON (((-70.7 18.6, -70.4 18.6, -70.4 18.9, -70.7 18.9, -70.7 18.6)), ((-70 18.6, -70.3 18.6, -70.2 18.9, -70 18.6)))
@@ -543,7 +543,7 @@ pto.sfc
 plot(pto.sfc, col = 'red'); box()
 ```
 
-![](../img/ptosfc-1.png)<!-- -->
+<img src="../img/ptosfc-1.png" width="100%" />
 
 Aunque la representación gráfica de `pto.sfc` es idéntica a la de su
 homólogo `pto.sfg`, la diferencia radica en la clase del objeto.
@@ -763,7 +763,7 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
   tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
 
-![](../img/tmmunptlinpol-1.png)<!-- -->
+<img src="../img/tmmunptlinpol-1.png" width="100%" />
 
 ## Análisis exploratorio de datos espaciales (ESDA)
 
@@ -772,16 +772,21 @@ datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el
 ESDA en profundidad, en este cierre veremos los pasos básicos para hacer
 que las geometrías “brillen” con atributos reales. Tendremos que unir
 los datos espaciales con atributos externos (la unión tradicional, o
-*join*)
+*join*), utilizando un campo común entre ambos. Como suele ocurrir en
+cualquier flujo de trabajo de análisis de datos, el 80% del esfuerzo lo
+dedicamos a limpiar y organizar; en este caso no será diferente.
 
 No hace falta abordar el problema de la unidad de área modificable en
 este punto. Baste decir por el momento que cualquier división que
 utilicemos es y será arbitraria. Si bien la mayoría de las agencias
 nacionales de estadística sirven sus datos a nivel de términos
 municipales, regiones o provincias (u otras unidades), no olvidemos que
-existe un sesgo inherente por no garantizarse la independencia de
-observaciones. Dado que trabajaremos con mapas, valga esta advertencia
-tomada de Bivand, Pebesma, & Gomez-Rubio (2013):
+existe un sesgo inherente, puesto que una división arbitraria no
+garantiza la independencia de observaciones.
+
+A modo de justificación del análisis exploratorio de datos espaciales, y
+dado que trabajaremos con mapas, valga esta advertencia tomada de
+Bivand, Pebesma, & Gomez-Rubio (2013):
 
 > Trying to detect pattern in maps of residuals visually is not an
 > acceptable choice, although one sometimes hears comments explaining
@@ -794,13 +799,16 @@ tomada de Bivand, Pebesma, & Gomez-Rubio (2013):
 > aleatoria’, o, alternativamente, ‘veo grupos/conglomerados’.
 
 Tómese también en cuenta el mito de John Snow (Brody, Rip,
-Vinten-Johansen, Paneth, & Rachman, 2000). Demos a los mapas su justa
-valoración, no los mitifiquemos ni los ignoremos. Hoy en día “cualquiera
-puede hacer mapas”, pero no cualquiera puede interpretarlos.
+Vinten-Johansen, Paneth, & Rachman, 2000). En definitiva, demos a los
+mapas su justa valoración, no los mitifiquemos, pero tampoco los
+ignoremos. Hoy en día “cualquiera puede hacer mapas”, pero no cualquiera
+puede interpretarlos.
+
 Exploraremos los datos de población a nivel municipal del IX Censo
 Nacional de Población y Vivienda 2010, algo que probablemente has
 realizado previamente en paquete SIG. La fuente es la [Oficina Nacional
-de Estadística](https://www.one.gob.do/), a través de la [plataforma
+de Estadística (ONE)](https://www.one.gob.do/), a través de la
+[plataforma
 REDATAM](https://www.one.gob.do/recursos-automatizados/consulta-en-linea-redatam).
 Descargué una consulta con algunas variables, incluyendo agregados de
 población totales y por sexo. La plataforma ofrece formatos Excel y PDF.
@@ -819,18 +827,18 @@ pop.mun <- read_csv('data/pop_adm3.csv') #read_csv pertenece al paquete readr, d
 ## See spec(...) for full column specifications.
 pop.mun
 ## # A tibble: 155 x 256
-##     Code `Municipio de r… `Jefa o jefe` `Esposo (a) o c… `Hijo (a)`
-##    <dbl> <chr>                    <dbl>            <dbl>      <dbl>
-##  1 10901 Municipio Moca           48032            28717      67964
-##  2 10902 Municipio Cayet…          2095             1118       2461
-##  3 10903 Municipio Gaspa…         11270             6144      13433
-##  4 10904 Municipio Jamao…          2330             1248       2646
-##  5 11801 Municipio Puert…         48041            25936      56957
-##  6 11802 Municipio Altam…          5875             3130       6073
-##  7 11803 Municipio Guana…          2010             1097       1900
-##  8 11804 Municipio Imbert          6937             3524       7487
-##  9 11805 Municipio Los H…          3653             2033       3997
-## 10 11806 Municipio Luper…          5170             2841       5177
+##    Código `Municipio de r… `Jefa o jefe` `Esposo (a) o c… `Hijo (a)`
+##     <dbl> <chr>                    <dbl>            <dbl>      <dbl>
+##  1  10901 Municipio Moca           48032            28717      67964
+##  2  10902 Municipio Cayet…          2095             1118       2461
+##  3  10903 Municipio Gaspa…         11270             6144      13433
+##  4  10904 Municipio Jamao…          2330             1248       2646
+##  5  11801 Municipio Puert…         48041            25936      56957
+##  6  11802 Municipio Altam…          5875             3130       6073
+##  7  11803 Municipio Guana…          2010             1097       1900
+##  8  11804 Municipio Imbert          6937             3524       7487
+##  9  11805 Municipio Los H…          3653             2033       3997
+## 10  11806 Municipio Luper…          5170             2841       5177
 ## # … with 145 more rows, and 251 more variables: `Hijo (a) de
 ## #   crianza` <dbl>, `Padre o madre` <dbl>, `Nieto (a)` <dbl>, `Suegro
 ## #   (a)` <dbl>, `Abuelo (a)` <dbl>, `Hermano (a)` <dbl>, `Empleado (a)
@@ -856,23 +864,114 @@ pop.mun
 ## #   `85` <dbl>, `86` <dbl>, …
 nrow(pop.mun)
 ## [1] 155
+ncol(pop.mun)
+## [1] 256
 ```
 
-Lamentablmente, el código de enlace en el archivo fuente suprime el ‘0’
-a la izquierda en el código de municipio, contenido en el campo
-`ENLACE`. Exploremos di
+Recordemos que para hacer la unión necesitamos un campo común entre los
+objetos que se unirán. Lamentablemente, el campo `Código` en el archivo
+fuente suprime el `0` a la izquierda en el código del municipio, por lo
+que no es comparable con su homólogo en el objeto de geometrías. El
+campo `Código` es de tipo “heredado”: cada nivel de la división del país
+deja su impronta en el campo `Código` del municipio. Así, los dos
+primeros dígitos corresponden a la región (por ejemplo, `01`, `02`, …,
+`10`), los dos siguientes a la provincia y los últimos al municipio. Por
+lo tanto, para el nivel municipal, cada `Código` debe componerse por 6
+dígitos, tal como aparece en el campo homólogo del objeto `mun.sf.ll`,
+el cual se denomina `ENLACE`. Veamos el caso en detalle.
 
-Aprovechemos esta inconsistencia para introducir las tuberías de
-`tidyverse`, concretamente en `dplyr`.
+> Los distritos municipales se analizan como parte del municipio
+> correspondiente.
 
 ``` r
-pop.mun <- pop.mun %>%
-  mutate(ENLACE = ifelse(
-    nchar(Code)==5,
-    paste0('0', Code),
-    Code)
-  )
-match(mun.sf$ENLACE, pop.mun$ENLACE)
+pop.mun$Código #Campo código de pop.mun
+##   [1]  10901  10902  10903  10904  11801  11802  11803  11804  11805  11806
+##  [11]  11807  11808  11809  12501  12502  12503  12504  12505  12506  12507
+##  [21]  12508  12509  21301  21302  21303  21304  22401  22402  22403  22404
+##  [31]  22801  22802  22803  30601  30602  30603  30604  30605  30606  30607
+##  [41]  31401  31402  31403  31404  31901  31902  31903  32001  32002  32003
+##  [51]  40501  40502  40503  40504  40505  41501  41502  41503  41504  41505
+##  [61]  41506  42601  42602  42603  42701  42702  42703  50201  50202  50203
+##  [71]  50204  50205  50206  50207  50208  50209  50210  51701  51702  52101
+##  [81]  52102  52103  52104  52105  52106  52107  52108  53101  53102  53103
+##  [91]  60301  60302  60303  60304  60305  60401  60402  60403  60404  60405
+## [101]  60406  60407  60408  60409  60410  60411  61001  61002  61003  61004
+## [111]  61005  61006  61601  61602  70701  70702  70703  70704  70705  70706
+## [121]  72201  72202  72203  72204  72205  72206  80801  80802  81101  81102
+## [131]  81201  81202  81203  92301  92302  92303  92304  92305  92306  92901
+## [141]  92902  92903  92904  92905  93001  93002  93003 100101 103201 103202
+## [151] 103203 103204 103205 103206 103207
+mun.sf.ll$ENLACE #Campo ENLACE de mun.sf.ll
+##   [1] 100101 050201 050202 050203 050204 050205 050206 050207 050208 050209
+##  [11] 050210 060301 060302 060303 060304 060305 060401 060402 060403 060404
+##  [21] 060405 060406 060407 060408 060409 060410 060411 040501 040502 040503
+##  [31] 040504 040505 030601 030602 030603 030604 030605 030606 030607 070701
+##  [41] 070702 070703 070704 070705 070706 080801 080802 010901 010902 010903
+##  [51] 010904 061001 061002 061003 061004 061005 061006 081101 081102 081201
+##  [61] 081202 081203 021301 021302 021303 021304 031401 031402 031403 031404
+##  [71] 041501 041502 041503 041504 041505 041506 061601 061602 051701 051702
+##  [81] 011801 011802 011803 011804 011805 011806 011807 011808 011809 031901
+##  [91] 031902 031903 032001 032002 032003 052101 052102 052103 052104 052105
+## [101] 052106 052107 052108 072201 072202 072203 072204 072205 072206 092301
+## [111] 092302 092303 092304 092305 092306 022401 022402 022403 022404 012501
+## [121] 012502 012503 012504 012505 012506 012507 012508 012509 042601 042602
+## [131] 042603 042701 042702 042703 022801 022802 022803 092901 092902 092903
+## [141] 092904 092905 093001 093002 093003 053101 053102 053103 103201 103202
+## [151] 103203 103204 103205 103206 103207
+## 155 Levels: 010901 010902 010903 010904 011801 011802 011803 ... 103207
+match(pop.mun$Código, mun.sf.ll$ENLACE) #Prueba de emparejamiento. Los "NA" son casos sin emparejamiento
+##   [1]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+##  [18]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+##  [35]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+##  [52]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+##  [69]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+##  [86]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+## [103]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+## [120]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA
+## [137]  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA  NA   1 149 150 151 152 153
+## [154] 154 155
+```
+
+Notamos que sólo los municipios con seis dígitos de `pop.mun$Código`
+tienen un “parejo” (hacen `match`) con los de `mun.sf.ll$ENLACE`. Si los
+campos no son comparables es imposible hacer unión. Por lo tanto, el
+primer paso consiste en corregir este problema. Aprovecho esta
+inconsistencia para introducir los flujos de trabajo (tuberías) de
+`tidyverse`, concretamente de `dplyr`.
+
+El código a continuación toma el objeto `pop.mun`, genera una columna
+denominada `ENLACE` (como la de `mun.sf.ll`), que evalúa en cada “celda”
+del campo `Código` si hay 5 caracteres, en cuyo caso le añade un `0` por
+delante; en caso contrario, lo deja tal
+cual.
+
+``` r
+pop.mun <- pop.mun %>% mutate(ENLACE = ifelse(nchar(Código)==5, paste0('0', Código),Código))
+pop.mun$ENLACE #Muestra la nueva variable creada
+##   [1] "010901" "010902" "010903" "010904" "011801" "011802" "011803"
+##   [8] "011804" "011805" "011806" "011807" "011808" "011809" "012501"
+##  [15] "012502" "012503" "012504" "012505" "012506" "012507" "012508"
+##  [22] "012509" "021301" "021302" "021303" "021304" "022401" "022402"
+##  [29] "022403" "022404" "022801" "022802" "022803" "030601" "030602"
+##  [36] "030603" "030604" "030605" "030606" "030607" "031401" "031402"
+##  [43] "031403" "031404" "031901" "031902" "031903" "032001" "032002"
+##  [50] "032003" "040501" "040502" "040503" "040504" "040505" "041501"
+##  [57] "041502" "041503" "041504" "041505" "041506" "042601" "042602"
+##  [64] "042603" "042701" "042702" "042703" "050201" "050202" "050203"
+##  [71] "050204" "050205" "050206" "050207" "050208" "050209" "050210"
+##  [78] "051701" "051702" "052101" "052102" "052103" "052104" "052105"
+##  [85] "052106" "052107" "052108" "053101" "053102" "053103" "060301"
+##  [92] "060302" "060303" "060304" "060305" "060401" "060402" "060403"
+##  [99] "060404" "060405" "060406" "060407" "060408" "060409" "060410"
+## [106] "060411" "061001" "061002" "061003" "061004" "061005" "061006"
+## [113] "061601" "061602" "070701" "070702" "070703" "070704" "070705"
+## [120] "070706" "072201" "072202" "072203" "072204" "072205" "072206"
+## [127] "080801" "080802" "081101" "081102" "081201" "081202" "081203"
+## [134] "092301" "092302" "092303" "092304" "092305" "092306" "092901"
+## [141] "092902" "092903" "092904" "092905" "093001" "093002" "093003"
+## [148] "100101" "103201" "103202" "103203" "103204" "103205" "103206"
+## [155] "103207"
+match(mun.sf$ENLACE, pop.mun$ENLACE) #Prueba si hay emparejamiento. Todos emparejados, no hay "NA"
 ##   [1] 148  68  69  70  71  72  73  74  75  76  77  91  92  93  94  95  96
 ##  [18]  97  98  99 100 101 102 103 104 105 106  51  52  53  54  55  34  35
 ##  [35]  36  37  38  39  40 115 116 117 118 119 120 127 128   1   2   3   4
@@ -884,6 +983,552 @@ match(mun.sf$ENLACE, pop.mun$ENLACE)
 ## [137]  33 140 141 142 143 144 145 146 147  88  89  90 149 150 151 152 153
 ## [154] 154 155
 ```
+
+La tubería `dplyr` se compone de dos tipos de elementos: acción/es y un
+“empalme/s”. La acción en este caso es la función `mutate` y el
+empalme es el operador `%>%` (*pipe*, pipa), que pertenece al paquete
+`magrittr`. El *pipe* “entuba” el resultado hacia adelante en una
+función o una llamada. En otras palabras, la pipa envía como valor del
+primer argumento de la función a su derecha lo que se encuentre a su
+derecha. Si lo prefieres, traduce `%>%` a “…entonces…”. Así, el valor
+del primer agrumento de `mutate` es `pop.mun`. La acción `mutate`
+significa en este ejemplo “añadir una variable”.
+
+Si lo leemos en lenguaje humano, le estamos ordenando a R lo siguiente:
+“Toma `pop.mun` como fuente de datos, y añade la variable `ENLACE`
+(nos conviene usar el mismo nombre que aparece en el objeto
+`mun.sf.ll`), que obtendrá su valor de la variable `Código` con una
+condición: si `Código` tiene 5 caracteres, pon un cero a la izquierda,
+de lo contrario, toma el valor de la variable `Código`”.
+
+Es importante notar que no se añadirá una variable propiamente a
+`pop.mun`, sino que en RAM se creará una réplica de `pop.mun` que
+contendrá una nueva variable. Si no lo asignásemos, mediante `<-`, la
+réplica no quedará disponible en la RAM para ser llamada nuevamente en
+el futuro. En este caso, se sobreescribe el objeto `pop.mun`.
+
+Ahora usemos una función para unir ambas tablas. Recordemos que
+`mun.sf.ll` es un `data.frame` con columna de geometría (`sf`).
+Igualmente, `pop.mun` es un `data.frame`, por lo que estaremos uniendo
+dos `data.frame`, de tal forma que los datos de población quedarán
+disponibles en objeto que crearemos a partir de dicha unión al que
+nombraremos
+`mun.sf.pop`.
+
+``` r
+mun.sf.pop <- mun.sf.ll %>% #El objeto sf como fuente, al que le uniremos pop.mun
+  inner_join(pop.mun, by = 'ENLACE') #Unión con pop.mun a través del campo ENLACE
+## Warning: Column `ENLACE` joining factor and character vector, coercing into
+## character vector
+mun.sf.pop
+## Simple feature collection with 155 features and 262 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## First 10 features:
+##    PROV MUN REG               TOPONIMIA ENLACE            area Código
+## 1    01  01  10 SANTO DOMINGO DE GUZMÁN 100101  91517576 [m^2] 100101
+## 2    02  01  05                    AZUA 050201 416324302 [m^2]  50201
+## 3    02  02  05             LAS CHARCAS 050202 246669929 [m^2]  50202
+## 4    02  03  05    LAS YAYAS DE VIAJAMA 050203 431079179 [m^2]  50203
+## 5    02  04  05         PADRE LAS CASAS 050204 573880948 [m^2]  50204
+## 6    02  05  05                 PERALTA 050205 129370697 [m^2]  50205
+## 7    02  06  05            SABANA YEGUA 050206 113799233 [m^2]  50206
+## 8    02  07  05            PUEBLO VIEJO 050207  48117190 [m^2]  50207
+## 9    02  08  05           TÁBARA ARRIBA 050208 274667489 [m^2]  50208
+## 10   02  09  05                GUAYABAL 050209 235625110 [m^2]  50209
+##              Municipio de residencia Jefa o jefe
+## 1  Municipio Santo Domingo de Guzmán      289084
+## 2                     Municipio Azua       23041
+## 3              Municipio Las Charcas        3186
+## 4     Municipio Las Yayas de Viajama        4815
+## 5          Municipio Padre las Casas        5258
+## 6                  Municipio Peralta        3204
+## 7             Municipio Sabana Yegua        4901
+## 8             Municipio Pueblo Viejo        2935
+## 9            Municipio Tábara Arriba        4200
+## 10                Municipio Guayabal        1389
+##    Esposo (a) o compañero (a) Hijo (a) Hijo (a) de crianza Padre o madre
+## 1                      143544   355071               14247          8556
+## 2                       13123    35896                2008           567
+## 3                        1844     4244                 270            56
+## 4                        2559     6309                 340            81
+## 5                        3318     7838                 459           131
+## 6                        1902     5962                 318            71
+## 7                        2643     6583                 469            90
+## 8                        1470     4046                 269            43
+## 9                        2441     6122                 457           101
+## 10                        799     2236                 120            16
+##    Nieto (a) Suegro (a) Abuelo (a) Hermano (a) Empleado (a) doméstico (a)
+## 1      54302       2262        621       23359                       5731
+## 2       9520        155         47        1392                         34
+## 3        839         17          7         153                         12
+## 4       2008         37          6         248                          1
+## 5       1657         28          7         243                          9
+## 6       1830         33          1         347                         24
+## 7       2221         24          1         369                          9
+## 8       1422         22          3         199                          1
+## 9       1960         27          6         318                          4
+## 10       403          1          0          53                          3
+##    Otro pariente Yerno o nuera No pariente Miembro de un hogar colectivo
+## 1          48877          5078       12315                          1993
+## 2           3955           924         635                            48
+## 3            393            94         117                            11
+## 4            841           117         257                             1
+## 5            765           111         208                             9
+## 6           1037           209         313                             6
+## 7            998           215         488                             9
+## 8            544           109         168                             4
+## 9            966           170         361                           514
+## 10           153            32          58                             0
+##    Hombres Mujeres     0     1     2     3     4     5     6     7     8
+## 1   460903  504137 17865 16677 16408 15275 15094 16356 15471 16180 17192
+## 2    46280   45065  2096  1756  1853  1886  1755  1911  1829  2063  2188
+## 3     5962    5281   263   252   253   238   235   281   272   235   262
+## 4     9513    8107   376   311   354   368   328   397   355   436   438
+## 5    10695    9346   327   367   347   381   397   395   365   422   461
+## 6     8189    7068   278   248   264   315   259   265   263   315   343
+## 7    10352    8668   434   332   392   320   353   449   377   379   443
+## 8     5861    5374   285   240   233   241   254   288   259   303   290
+## 9     9999    7648   373   326   357   306   340   383   324   355   401
+## 10    2994    2269    88    70    95    78   106   109    93   117   111
+##        9    10    11    12    13    14    15    16    17    18    19    20
+## 1  16901 18198 16701 16666 16479 16478 17565 17560 17947 19644 18828 20559
+## 2   2087  2295  2086  2077  2173  2003  2133  2105  2038  2083  1706  1892
+## 3    213   285   251   279   240   214   229   252   209   235   206   269
+## 4    438   444   381   439   358   398   462   433   414   434   329   369
+## 5    457   560   538   520   464   493   569   475   476   477   342   435
+## 6    320   348   328   367   301   346   380   318   304   338   257   352
+## 7    414   451   401   456   419   381   415   394   447   423   382   460
+## 8    261   262   203   241   260   235   230   274   260   264   218   254
+## 9    395   372   323   370   336   343   382   391   413   417   349   413
+## 10   131   123   127   137   129   131   140   130   123   137   110   112
+##       21    22    23    24    25    26    27    28    29    30    31    32
+## 1  18830 18298 17885 17863 17828 16684 16695 16839 15350 17160 16019 14583
+## 2   1656  1470  1543  1498  1572  1280  1367  1406  1149  1361  1297  1149
+## 3    202   223   210   213   214   176   171   176   167   197   163   187
+## 4    273   280   268   252   266   249   247   205   214   252   245   216
+## 5    299   329   325   327   265   248   251   258   228   285   239   232
+## 6    267   323   254   274   313   235   272   263   196   377   233   259
+## 7    356   363   367   373   331   299   320   316   289   323   269   271
+## 8    184   174   191   209   236   209   181   209   163   174   136   122
+## 9    307   332   324   344   358   275   301   316   271   301   248   209
+## 10    94   110    93    80    93    75    78    68    61    74    62    68
+##       33    34    35    36    37    38    39    40    41    42    43    44
+## 1  14058 13966 14613 12732 13438 13392 12069 14341 11700 12592 11937 11669
+## 2   1181  1232  1259  1045  1049  1113  1084  1255   896  1028  1026   918
+## 3    129   131   166   131   162   139   139   153   115   103   119    97
+## 4    198   199   227   201   195   249   158   253   155   180   169   157
+## 5    214   183   264   224   220   234   200   298   168   201   206   205
+## 6    193   214   288   206   166   211   156   335   110   195   135   137
+## 7    247   255   271   179   232   231   201   245   154   195   191   187
+## 8    128   107   146   139   122   142   109   145   101   118   101    92
+## 9    233   237   279   234   208   196   171   234   177   185   223   173
+## 10    46    70    90    56    59    59    59    49    44    51    44    57
+##       45    46    47   48   49    50   51   52   53   54   55   56   57
+## 1  14028 11192 11733 9978 9868 10908 9434 9114 8667 8881 8755 8364 7609
+## 2   1126   870   982  717  711   903  798  683  743  727  739  710  545
+## 3    140    93   111   75   91   120   80   76   89   69   92   57   69
+## 4    189   111   186  146  124   191  160  175  111  153  204  133  128
+## 5    255   177   226  150  188   258  198  180  138  182  154  167  138
+## 6    230   125   153   94  136   227   91  105   79   93  144  123   73
+## 7    209   184   203  143  139   204  162  134  143  132  173  129  116
+## 8    156   101   115   98   84    98   98   85   78   95   84   80   68
+## 9    175   151   159  126  138   199  136  143  127  138  158  131  134
+## 10    51    47    71   45   45    73   52   39   27   35   47   36   39
+##      58   59   60   61   62   63   64   65   66   67   68   69   70   71
+## 1  7469 6497 7804 6445 6290 5598 5839 5108 4543 4443 4516 3374 4802 3477
+## 2   587  484  705  474  479  441  460  454  382  396  407  297  422  250
+## 3    62   59   84   61   71   59   50   45   32   34   43   26   60   28
+## 4   123   93  171  106   98   95   97  110   82   86   84   55   98   59
+## 5   166  140  179  114  107  128  107   98  115   88  103   69  158   66
+## 6    84   88  153   61   57   65   66   66   49   53   43   31  123   37
+## 7   134   97  144   98   94   94  111   98   93   78  108   51  102   47
+## 8    72   47   85   51   47   58   45   62   37   34   39   18   35   34
+## 9   118   96  161  105  107   97   89   87   80   65   82   51   96   50
+## 10   45   38   42   29   28   38   30   37   22   23   32   19   42   12
+##      72   73   74   75   76   77   78   79   80   81   82   83   84   85
+## 1  3372 3405 3162 3163 2648 2404 2315 1879 3049 1830 1668 1512 1438 1357
+## 2   260  271  241  273  262  197  186  137  276   95  105   88   77   87
+## 3    34   37   27   26   29   18   15   12   21    7    8    8   10   10
+## 4    57   61   46   53   63   44   33   27   77   30   30   12   25   23
+## 5    51   76   56   91   43   58   71   31  102   26   34   22   18   18
+## 6    43   49   45   47   39   25   27   19   51   15   13   11   10   21
+## 7    59   62   50   55   45   44   46   24   59   17   25   13   18   20
+## 8    28   29   33   41   31   21   19   16   23    8   11    6   15    6
+## 9    62   44   42   56   38   43   29   33   85   17   20   19   30   14
+## 10   20   14   12   25   16   18    9   14   13    9    6    2    5    2
+##      86  87  88  89  90  91  92  93  94  95  96  97  98  99 100 101 102
+## 1  1039 870 751 585 862 349 397 252 285 194 174 137 128 130 107  32  19
+## 2    70  61  24  35  74  22  30  18  13  17  13  10  24  10   8   5   1
+## 3     6   4   5   3  14   2   1   1   1   3   1   0   1   0   2   1   1
+## 4    11   7  16   6  19   5   4   3   4   3   3   1   7   3   1   0   2
+## 5    10  12  14   8  18   6   9   3   7   6   2   5   5   6   3   2   0
+## 6     6   6   6   3  22   2   6   2   4   0   2   0   4   1   1   2   2
+## 7     9  12   9  11   8   3   5   0   4   2   0   2   0   3   4   0   1
+## 8     8   6  10   2   7   1   5   2   3   3   0   1   0   0   0   0   0
+## 9    14  10  13   6  30   5   3   0   3   1   1   1   4   4   4   0   1
+## 10    1   1   2   1   1   0   0   2   1   3   0   2   1   0   1   1   0
+##    103 104 105 106 107 108 109 110 Municipio de residencial actual
+## 1   21  22  25  14   9  25  12  78                          603299
+## 2    2   1   2   0   2   0   0   7                           79417
+## 3    0   0   0   2   1   0   0   0                            8636
+## 4    0   1   2   0   0   0   1   2                           13754
+## 5    1   0   2   1   1   1   1   1                           17443
+## 6    0   0   1   0   0   0   1   1                           14137
+## 7    0   1   0   1   0   0   0   1                           11426
+## 8    0   0   0   0   0   0   1   2                           10133
+## 9    0   1   3   1   1   0   2   3                           14379
+## 10   0   0   0   0   0   0   0   0                            4533
+##    En otro municipio En otro país Afganistán Argelia Andorra Angola
+## 1             317773        43968          2       1       0      0
+## 2              10431         1497          0       0       0      0
+## 3               1776          831          0       0       0      0
+## 4               3687          179          0       0       0      0
+## 5               2262          336          0       0       0      0
+## 6                685          435          0       0       0      0
+## 7               6200         1394          0       0       0      0
+## 8                707          395          0       0       0      0
+## 9               2379          889          0       0       0      0
+## 10               623          107          0       0       0      0
+##    Antigua y Barbuda Argentina Australia Austria Bahamas Bangladesh
+## 1                  8       486         5      19       5          1
+## 2                  0         0         0       0       0          0
+## 3                  0         0         0       0       0          0
+## 4                  0         0         0       0       0          0
+## 5                  0         0         0       0       0          0
+## 6                  0         0         0       0       0          0
+## 7                  0         0         0       0       0          0
+## 8                  0         0         0       0       0          0
+## 9                  0         0         0       0       0          0
+## 10                 0         0         0       0       0          0
+##    Armenia Barbados Bélgica Bermuda Estado Plurinacional de Bolivia Brasil
+## 1        1        4      35       5                             109    326
+## 2        0        0       1       0                               1      3
+## 3        0        0       0       0                               0      0
+## 4        0        0       0       0                               0      0
+## 5        0        0       0       0                               0      0
+## 6        0        0       0       0                               0      0
+## 7        0        0       1       0                               0      0
+## 8        0        0       0       0                               0      0
+## 9        0        0       0       0                               0      0
+## 10       0        0       0       0                               0      0
+##    Belice Islas Vírgenes Británicas Brunei Darussalam Bulgaria
+## 1       5                         6                 0       45
+## 2       0                         0                 0        0
+## 3       0                         0                 0        0
+## 4       0                         0                 0        0
+## 5       0                         0                 0        0
+## 6       0                         0                 0        0
+## 7       0                         0                 0        0
+## 8       0                         0                 0        0
+## 9       0                         0                 0        0
+## 10      0                         0                 0        0
+##    Unión De Myanmar (Burma) Belarus Camerún Canadá Islas Caymán
+## 1                         1       1      20    163            1
+## 2                         0       0       0      0            0
+## 3                         0       0       0      0            0
+## 4                         0       0       0      0            0
+## 5                         0       0       0      1            0
+## 6                         0       0       0      0            0
+## 7                         0       0       0      1            0
+## 8                         0       0       0      0            0
+## 9                         0       0       0      0            0
+## 10                        0       0       0      0            0
+##    República Central Africana Sri Lanka Chile China
+## 1                          38         0   353   454
+## 2                           0         0     0    32
+## 3                           0         0     0     1
+## 4                           0         0     0     2
+## 5                           0         0     0     0
+## 6                           0         0     0     0
+## 7                           0         0     0     0
+## 8                           0         0     0     0
+## 9                           0         0     0     1
+## 10                          0         0     0     0
+##    Taiwan, Republica China Colombia Mayotte Congo
+## 1                      209     1669       1     8
+## 2                        0       14       0     0
+## 3                        0        0       0     0
+## 4                        0        0       0     0
+## 5                        0        0       0     0
+## 6                        0        0       0     0
+## 7                        0        0       0     0
+## 8                        0        0       0     0
+## 9                        0        1       0     0
+## 10                       0        0       0     0
+##    República Democrática del Congo Costa Rica Croacia Cuba Chipre
+## 1                                0        115       3 1814      1
+## 2                                0          1       0    2      0
+## 3                                0          0       0    1      0
+## 4                                0          0       0    0      0
+## 5                                0          1       0    0      0
+## 6                                0          0       0    0      0
+## 7                                0          2       0    3      0
+## 8                                0          0       0    0      0
+## 9                                0          0       0    0      0
+## 10                               0          0       0    0      0
+##    República Checa República de Benin Dinamarca Dominica
+## 1                6                  0         5        2
+## 2                0                  0         0        0
+## 3                0                  0         0        0
+## 4                0                  0         0        0
+## 5                0                  0         0        0
+## 6                0                  0         0        0
+## 7                0                  0         0        0
+## 8                0                  0         0        0
+## 9                0                  0         0        0
+## 10               0                  0         0        0
+##    República Dominicana Ecuador El Salvador Etiopía Estonia Finlandia
+## 1                921072     196         109       1       0        12
+## 2                 89848       1           2       0       0         0
+## 3                 10412       0           0       0       0         0
+## 4                 17441       0           0       0       0         0
+## 5                 19705       0           0       0       0         0
+## 6                 14822       0           0       0       0         0
+## 7                 17626       0           0       0       0         0
+## 8                 10840       0           0       0       0         0
+## 9                 16758       0           0       0       0         0
+## 10                 5156       0           0       0       0         0
+##    Francia Guayana Francesa Gabón Georgia Territorios Ocupados Palestinos
+## 1      566                0     1       0                               8
+## 2        2                0     0       0                               0
+## 3        0                0     0       0                               0
+## 4        0                0     0       0                               0
+## 5        1                0     0       0                               0
+## 6        0                0     0       0                               0
+## 7        0                0     0       0                               0
+## 8        0                0     0       0                               0
+## 9        0                0     0       0                               0
+## 10       0                0     0       0                               0
+##    Alemania Ghana Gibraltar Grecia Granada Guadalupe Guam Guatemala Guinea
+## 1       188     0         0     17       1         8    1       175      2
+## 2         2     0         0      0       0         0    0         2      0
+## 3         1     0         0      0       0         0    0         0      0
+## 4         0     0         0      0       0         0    0         0      0
+## 5         0     0         0      0       0         0    0         1      0
+## 6         0     0         0      0       0         0    0         0      0
+## 7         0     0         0      0       0         0    0         0      0
+## 8         0     0         0      0       0         0    0         0      0
+## 9         1     0         0      0       0         0    0         0      0
+## 10        0     0         0      0       0         0    0         0      0
+##    Guyana Haití Honduras
+## 1       4 19135      133
+## 2       0  1090        5
+## 3       0   787        4
+## 4       0   142        0
+## 5       0   291        1
+## 6       0   399        0
+## 7       0  1269        0
+## 8       0   364        0
+## 9       0   772        2
+## 10      0    93        0
+##    Hong Kong (Región Administrativa Especial del Pueblo de La República de China)
+## 1                                                                              22
+## 2                                                                               0
+## 3                                                                               0
+## 4                                                                               0
+## 5                                                                               0
+## 6                                                                               0
+## 7                                                                               0
+## 8                                                                               0
+## 9                                                                               0
+## 10                                                                              0
+##    Hungría Islandia India Indonesia República Islámica de Irán Iraq
+## 1        4        0    40         2                         17   13
+## 2        0        0     0         0                          0    0
+## 3        0        0     0         0                          0    0
+## 4        0        0     0         0                          0    0
+## 5        0        0     0         0                          0    0
+## 6        0        0     0         0                          0    0
+## 7        0        0     0         0                          0    0
+## 8        0        0     0         0                          0    0
+## 9        0        0     0         0                          0    0
+## 10       0        0     0         0                          0    0
+##    Irlanda Israel Italia Jamaica Japón República de Kazakhstan Jordania
+## 1        5     26    778      38   134                       1        5
+## 2        1      0     14       0     4                       0        0
+## 3        0      0      1       0     0                       0        0
+## 4        0      0      0       0     0                       0        0
+## 5        0      0      1       0     0                       0        0
+## 6        0      0      0       0     0                       0        0
+## 7        0      0      4       0     0                       0        0
+## 8        0      0      1       0     0                       0        0
+## 9        0      0      0       0     0                       0        0
+## 10       0      0      0       0     0                       0        0
+##    Kenya República de Corea Kuwait Líbano Lesotho Latvia Libya Lituania
+## 1      2                 97      0     80       0      0     0        0
+## 2      0                  0      0      0       0      0     0        0
+## 3      0                  0      0      0       0      0     0        0
+## 4      0                  0      0      0       0      0     0        0
+## 5      0                  0      0      0       0      0     0        0
+## 6      0                  0      0      0       0      0     0        0
+## 7      0                  0      0      0       0      0     0        0
+## 8      0                  0      0      0       0      0     0        0
+## 9      0                  0      0      0       0      0     0        0
+## 10     0                  0      0      0       0      0     0        0
+##    Luxemburgo Madagascar Malasia Malta Martinique Mauritania Méjico Mónaco
+## 1           0          1      15     0         13          0    666      0
+## 2           0          0       0     0          1          0      2      0
+## 3           0          0       0     0          0          0      0      0
+## 4           0          0       0     0          0          0      0      0
+## 5           0          0       0     0          0          0      0      0
+## 6           0          0       0     0          0          0      0      0
+## 7           0          0       0     0          0          0      0      0
+## 8           0          0       0     0          0          0      0      0
+## 9           0          0       0     0          0          0      3      0
+## 10          0          0       0     0          0          0      0      0
+##    Moldova Montenegro Montserrat Morocco Mozambique Namibia Nauru Nepal
+## 1        3          0          0      10          2       0     0     0
+## 2        0          0          0       0          0       0     0     0
+## 3        0          0          0       0          0       0     0     0
+## 4        0          0          0       0          0       0     0     0
+## 5        0          0          0       0          0       0     0     0
+## 6        0          0          0       0          0       0     0     0
+## 7        0          0          0       0          0       0     0     0
+## 8        0          0          0       0          0       0     0     0
+## 9        0          0          0       0          0       0     0     0
+## 10       0          0          0       0          0       0     0     0
+##    Holanda Aruba Curacao San Martin(Parte Holandesa) Nueva Caledonia
+## 1       89    19      63                          21               1
+## 2        2     2       0                           0               0
+## 3        0     0       0                           0               0
+## 4        0     0       0                           0               0
+## 5        0     0       0                           0               0
+## 6        0     0       0                           0               0
+## 7        1     2       0                           1               0
+## 8        0     0       0                           0               0
+## 9        0     0       1                           0               0
+## 10       0     0       0                           0               0
+##    Nueva Zelanda Nicaragua Nigeria Noruega Pakistán Panamá Paraguay Perú
+## 1              1       111       6       8       52    176       11  505
+## 2              0         0       0       0        0      7        0    5
+## 3              0         1       0       0        0      0        0    1
+## 4              0         2       0       0        0      3        0    0
+## 5              0         0       0       0        0      0        0    0
+## 6              0         0       0       0        0      0        0    0
+## 7              0         0       0       0        0      0        0    1
+## 8              0         0       0       0        0      0        0    0
+## 9              0         0       0       0        0      1        0    1
+## 10             0         0       0       0        0      0        0    0
+##    Filipinas Polonia Portugal Puerto Rico Qatar Rumania Federación Rusa
+## 1         15      11       32        1760     1      13             111
+## 2          0       0        0          39     0       0               0
+## 3          0       0        0           1     0       0               0
+## 4          0       0        0           0     0       0               0
+## 5          0       0        0           8     0       0               1
+## 6          0       0        0           1     0       0               0
+## 7          0       0        1           6     0       0               0
+## 8          0       0        0           2     0       0               0
+## 9          0       0        0           3     0       0               0
+## 10         0       0        0           0     0       0               0
+##    Rwanda                           geom
+## 1       0 MULTIPOLYGON (((-69.9748 18...
+## 2       0 MULTIPOLYGON (((-70.71679 1...
+## 3       0 MULTIPOLYGON (((-70.57286 1...
+## 4       0 MULTIPOLYGON (((-71.00905 1...
+## 5       0 MULTIPOLYGON (((-70.86264 1...
+## 6       0 MULTIPOLYGON (((-70.82254 1...
+## 7       0 MULTIPOLYGON (((-70.85519 1...
+## 8       0 MULTIPOLYGON (((-70.75679 1...
+## 9       0 MULTIPOLYGON (((-70.87475 1...
+## 10      0 MULTIPOLYGON (((-70.76943 1...
+```
+
+Notemos que el objeto `mun.sf.pop` conserva las columnas que contenía
+inicialmente `mun.sf.ll` y se añaden todas las columnas `pop.mun`. El
+resumen del objeto `mun.sf.pop`, en el encabezado indica `Simple feature
+collection with 155 features and 262 fields`, lo que supone que se han
+conservado todos los municipios (cada fila un municipio) y se han
+añadido 256 columnas de las 257 disponibles (`ENLACE` no se añade, por
+tratarse del campo de unión).
+
+Creemos un objeto nuevo al que llamaremos `mun.sf.sex`, seleccionando de
+`mun.sf.pop` las columnas de `ENLACE`, `TOPONIMIA`, `Hombres` y
+`Mujeres` (número de hombres y mujeres, respectivamente). Al mismo
+tiempo, crearemos la columna `Total`, que contendrá la suma de la
+población de hombres y mujeres.
+
+``` r
+mun.sf.sex <- mun.sf.pop %>%
+  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
+  mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
+mun.sf.sex
+## Simple feature collection with 155 features and 5 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## First 10 features:
+##    ENLACE               TOPONIMIA Hombres Mujeres
+## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137
+## 2  050201                    AZUA   46280   45065
+## 3  050202             LAS CHARCAS    5962    5281
+## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107
+## 5  050204         PADRE LAS CASAS   10695    9346
+## 6  050205                 PERALTA    8189    7068
+## 7  050206            SABANA YEGUA   10352    8668
+## 8  050207            PUEBLO VIEJO    5861    5374
+## 9  050208           TÁBARA ARRIBA    9999    7648
+## 10 050209                GUAYABAL    2994    2269
+##                              geom  Total
+## 1  MULTIPOLYGON (((-69.9748 18... 965040
+## 2  MULTIPOLYGON (((-70.71679 1...  91345
+## 3  MULTIPOLYGON (((-70.57286 1...  11243
+## 4  MULTIPOLYGON (((-71.00905 1...  17620
+## 5  MULTIPOLYGON (((-70.86264 1...  20041
+## 6  MULTIPOLYGON (((-70.82254 1...  15257
+## 7  MULTIPOLYGON (((-70.85519 1...  19020
+## 8  MULTIPOLYGON (((-70.75679 1...  11235
+## 9  MULTIPOLYGON (((-70.87475 1...  17647
+## 10 MULTIPOLYGON (((-70.76943 1...   5263
+```
+
+El objeto `mun.sf.sex` tiene los mismo 155 municipios, pero sólo 5
+campos. Representemos la población por sexo y total en un panel (la
+función `plot` representa la misma geometría según cada uno de los
+campos disponibles)
+
+``` r
+plot(mun.sf.sex, breaks = 'jenks') #Panel
+```
+
+<img src="../img/plotmunsfsex-1.png" width="100%" />
+
+Hagamos lo propio sólo para la población de mujeres.
+
+``` r
+plot(mun.sf.sex['Mujeres'], breaks = 'jenks') #Población de mujeres
+```
+
+<img src="../img/plotmunsfmujeres-1.png" width="100%" />
+
+Tal como indiqué arriba, los mapas generados con la función `plot` son
+muy mejorables. En R no es fácil cumplir con los estándares propios de
+un mapa cartográficamente apropiado. Por ejemplo, eliminar el “efecto
+isla” requeriría retoques manuales, y rotular objetos de referencia en
+el mapa requeriría también acciones manuales. Sin embargo, no podemos
+olvidar que en R lo que más nos interesa es explorar e interpretar
+patrones, por lo que la simbología y está orientada a actuar sobre la o
+las variables de nuestro interés. En tal sentido, los paquetes `ggplot2`
+(parte de `tidyverse`) y `tmap` ofrecen herramientas versátiles para
+conseguir mapas informativos, al menos en lo que respecta a la variable
+de interés.
+
+``` r
+mun.sf.sex %>%
+  dplyr::select(Mujeres, Hombres) %>% 
+  gather(variable, value, -geom) %>%
+  ggplot(aes(fill=value)) +
+  geom_sf(lwd=0.2) +
+  facet_wrap(~variable) +
+  scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+```
+
+<img src="../img/ggplot-1.png" width="100%" />
 
 ## Conclusión
 
