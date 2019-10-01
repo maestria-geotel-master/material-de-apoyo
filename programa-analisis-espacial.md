@@ -8,7 +8,8 @@ Octubre 2019 <br/> *José Ramón Martínez Batlle*
 ## Básicos:
 
   - Correo: <jmartinez19@uasd.edu.do>
-  - Lugar y horario: Aula ¿?, Lunes y Martes de 6 a 10 pm
+  - Lugar y horario: Salón de Posgrado de Matemática, Lunes de 5 a 9 pm,
+    Martes de 6 a 10 pm
 
 ## URLs del contenido del curso:
 
