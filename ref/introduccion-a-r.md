@@ -1818,8 +1818,8 @@ parecido ocurre en los municipios septentrionales de las provincias
 Peravia y San Cristóbal. Por el contrario, el número de mujeres se
 presenta mayor en las ciudades en el Santo Domingo de Guzmán, Santo
 Domingo Este y Santiago. Una inspección del siguiente panel de gráficos
-de barras, donde cada cuadro recoge los municipios de cada región
-dominicana, complementa lo interpretado en la mancha cartográfica:
+de barras, donde cada cuadro recoge los municipios por regiones
+dominicanas, complementa lo interpretado en la mancha cartográfica:
 
 ``` r
 mun.sf.sex2 %>% ggplot() +
