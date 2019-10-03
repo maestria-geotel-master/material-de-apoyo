@@ -520,7 +520,7 @@ Ambos mapas son prácticamente un calco el uno del otro. Pocos municipios presen
 with(mun.sf.sex1, t.test(Mujeres, Hombres, paired = T))
 ```
 
-Sin embargo, destacan algunos casos puntuales, como Higüey y San Juan, que tienen una población de mujeres algo menor que la de hombres. Algo parecido ocurre en los municipios septentrionales de las provincias Peravia y San Cristóbal. Por el contrario, el número de mujeres se presenta mayor en las ciudades en el Santo Domingo de Guzmán, Santo Domingo Este y Santiago. Una inspección del siguiente panel de gráficos de barras, donde cada cuadro recoge los municipios por regiones dominicanas, complementa lo interpretado en la mancha cartográfica:
+Sin embargo, destacan algunos casos puntuales, como Higüey y San Juan, que tienen una población de mujeres ligeramente menor que la de hombres, al igual que como ocurre en los municipios septentrionales de las provincias Peravia y San Cristóbal. Por el contrario, el número de mujeres es ligeramente mayor en los municipios Santo Domingo de Guzmán, Santo Domingo Este y Santiago. Una inspección del siguiente panel de gráficos de barras, donde cada cuadro recoge los municipios por regiones dominicanas, complementa lo reflejado en la mancha cartográfica:
 
 ```{r pobmunicpreg, fig.height=12}
 mun.sf.sex2 %>% ggplot() +
