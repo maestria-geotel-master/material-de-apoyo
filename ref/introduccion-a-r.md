@@ -1454,27 +1454,27 @@ población de hombres y mujeres.
 
 ``` r
 mun.sf.sex <- mun.sf.pop %>%
-  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres, area) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
+  dplyr::select(ENLACE, TOPONIMIA, REG, Hombres, Mujeres, area) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
   mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
 mun.sf.sex
-## Simple feature collection with 155 features and 6 fields
+## Simple feature collection with 155 features and 7 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
-##    ENLACE               TOPONIMIA Hombres Mujeres            area
-## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137  91517576 [m^2]
-## 2  050201                    AZUA   46280   45065 416324302 [m^2]
-## 3  050202             LAS CHARCAS    5962    5281 246669929 [m^2]
-## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107 431079179 [m^2]
-## 5  050204         PADRE LAS CASAS   10695    9346 573880948 [m^2]
-## 6  050205                 PERALTA    8189    7068 129370697 [m^2]
-## 7  050206            SABANA YEGUA   10352    8668 113799233 [m^2]
-## 8  050207            PUEBLO VIEJO    5861    5374  48117190 [m^2]
-## 9  050208           TÁBARA ARRIBA    9999    7648 274667489 [m^2]
-## 10 050209                GUAYABAL    2994    2269 235625110 [m^2]
+##    ENLACE               TOPONIMIA REG Hombres Mujeres            area
+## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91517576 [m^2]
+## 2  050201                    AZUA  05   46280   45065 416324302 [m^2]
+## 3  050202             LAS CHARCAS  05    5962    5281 246669929 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 431079179 [m^2]
+## 5  050204         PADRE LAS CASAS  05   10695    9346 573880948 [m^2]
+## 6  050205                 PERALTA  05    8189    7068 129370697 [m^2]
+## 7  050206            SABANA YEGUA  05   10352    8668 113799233 [m^2]
+## 8  050207            PUEBLO VIEJO  05    5861    5374  48117190 [m^2]
+## 9  050208           TÁBARA ARRIBA  05    9999    7648 274667489 [m^2]
+## 10 050209                GUAYABAL  05    2994    2269 235625110 [m^2]
 ##                              geom  Total
 ## 1  MULTIPOLYGON (((-69.9748 18... 965040
 ## 2  MULTIPOLYGON (((-70.71679 1...  91345
@@ -1612,38 +1612,54 @@ p3
 
 <img src="../img/ggplotp3-1.png" width="100%" />
 
-En este caso, podemos reconocer múltiples patrones “ocultos” en el mapa
+Para fines de referencia, y aunque no sea muy estético, generaremos un
+mapa con algunos rótulos a los municipios (no lo asignaremos, puesto que
+no lo usaremos posteriormente).
+
+``` r
+p3 + geom_sf_text(aes(label=TOPONIMIA), check_overlap = T, size = 1.5)
+## Warning in st_point_on_surface.sfc(sf::st_zm(x)): st_point_on_surface may
+## not give correct results for longitude/latitude data
+```
+
+<img src="../img/ggplotp3conrotulos-1.png" width="100%" />
+
+En este mapa reconocemos múltiples patrones “ocultos” en el mapa
 anterior, como que hay municipios poco poblados en el entorno de la Hoya
-de Enriquillo y en parte de la frontera Domínico-Haitiana. Igualmente,
-gracias a la simbología, los municipios muy poblados se distinguen más
-del resto. Nótese que se está representando población total, no densidad
-de población. Calculemos la densidad poblacional en habitantes por
-kilómetro cuadrado y, posteriormente, generemos un mapa para comparar
-con el
-anterior.
+de Enriquillo (véase el área rodeada por los municipios rotulados como
+Cristóbal y Duvergé), y en parte de la frontera Domínico-Haitiana (hacia
+el oeste, e.g. Pedro Santana). Igualmente, gracias a la simbología, los
+municipios muy poblados se distinguen ahora más del resto (Santiago,
+Santo Domingo de Guzmán).
+
+Nótese que se está representando población total, no densidad de
+población. Calculemos la densidad poblacional en habitantes por
+kilómetro cuadrado y, posteriormente, generemos un mapa cuya simbología
+sea dicha
+variable.
 
 ``` r
 mun.sf.sex.dpob <- mun.sf.sex %>% mutate(areakm2 = set_units(area, km^2)) %>%
   mutate(dpob = drop_units(Total/areakm2))
 mun.sf.sex.dpob
-## Simple feature collection with 155 features and 8 fields
+## Simple feature collection with 155 features and 9 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
-##    ENLACE               TOPONIMIA Hombres Mujeres            area
-## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137  91517576 [m^2]
-## 2  050201                    AZUA   46280   45065 416324302 [m^2]
-## 3  050202             LAS CHARCAS    5962    5281 246669929 [m^2]
-## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107 431079179 [m^2]
-## 5  050204         PADRE LAS CASAS   10695    9346 573880948 [m^2]
-## 6  050205                 PERALTA    8189    7068 129370697 [m^2]
-## 7  050206            SABANA YEGUA   10352    8668 113799233 [m^2]
-## 8  050207            PUEBLO VIEJO    5861    5374  48117190 [m^2]
-## 9  050208           TÁBARA ARRIBA    9999    7648 274667489 [m^2]
-## 10 050209                GUAYABAL    2994    2269 235625110 [m^2]
+##    ENLACE               TOPONIMIA REG Hombres Mujeres            area
+## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91517576 [m^2]
+## 2  050201                    AZUA  05   46280   45065 416324302 [m^2]
+## 3  050202             LAS CHARCAS  05    5962    5281 246669929 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 431079179 [m^2]
+## 5  050204         PADRE LAS CASAS  05   10695    9346 573880948 [m^2]
+## 6  050205                 PERALTA  05    8189    7068 129370697 [m^2]
+## 7  050206            SABANA YEGUA  05   10352    8668 113799233 [m^2]
+## 8  050207            PUEBLO VIEJO  05    5861    5374  48117190 [m^2]
+## 9  050208           TÁBARA ARRIBA  05    9999    7648 274667489 [m^2]
+## 10 050209                GUAYABAL  05    2994    2269 235625110 [m^2]
 ##                              geom  Total          areakm2        dpob
 ## 1  MULTIPOLYGON (((-69.9748 18... 965040  91.51758 [km^2] 10544.85975
 ## 2  MULTIPOLYGON (((-70.71679 1...  91345 416.32430 [km^2]   219.40828
@@ -1655,15 +1671,17 @@ mun.sf.sex.dpob
 ## 8  MULTIPOLYGON (((-70.75679 1...  11235  48.11719 [km^2]   233.49244
 ## 9  MULTIPOLYGON (((-70.87475 1...  17647 274.66749 [km^2]    64.24859
 ## 10 MULTIPOLYGON (((-70.76943 1...   5263 235.62511 [km^2]    22.33633
-dpob <- ggplot(mun.sf.sex.dpob) + aes(fill = dpob) + geom_sf(lwd = 0.2) +
+ggplot(mun.sf.sex.dpob) + aes(fill = dpob) + geom_sf(lwd = 0.2) +
   scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
 ```
 
-Si comparamos este mapa con el anterior, veremos que afloran nuevos
-patrones, puesto que el área relativiza el efecto de la población
-absoluta. Por ejemplo, Higüey queda como municipio de densidad
-poblacional intermedia, mientras que según su población absoluta podría
-considerarse como municipio muy poblado.
+<img src="../img/ggplotdpob-1.png" width="100%" />
+
+Si comparamos este mapa con el anterior, el de población total, veremos
+que afloran nuevos patrones, puesto que el área relativiza el efecto de
+la población absoluta. Por ejemplo, Higüey queda como municipio de
+densidad poblacional intermedia, mientras que según su población
+absoluta podría considerarse como municipio muy poblado.
 
 Finalmente, la colección `tidyverse`, a través de sus paquetes `tidyr` y
 `ggplot2`, cuenta con funciones de reorganización de datos para
@@ -1676,26 +1694,37 @@ las columnas que nos interesan (`Mujeres`, `Hombres` y `TOPONIMIA`)
 
 ``` r
 mun.sf.sex1 <- mun.sf.sex %>%
-  dplyr::select(TOPONIMIA, Mujeres, Hombres)
+  dplyr::select(TOPONIMIA, REG, Mujeres, Hombres)
 mun.sf.sex1
-## Simple feature collection with 155 features and 3 fields
+## Simple feature collection with 155 features and 4 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
-##                  TOPONIMIA Mujeres Hombres                           geom
-## 1  SANTO DOMINGO DE GUZMÁN  504137  460903 MULTIPOLYGON (((-69.9748 18...
-## 2                     AZUA   45065   46280 MULTIPOLYGON (((-70.71679 1...
-## 3              LAS CHARCAS    5281    5962 MULTIPOLYGON (((-70.57286 1...
-## 4     LAS YAYAS DE VIAJAMA    8107    9513 MULTIPOLYGON (((-71.00905 1...
-## 5          PADRE LAS CASAS    9346   10695 MULTIPOLYGON (((-70.86264 1...
-## 6                  PERALTA    7068    8189 MULTIPOLYGON (((-70.82254 1...
-## 7             SABANA YEGUA    8668   10352 MULTIPOLYGON (((-70.85519 1...
-## 8             PUEBLO VIEJO    5374    5861 MULTIPOLYGON (((-70.75679 1...
-## 9            TÁBARA ARRIBA    7648    9999 MULTIPOLYGON (((-70.87475 1...
-## 10                GUAYABAL    2269    2994 MULTIPOLYGON (((-70.76943 1...
+##                  TOPONIMIA REG Mujeres Hombres
+## 1  SANTO DOMINGO DE GUZMÁN  10  504137  460903
+## 2                     AZUA  05   45065   46280
+## 3              LAS CHARCAS  05    5281    5962
+## 4     LAS YAYAS DE VIAJAMA  05    8107    9513
+## 5          PADRE LAS CASAS  05    9346   10695
+## 6                  PERALTA  05    7068    8189
+## 7             SABANA YEGUA  05    8668   10352
+## 8             PUEBLO VIEJO  05    5374    5861
+## 9            TÁBARA ARRIBA  05    7648    9999
+## 10                GUAYABAL  05    2269    2994
+##                              geom
+## 1  MULTIPOLYGON (((-69.9748 18...
+## 2  MULTIPOLYGON (((-70.71679 1...
+## 3  MULTIPOLYGON (((-70.57286 1...
+## 4  MULTIPOLYGON (((-71.00905 1...
+## 5  MULTIPOLYGON (((-70.86264 1...
+## 6  MULTIPOLYGON (((-70.82254 1...
+## 7  MULTIPOLYGON (((-70.85519 1...
+## 8  MULTIPOLYGON (((-70.75679 1...
+## 9  MULTIPOLYGON (((-70.87475 1...
+## 10 MULTIPOLYGON (((-70.76943 1...
 ```
 
 ¿Qué pasó? Pues simplemente, seleccionamos las columnas que nos
@@ -1709,40 +1738,51 @@ conservarán, como columnas pivotantes, `TOPONIMIA` y `geom`.
 
 ``` r
 mun.sf.sex2 <- mun.sf.sex1 %>% 
-  gather(variable, value, Mujeres:Hombres)
+  gather(variable, valor, Mujeres:Hombres)
 mun.sf.sex2
-## Simple feature collection with 310 features and 3 fields
+## Simple feature collection with 310 features and 4 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
-##                  TOPONIMIA variable  value                           geom
-## 1  SANTO DOMINGO DE GUZMÁN  Mujeres 504137 MULTIPOLYGON (((-69.9748 18...
-## 2                     AZUA  Mujeres  45065 MULTIPOLYGON (((-70.71679 1...
-## 3              LAS CHARCAS  Mujeres   5281 MULTIPOLYGON (((-70.57286 1...
-## 4     LAS YAYAS DE VIAJAMA  Mujeres   8107 MULTIPOLYGON (((-71.00905 1...
-## 5          PADRE LAS CASAS  Mujeres   9346 MULTIPOLYGON (((-70.86264 1...
-## 6                  PERALTA  Mujeres   7068 MULTIPOLYGON (((-70.82254 1...
-## 7             SABANA YEGUA  Mujeres   8668 MULTIPOLYGON (((-70.85519 1...
-## 8             PUEBLO VIEJO  Mujeres   5374 MULTIPOLYGON (((-70.75679 1...
-## 9            TÁBARA ARRIBA  Mujeres   7648 MULTIPOLYGON (((-70.87475 1...
-## 10                GUAYABAL  Mujeres   2269 MULTIPOLYGON (((-70.76943 1...
+##                  TOPONIMIA REG variable  valor
+## 1  SANTO DOMINGO DE GUZMÁN  10  Mujeres 504137
+## 2                     AZUA  05  Mujeres  45065
+## 3              LAS CHARCAS  05  Mujeres   5281
+## 4     LAS YAYAS DE VIAJAMA  05  Mujeres   8107
+## 5          PADRE LAS CASAS  05  Mujeres   9346
+## 6                  PERALTA  05  Mujeres   7068
+## 7             SABANA YEGUA  05  Mujeres   8668
+## 8             PUEBLO VIEJO  05  Mujeres   5374
+## 9            TÁBARA ARRIBA  05  Mujeres   7648
+## 10                GUAYABAL  05  Mujeres   2269
+##                              geom
+## 1  MULTIPOLYGON (((-69.9748 18...
+## 2  MULTIPOLYGON (((-70.71679 1...
+## 3  MULTIPOLYGON (((-70.57286 1...
+## 4  MULTIPOLYGON (((-71.00905 1...
+## 5  MULTIPOLYGON (((-70.86264 1...
+## 6  MULTIPOLYGON (((-70.82254 1...
+## 7  MULTIPOLYGON (((-70.85519 1...
+## 8  MULTIPOLYGON (((-70.75679 1...
+## 9  MULTIPOLYGON (((-70.87475 1...
+## 10 MULTIPOLYGON (((-70.76943 1...
 ```
 
 El objeto resultante tiene 310 elementos, que corresponden a los 155
 municipios con su número de mujeres y otros 155 con su número de
 hombres. Con los datos organizados de esta manera, es posible generar un
-panel usando la función `facet_wrap`. Nota que generemos el mapa “de un
-tirón”, insertando la función `ggplot` dentro de la tubería `dplyr`. De
-esta manera, la función `ggplot` no necesita el argumento `data =
-mun.sf.sex` porque, al usarse la pipa (`%>%`), el objeto a su izquierda
-se inserta como primer argumento de la función a su derecha.
+panel usando la función `facet_wrap`. Observa que generaremos el mapa
+“de un tirón”, insertando la función `ggplot` dentro de la tubería
+`dplyr`. De esta manera, la función `ggplot` no necesita el argumento
+`data = mun.sf.sex2` porque, al usarse la pipa (`%>%`), el objeto a su
+izquierda se inserta como primer argumento de la función a su derecha.
 
 ``` r
 mun.sf.sex2 %>% 
-  ggplot() + aes(fill=value) + geom_sf(lwd=0.2) +
+  ggplot() + aes(fill = valor) + geom_sf(lwd = 0.2) +
   facet_wrap(~variable) + theme(text = element_text(size = 8)) +
   scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
 ```
@@ -1752,10 +1792,44 @@ mun.sf.sex2 %>%
 > Para conseguir una visualización apropiada, se incluyó la función
 > `theme(text = element_text(size = 8))`.
 
-Ambos mapas son un calco el uno del otro. Pocos patrones diferenciados
-se pueden destacar más que, por ejemplo, Higüey tiene una población de
-mujeres algo menor que la de hombres. Algo parecido ocurre en los
-municipios septentrionales de las provincias Peravia y San Cristóbal.
+Ambos mapas son prácticamente un calco el uno del otro. Pocos municipios
+presentan patrones diferenciados. De hecho, una prueba pareada *t* de
+*Student* revela que no hay evidencia de que existan diferencias
+significativas de la variable población por sexo.
+
+``` r
+with(mun.sf.sex1, t.test(Mujeres, Hombres, paired = T))
+## 
+##  Paired t-test
+## 
+## data:  Mujeres and Hombres
+## t = -0.5413, df = 154, p-value = 0.5891
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -983.7469  560.5856
+## sample estimates:
+## mean of the differences 
+##               -211.5806
+```
+
+Sin embargo, destacan algunos casos puntuales, como Higüey y San Juan,
+que tienen una población de mujeres algo menor que la de hombres. Algo
+parecido ocurre en los municipios septentrionales de las provincias
+Peravia y San Cristóbal. Por el contrario, el número de mujeres se
+presenta mayor en las ciudades en el Santo Domingo de Guzmán, Santo
+Domingo Este y Santiago. Una inspección del siguiente panel de gráficos
+de barras, donde cada cuadro recoge los municipios de cada región
+dominicana, complementa lo interpretado en la mancha cartográfica:
+
+``` r
+mun.sf.sex2 %>% ggplot() +
+  aes(x = TOPONIMIA, y = valor, fill = variable, group = variable) +
+  geom_col(position = 'dodge') + scale_y_continuous() +
+  theme(axis.text.x = element_text(angle = 90), text = element_text(size = 6)) +
+  facet_wrap(REG~., scales = 'free', ncol = 2) + coord_flip()
+```
+
+<img src="../img/pobmunicpreg-1.png" width="100%" />
 
 ## Conclusión
 
