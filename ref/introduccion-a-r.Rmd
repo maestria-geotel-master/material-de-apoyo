@@ -106,6 +106,7 @@ library(tidyverse)
 library(readxl)
 library(tmap)
 library(RColorBrewer)
+library(units)
 ```
 
 Brevemente, con `sf` crearás y manipularás *simple features*, `raster` te ayudará a manipular y analizar imágenes de dicho modelo, con `rgdal` tendrás varias funciones *wrapper* para trabajar con `gdal`desde R, `tidyverse` carga una colección de paquetes para manipular, limpiar y organizar datos de `data.frame`, `readxl` te permitirá cargar archivos Excel, y con `tmap` crearás mapas y los personalizarás. Busca más información sobre estos paquetes, y comprobarás las múltiples capacidades de R para manipular información espacial.
@@ -403,7 +404,7 @@ Creemos un objeto nuevo al que llamaremos `mun.sf.sex`, seleccionando de `mun.sf
 
 ```{r}
 mun.sf.sex <- mun.sf.pop %>%
-  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
+  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres, area) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
   mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
 mun.sf.sex
 ```
@@ -420,19 +421,95 @@ Hagamos lo propio sólo para la población de mujeres.
 plot(mun.sf.sex['Mujeres'], breaks = 'jenks') #Población de mujeres
 ```
 
-Tal como indiqué arriba, los mapas generados con la función `plot` son muy mejorables. En R no es fácil cumplir con los estándares propios de un mapa cartográficamente apropiado. Por ejemplo, eliminar el "efecto isla" requeriría retoques manuales, y rotular objetos de referencia en el mapa requeriría también acciones manuales. Sin embargo, no podemos olvidar que en R lo que más nos interesa es explorar e interpretar patrones, por lo que la simbología y está orientada a actuar sobre la o las variables de nuestro interés. En tal sentido, los paquetes `ggplot2` (parte de `tidyverse`) y `tmap` ofrecen herramientas versátiles para conseguir mapas informativos, al menos en lo que respecta a la variable de interés.
+Tal como indiqué arriba, los mapas generados con la función `plot` son muy mejorables. En R no es fácil cumplir con los estándares propios de un mapa cartográficamente apropiado. Por ejemplo, eliminar el "efecto isla" requeriría retocar manualmente el mapa anterior; colocar y rotular objetos de referencia requeriría también acciones manuales. Sin embargo, no debemos olvidar que en R lo que más nos interesa es explorar e interpretar patrones, por lo que la simbología actúa primordialmente sobre la o las variables de interés.
+
+En tal sentido, los paquetes `ggplot2` (parte de `tidyverse`) y `tmap` ofrecen herramientas versátiles para conseguir mapas informativos, al menos en lo que respecta a la variable de interés. Probemos primero con `ggplot2`. Este paquete incorpora función `geom_sf` para añadir capas de objetos `sf`. Una breve introducción al funcionamiento de `ggplot2`: mediante la función `ggplot` se crea un espacio de coordenadas según los datos disponibles en el `data.frame` que se introduzca en el argumento `data`. A continuación, se definen las variables estéticas sobre las que se construirá la simbología. Finalmente, se definen propiedades del gráfico, como por ejemplo, tema o plantilla base, escala de colores, tamaño de letra, variables para representar en forma de panel, entre otras. Utilicemos el objeto `mun.sf.sex` para hacer un mapa básico de población total.
+
+Para fines didácticos, avancemos añadiendo fuentes de datos y capas paso a paso. Primero crearemos el espacio de coordenadas y lo asignaremos a `p0`, y sobre éste acumularemos las siguientes funciones en subsecuentes objetos `p#`. En el futuro no necesitarás realizar tus gráficos de forma acumulativa y crearás *scripts* más fluidos.
 
 
-```{r ggplot}
-mun.sf.sex %>%
-  dplyr::select(Mujeres, Hombres) %>% 
-  gather(variable, value, -geom) %>%
-  ggplot(aes(fill=value)) +
-  geom_sf(lwd=0.2) +
-  facet_wrap(~variable) +
+```{r ggplotp0}
+p0 <- ggplot(mun.sf.sex)
+p0
+```
+
+El espacio de coordenadas ya está creado, y `ggplot2` está preparado para aceptar variables. Como variable a representar (mapear, `map`), usaremos la "población total", que en la tabla `mun.sf.sex` se denomina `Total`. Nota que acumularemos usando `+`.
+
+
+```{r ggplotp1}
+p1 <- p0 + aes(fill = Total)
+p1
+```
+
+Dado que nuestro gráfico se basará en población total, `ggplot2` está preparado para recibir capas, o geometrías. Las capas son las que definen el cuerpo del gráfico. Si no añadimos capas, el gráfico permanecerá vacío. En este caso, añadiremos la capa `geom_sf`, que tomará las geometrías de la fuente de datos y la estilizará con un borde de `0.2`.
+
+```{r ggplotp2}
+p2 <- p1 + geom_sf(lwd = 0.2)
+p2
+```
+
+`ggplot2`, al reconocer que la variable `Total` es cuantitativa, utiliza un gradiente como escala de simbología, en este caso, un gradiente de azules, desde el oscuro al claro. Nótese que la simbología es bastante pobre, por dos razones principalmente. Por una parte, la variable visual empleada es intensidad, pero ésta sobre una escala lineal. Por otro lado, la escala lineal no favorece una adecuada representación. En casos como éste, donde se tienen muchas unidades con valores muy pequeños, y unas pocas con valores muy grandes, la escala lineal esconde una parte importante de los patrones. Un histograma básico refleja recoje este sesgo de la distribución:
+
+```{r histbasico}
+hist(mun.sf.sex$Total)
+```
+
+La variable población total muestra un fuerte sesgo hacia la derecha, influido especialmente por las unidades de mucha población (los municipios Santo Domingo *, Los Alcarrizos y Santiago, con más de 250,000 cada uno, y que acumulaban casi 4 millones de habitantes en 2010). Por tal razón, una escala logarítimica (puede ser en base e como en base 10) ayuda a mejorar la visualización. 
+
+```{r histbasicolog10}
+hist(log10(mun.sf.sex$Total))
+```
+
+Aplicaremos dicha escala en `ggplot2`, utilizando el argumento `trans=log10` en la escala de gradiente, y usaremos una función de gradiente versátil que permite definir una paleta. En este caso, elegimos una paleta de rojos de la colección [ColorBrewer](http://colorbrewer2.org).
+
+```{r ggplotp3}
+p3 <- p2 + scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+p3
+```
+
+En este caso, podemos reconocer múltiples patrones "ocultos" en el mapa anterior, como que hay municipios poco poblados en el entorno de la Hoya de Enriquillo y en parte de la frontera Domínico-Haitiana. Igualmente, gracias a la simbología, los municipios muy poblados se distinguen más del resto. Nótese que se está representando población total, no densidad de población. Calculemos la densidad poblacional en habitantes por kilómetro cuadrado y, posteriormente, generemos un mapa para comparar con el anterior.
+
+
+```{r ggplotdpob}
+mun.sf.sex.dpob <- mun.sf.sex %>% mutate(areakm2 = set_units(area, km^2)) %>%
+  mutate(dpob = drop_units(Total/areakm2))
+mun.sf.sex.dpob
+dpob <- ggplot(mun.sf.sex.dpob) + aes(fill = dpob) + geom_sf(lwd = 0.2) +
   scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
 ```
 
+Si comparamos este mapa con el anterior, veremos que afloran nuevos patrones, puesto que el área relativiza el efecto de la población absoluta. Por ejemplo, Higüey queda como municipio de densidad poblacional intermedia, mientras que según su población absoluta podría considerarse como municipio muy poblado.
+
+Finalmente, la colección `tidyverse`, a través de sus paquetes `tidyr` y `ggplot2`, cuenta con funciones de reorganización de datos para facilitarnos la tara de representar múltiples variables en un único panel. Por ejemplo, sería útil representar la población de mujeres y hombres en un mismo panel, para facilitarnos la tarea de comparar y encontrar patrones diferenciados, si los hubiere. Para fines didácticos, generemos los datos fuente paso a paso. Primero necesitamos seleccionar las columnas que nos interesan (`Mujeres`,  `Hombres` y `TOPONIMIA`)
+
+
+
+```{r}
+mun.sf.sex1 <- mun.sf.sex %>%
+  dplyr::select(TOPONIMIA, Mujeres, Hombres)
+mun.sf.sex1
+```
+
+¿Qué pasó? Pues simplemente, seleccionamos las columnas que nos interesan de la tabla de atributos. El objeto sigue siendo un *simple feature*, puesto que la columna `geom` es "pegajosa" y no abandona el objeto a menos que se lo indiquemos expresamente. Ahora viene la parte interesante, donde reuniremos las columnas `Hombres` y `Mujeres` en una única columna clave denominada `variable`, y los valores de cada una de éstas terminarán en una columna de valores denominada `valor`. Se conservarán, como columnas pivotantes, `TOPONIMIA` y `geom`.
+
+```{r}
+mun.sf.sex2 <- mun.sf.sex1 %>% 
+  gather(variable, value, Mujeres:Hombres)
+mun.sf.sex2
+```
+
+El objeto resultante tiene 310 elementos, que corresponden a los 155 municipios con su número de mujeres y otros 155 con su número de hombres. Con los datos organizados de esta manera, es posible generar un panel usando la función `facet_wrap`. Nota que generemos el mapa "de un tirón", insertando la función `ggplot` dentro de la tubería `dplyr`. De esta manera, la función `ggplot` no necesita el argumento `data = mun.sf.sex` porque, al usarse la pipa (`%>%`), el objeto a su izquierda se inserta como primer argumento de la función a su derecha.
+
+```{r ggplotmh}
+mun.sf.sex2 %>% 
+  ggplot() + aes(fill=value) + geom_sf(lwd=0.2) +
+  facet_wrap(~variable) + theme(text = element_text(size = 8)) +
+  scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+```
+
+>Para conseguir una visualización apropiada, se incluyó la función `theme(text = element_text(size = 8))`.
+
+Ambos mapas son un calco el uno del otro. Pocos patrones diferenciados se pueden destacar más que, por ejemplo, Higüey tiene una población de mujeres algo menor que la de hombres. Algo parecido ocurre en los municipios septentrionales de las provincias Peravia y San Cristóbal.
 
 
 ```{r, eval=F, echo=F}

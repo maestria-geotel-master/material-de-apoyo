@@ -186,6 +186,7 @@ library(tidyverse)
 library(readxl)
 library(tmap)
 library(RColorBrewer)
+library(units)
 ```
 
 Brevemente, con `sf` crearás y manipularás *simple features*, `raster`
@@ -1453,27 +1454,27 @@ población de hombres y mujeres.
 
 ``` r
 mun.sf.sex <- mun.sf.pop %>%
-  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
+  dplyr::select(ENLACE, TOPONIMIA, Hombres, Mujeres, area) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
   mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
 mun.sf.sex
-## Simple feature collection with 155 features and 5 fields
+## Simple feature collection with 155 features and 6 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
-##    ENLACE               TOPONIMIA Hombres Mujeres
-## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137
-## 2  050201                    AZUA   46280   45065
-## 3  050202             LAS CHARCAS    5962    5281
-## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107
-## 5  050204         PADRE LAS CASAS   10695    9346
-## 6  050205                 PERALTA    8189    7068
-## 7  050206            SABANA YEGUA   10352    8668
-## 8  050207            PUEBLO VIEJO    5861    5374
-## 9  050208           TÁBARA ARRIBA    9999    7648
-## 10 050209                GUAYABAL    2994    2269
+##    ENLACE               TOPONIMIA Hombres Mujeres            area
+## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137  91517576 [m^2]
+## 2  050201                    AZUA   46280   45065 416324302 [m^2]
+## 3  050202             LAS CHARCAS    5962    5281 246669929 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107 431079179 [m^2]
+## 5  050204         PADRE LAS CASAS   10695    9346 573880948 [m^2]
+## 6  050205                 PERALTA    8189    7068 129370697 [m^2]
+## 7  050206            SABANA YEGUA   10352    8668 113799233 [m^2]
+## 8  050207            PUEBLO VIEJO    5861    5374  48117190 [m^2]
+## 9  050208           TÁBARA ARRIBA    9999    7648 274667489 [m^2]
+## 10 050209                GUAYABAL    2994    2269 235625110 [m^2]
 ##                              geom  Total
 ## 1  MULTIPOLYGON (((-69.9748 18... 965040
 ## 2  MULTIPOLYGON (((-70.71679 1...  91345
@@ -1509,26 +1510,252 @@ plot(mun.sf.sex['Mujeres'], breaks = 'jenks') #Población de mujeres
 Tal como indiqué arriba, los mapas generados con la función `plot` son
 muy mejorables. En R no es fácil cumplir con los estándares propios de
 un mapa cartográficamente apropiado. Por ejemplo, eliminar el “efecto
-isla” requeriría retoques manuales, y rotular objetos de referencia en
-el mapa requeriría también acciones manuales. Sin embargo, no podemos
-olvidar que en R lo que más nos interesa es explorar e interpretar
-patrones, por lo que la simbología y está orientada a actuar sobre la o
-las variables de nuestro interés. En tal sentido, los paquetes `ggplot2`
-(parte de `tidyverse`) y `tmap` ofrecen herramientas versátiles para
-conseguir mapas informativos, al menos en lo que respecta a la variable
-de interés.
+isla” requeriría retocar manualmente el mapa anterior; colocar y rotular
+objetos de referencia requeriría también acciones manuales. Sin embargo,
+no debemos olvidar que en R lo que más nos interesa es explorar e
+interpretar patrones, por lo que la simbología actúa primordialmente
+sobre la o las variables de interés.
+
+En tal sentido, los paquetes `ggplot2` (parte de `tidyverse`) y `tmap`
+ofrecen herramientas versátiles para conseguir mapas informativos, al
+menos en lo que respecta a la variable de interés. Probemos primero con
+`ggplot2`. Este paquete incorpora función `geom_sf` para añadir capas de
+objetos `sf`. Una breve introducción al funcionamiento de `ggplot2`:
+mediante la función `ggplot` se crea un espacio de coordenadas según los
+datos disponibles en el `data.frame` que se introduzca en el argumento
+`data`. A continuación, se definen las variables estéticas sobre las que
+se construirá la simbología. Finalmente, se definen propiedades del
+gráfico, como por ejemplo, tema o plantilla base, escala de colores,
+tamaño de letra, variables para representar en forma de panel, entre
+otras. Utilicemos el objeto `mun.sf.sex` para hacer un mapa básico de
+población total.
+
+Para fines didácticos, avancemos añadiendo fuentes de datos y capas paso
+a paso. Primero crearemos el espacio de coordenadas y lo asignaremos a
+`p0`, y sobre éste acumularemos las siguientes funciones en subsecuentes
+objetos `p#`. En el futuro no necesitarás realizar tus gráficos de forma
+acumulativa y crearás *scripts* más fluidos.
 
 ``` r
-mun.sf.sex %>%
-  dplyr::select(Mujeres, Hombres) %>% 
-  gather(variable, value, -geom) %>%
-  ggplot(aes(fill=value)) +
-  geom_sf(lwd=0.2) +
-  facet_wrap(~variable) +
+p0 <- ggplot(mun.sf.sex)
+p0
+```
+
+<img src="../img/ggplotp0-1.png" width="100%" />
+
+El espacio de coordenadas ya está creado, y `ggplot2` está preparado
+para aceptar variables. Como variable a representar (mapear, `map`),
+usaremos la “población total”, que en la tabla `mun.sf.sex` se denomina
+`Total`. Nota que acumularemos usando `+`.
+
+``` r
+p1 <- p0 + aes(fill = Total)
+p1
+```
+
+<img src="../img/ggplotp1-1.png" width="100%" />
+
+Dado que nuestro gráfico se basará en población total, `ggplot2` está
+preparado para recibir capas, o geometrías. Las capas son las que
+definen el cuerpo del gráfico. Si no añadimos capas, el gráfico
+permanecerá vacío. En este caso, añadiremos la capa `geom_sf`, que
+tomará las geometrías de la fuente de datos y la estilizará con un
+borde de `0.2`.
+
+``` r
+p2 <- p1 + geom_sf(lwd = 0.2)
+p2
+```
+
+<img src="../img/ggplotp2-1.png" width="100%" />
+
+`ggplot2`, al reconocer que la variable `Total` es cuantitativa, utiliza
+un gradiente como escala de simbología, en este caso, un gradiente de
+azules, desde el oscuro al claro. Nótese que la simbología es bastante
+pobre, por dos razones principalmente. Por una parte, la variable visual
+empleada es intensidad, pero ésta sobre una escala lineal. Por otro
+lado, la escala lineal no favorece una adecuada representación. En casos
+como éste, donde se tienen muchas unidades con valores muy pequeños, y
+unas pocas con valores muy grandes, la escala lineal esconde una parte
+importante de los patrones. Un histograma básico refleja recoje este
+sesgo de la distribución:
+
+``` r
+hist(mun.sf.sex$Total)
+```
+
+<img src="../img/histbasico-1.png" width="100%" />
+
+La variable población total muestra un fuerte sesgo hacia la derecha,
+influido especialmente por las unidades de mucha población (los
+municipios Santo Domingo \*, Los Alcarrizos y Santiago, con más de
+250,000 cada uno, y que acumulaban casi 4 millones de habitantes en
+2010). Por tal razón, una escala logarítimica (puede ser en base e como
+en base 10) ayuda a mejorar la visualización.
+
+``` r
+hist(log10(mun.sf.sex$Total))
+```
+
+<img src="../img/histbasicolog10-1.png" width="100%" />
+
+Aplicaremos dicha escala en `ggplot2`, utilizando el argumento
+`trans=log10` en la escala de gradiente, y usaremos una función de
+gradiente versátil que permite definir una paleta. En este caso,
+elegimos una paleta de rojos de la colección
+[ColorBrewer](http://colorbrewer2.org).
+
+``` r
+p3 <- p2 + scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+p3
+```
+
+<img src="../img/ggplotp3-1.png" width="100%" />
+
+En este caso, podemos reconocer múltiples patrones “ocultos” en el mapa
+anterior, como que hay municipios poco poblados en el entorno de la Hoya
+de Enriquillo y en parte de la frontera Domínico-Haitiana. Igualmente,
+gracias a la simbología, los municipios muy poblados se distinguen más
+del resto. Nótese que se está representando población total, no densidad
+de población. Calculemos la densidad poblacional en habitantes por
+kilómetro cuadrado y, posteriormente, generemos un mapa para comparar
+con el
+anterior.
+
+``` r
+mun.sf.sex.dpob <- mun.sf.sex %>% mutate(areakm2 = set_units(area, km^2)) %>%
+  mutate(dpob = drop_units(Total/areakm2))
+mun.sf.sex.dpob
+## Simple feature collection with 155 features and 8 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## First 10 features:
+##    ENLACE               TOPONIMIA Hombres Mujeres            area
+## 1  100101 SANTO DOMINGO DE GUZMÁN  460903  504137  91517576 [m^2]
+## 2  050201                    AZUA   46280   45065 416324302 [m^2]
+## 3  050202             LAS CHARCAS    5962    5281 246669929 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA    9513    8107 431079179 [m^2]
+## 5  050204         PADRE LAS CASAS   10695    9346 573880948 [m^2]
+## 6  050205                 PERALTA    8189    7068 129370697 [m^2]
+## 7  050206            SABANA YEGUA   10352    8668 113799233 [m^2]
+## 8  050207            PUEBLO VIEJO    5861    5374  48117190 [m^2]
+## 9  050208           TÁBARA ARRIBA    9999    7648 274667489 [m^2]
+## 10 050209                GUAYABAL    2994    2269 235625110 [m^2]
+##                              geom  Total          areakm2        dpob
+## 1  MULTIPOLYGON (((-69.9748 18... 965040  91.51758 [km^2] 10544.85975
+## 2  MULTIPOLYGON (((-70.71679 1...  91345 416.32430 [km^2]   219.40828
+## 3  MULTIPOLYGON (((-70.57286 1...  11243 246.66993 [km^2]    45.57913
+## 4  MULTIPOLYGON (((-71.00905 1...  17620 431.07918 [km^2]    40.87416
+## 5  MULTIPOLYGON (((-70.86264 1...  20041 573.88095 [km^2]    34.92188
+## 6  MULTIPOLYGON (((-70.82254 1...  15257 129.37070 [km^2]   117.93242
+## 7  MULTIPOLYGON (((-70.85519 1...  19020 113.79923 [km^2]   167.13645
+## 8  MULTIPOLYGON (((-70.75679 1...  11235  48.11719 [km^2]   233.49244
+## 9  MULTIPOLYGON (((-70.87475 1...  17647 274.66749 [km^2]    64.24859
+## 10 MULTIPOLYGON (((-70.76943 1...   5263 235.62511 [km^2]    22.33633
+dpob <- ggplot(mun.sf.sex.dpob) + aes(fill = dpob) + geom_sf(lwd = 0.2) +
   scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
 ```
 
-<img src="../img/ggplot-1.png" width="100%" />
+Si comparamos este mapa con el anterior, veremos que afloran nuevos
+patrones, puesto que el área relativiza el efecto de la población
+absoluta. Por ejemplo, Higüey queda como municipio de densidad
+poblacional intermedia, mientras que según su población absoluta podría
+considerarse como municipio muy poblado.
+
+Finalmente, la colección `tidyverse`, a través de sus paquetes `tidyr` y
+`ggplot2`, cuenta con funciones de reorganización de datos para
+facilitarnos la tara de representar múltiples variables en un único
+panel. Por ejemplo, sería útil representar la población de mujeres y
+hombres en un mismo panel, para facilitarnos la tarea de comparar y
+encontrar patrones diferenciados, si los hubiere. Para fines didácticos,
+generemos los datos fuente paso a paso. Primero necesitamos seleccionar
+las columnas que nos interesan (`Mujeres`, `Hombres` y `TOPONIMIA`)
+
+``` r
+mun.sf.sex1 <- mun.sf.sex %>%
+  dplyr::select(TOPONIMIA, Mujeres, Hombres)
+mun.sf.sex1
+## Simple feature collection with 155 features and 3 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## First 10 features:
+##                  TOPONIMIA Mujeres Hombres                           geom
+## 1  SANTO DOMINGO DE GUZMÁN  504137  460903 MULTIPOLYGON (((-69.9748 18...
+## 2                     AZUA   45065   46280 MULTIPOLYGON (((-70.71679 1...
+## 3              LAS CHARCAS    5281    5962 MULTIPOLYGON (((-70.57286 1...
+## 4     LAS YAYAS DE VIAJAMA    8107    9513 MULTIPOLYGON (((-71.00905 1...
+## 5          PADRE LAS CASAS    9346   10695 MULTIPOLYGON (((-70.86264 1...
+## 6                  PERALTA    7068    8189 MULTIPOLYGON (((-70.82254 1...
+## 7             SABANA YEGUA    8668   10352 MULTIPOLYGON (((-70.85519 1...
+## 8             PUEBLO VIEJO    5374    5861 MULTIPOLYGON (((-70.75679 1...
+## 9            TÁBARA ARRIBA    7648    9999 MULTIPOLYGON (((-70.87475 1...
+## 10                GUAYABAL    2269    2994 MULTIPOLYGON (((-70.76943 1...
+```
+
+¿Qué pasó? Pues simplemente, seleccionamos las columnas que nos
+interesan de la tabla de atributos. El objeto sigue siendo un *simple
+feature*, puesto que la columna `geom` es “pegajosa” y no abandona el
+objeto a menos que se lo indiquemos expresamente. Ahora viene la parte
+interesante, donde reuniremos las columnas `Hombres` y `Mujeres` en una
+única columna clave denominada `variable`, y los valores de cada una de
+éstas terminarán en una columna de valores denominada `valor`. Se
+conservarán, como columnas pivotantes, `TOPONIMIA` y `geom`.
+
+``` r
+mun.sf.sex2 <- mun.sf.sex1 %>% 
+  gather(variable, value, Mujeres:Hombres)
+mun.sf.sex2
+## Simple feature collection with 310 features and 3 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+## First 10 features:
+##                  TOPONIMIA variable  value                           geom
+## 1  SANTO DOMINGO DE GUZMÁN  Mujeres 504137 MULTIPOLYGON (((-69.9748 18...
+## 2                     AZUA  Mujeres  45065 MULTIPOLYGON (((-70.71679 1...
+## 3              LAS CHARCAS  Mujeres   5281 MULTIPOLYGON (((-70.57286 1...
+## 4     LAS YAYAS DE VIAJAMA  Mujeres   8107 MULTIPOLYGON (((-71.00905 1...
+## 5          PADRE LAS CASAS  Mujeres   9346 MULTIPOLYGON (((-70.86264 1...
+## 6                  PERALTA  Mujeres   7068 MULTIPOLYGON (((-70.82254 1...
+## 7             SABANA YEGUA  Mujeres   8668 MULTIPOLYGON (((-70.85519 1...
+## 8             PUEBLO VIEJO  Mujeres   5374 MULTIPOLYGON (((-70.75679 1...
+## 9            TÁBARA ARRIBA  Mujeres   7648 MULTIPOLYGON (((-70.87475 1...
+## 10                GUAYABAL  Mujeres   2269 MULTIPOLYGON (((-70.76943 1...
+```
+
+El objeto resultante tiene 310 elementos, que corresponden a los 155
+municipios con su número de mujeres y otros 155 con su número de
+hombres. Con los datos organizados de esta manera, es posible generar un
+panel usando la función `facet_wrap`. Nota que generemos el mapa “de un
+tirón”, insertando la función `ggplot` dentro de la tubería `dplyr`. De
+esta manera, la función `ggplot` no necesita el argumento `data =
+mun.sf.sex` porque, al usarse la pipa (`%>%`), el objeto a su izquierda
+se inserta como primer argumento de la función a su derecha.
+
+``` r
+mun.sf.sex2 %>% 
+  ggplot() + aes(fill=value) + geom_sf(lwd=0.2) +
+  facet_wrap(~variable) + theme(text = element_text(size = 8)) +
+  scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
+```
+
+<img src="../img/ggplotmh-1.png" width="100%" />
+
+> Para conseguir una visualización apropiada, se incluyó la función
+> `theme(text = element_text(size = 8))`.
+
+Ambos mapas son un calco el uno del otro. Pocos patrones diferenciados
+se pueden destacar más que, por ejemplo, Higüey tiene una población de
+mujeres algo menor que la de hombres. Algo parecido ocurre en los
+municipios septentrionales de las provincias Peravia y San Cristóbal.
 
 ## Conclusión
 
@@ -1585,7 +1812,7 @@ for the useR*. Retrieved from <https://happygitwithr.com/>
 
 <div id="ref-perpinan2019intro">
 
-Lamigueiro, O. P. (2015). *Introducción a r*.
+Lamigueiro, O. P. (2015). *Introducción a R*.
 <https://oscarperpinan.github.io/R/>.
 
 </div>
