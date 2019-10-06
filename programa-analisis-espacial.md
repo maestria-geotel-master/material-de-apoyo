@@ -209,13 +209,13 @@ la asignatura. Valoraré el dominio que muestres sobre tu trabajo.
 
 ### Código informático reproducible
 
-Este es el fuerte de la asignatura, y es imprescindible para realizar
-culminar con éxito tu proyecto. Por correo electrónico, te enviaré
-asignaciones que te ayudarán a construir tu código reproducible. Las
-podrás realizar utilizando el servidor RStudio habilitado por el
-profesor (sólo necesitarás una PC con conexión a Internet y un
-navegador), o utilizando tu propia PC, pero en este último caso tendrás
-que instalar R, RStudio y los paquetes requeridos.
+Este es el fuerte de la asignatura, y es imprescindible para culminar
+con éxito tu proyecto. Por correo electrónico, te enviaré asignaciones
+que te ayudarán a construir tu código reproducible. Las podrás realizar
+utilizando el servidor RStudio habilitado por el profesor (sólo
+necesitarás una PC con conexión a Internet y un navegador), o utilizando
+tu propia PC, pero en este último caso tendrás que instalar R, RStudio y
+los paquetes requeridos.
 
 Orientaré con ejemplos y soluciones a través de *issues* que abrirás tú
 o yo en el GitHub. De esta forma las discusiones quedarán disponibles
