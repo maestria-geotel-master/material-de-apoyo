@@ -380,7 +380,8 @@ the Royal Statistical Society. Series B (Methodological)*, *10*(2),
 
 <div id="ref-olaya2014sistemas">
 
-Olaya, V. (2014). *Sistemas de informacion geográfica*.
+Olaya, V. (2014). *Sistemas de informacion geográfica*. Retrieved from
+<https://volaya.github.io/libro-sig/>
 
 </div>
 
