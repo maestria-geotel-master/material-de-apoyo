@@ -288,7 +288,7 @@ mun.sf
 ## Simple feature collection with 155 features and 6 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: 182215.8 ymin: 1933512 xmax: 571429.3 ymax: 2205216
+## bbox:           xmin: 182215.8 ymin: 1933532 xmax: 571365.3 ymax: 2205216
 ## epsg (SRID):    32619
 ## proj4string:    +proj=utm +zone=19 +datum=WGS84 +units=m +no_defs
 ## First 10 features:
@@ -304,16 +304,16 @@ mun.sf
 ## 9    02  08  05           TÁBARA ARRIBA 050208
 ## 10   02  09  05                GUAYABAL 050209
 ##                              geom            area
-## 1  MULTIPOLYGON (((397122.7 20...  91517576 [m^2]
-## 2  MULTIPOLYGON (((318830.5 20... 416324302 [m^2]
-## 3  MULTIPOLYGON (((333950.3 20... 246669929 [m^2]
-## 4  MULTIPOLYGON (((288107.3 20... 431079179 [m^2]
-## 5  MULTIPOLYGON (((303931.9 21... 573880948 [m^2]
-## 6  MULTIPOLYGON (((307770.9 20... 129370697 [m^2]
-## 7  MULTIPOLYGON (((304091.3 20... 113799233 [m^2]
-## 8  MULTIPOLYGON (((314474 2040...  48117190 [m^2]
-## 9  MULTIPOLYGON (((302204.4 20... 274667489 [m^2]
-## 10 MULTIPOLYGON (((313520.7 20... 235625110 [m^2]
+## 1  MULTIPOLYGON (((405218.1 20...  91445631 [m^2]
+## 2  MULTIPOLYGON (((319065.3 20... 416284424 [m^2]
+## 3  MULTIPOLYGON (((341415.3 20... 246501017 [m^2]
+## 4  MULTIPOLYGON (((304058.1 20... 430949892 [m^2]
+## 5  MULTIPOLYGON (((312890.8 20... 573677765 [m^2]
+## 6  MULTIPOLYGON (((317370.6 20... 129369696 [m^2]
+## 7  MULTIPOLYGON (((306745.8 20... 113924640 [m^2]
+## 8  MULTIPOLYGON (((310447.9 20...  48083834 [m^2]
+## 9  MULTIPOLYGON (((306556.7 20... 274922988 [m^2]
+## 10 MULTIPOLYGON (((322129.5 20... 235362759 [m^2]
 ```
 
 Nos informa que se trata de un `Simple feature collection with 155
@@ -365,10 +365,10 @@ str(mun.sf)
 ##  $ ENLACE   : Factor w/ 155 levels "010901","010902",..: 148 68 69 70 71 72 73 74 75 76 ...
 ##  $ geom     :sfc_MULTIPOLYGON of length 155; first list element: List of 1
 ##   ..$ :List of 1
-##   .. ..$ : num [1:3521, 1:2] 397123 397142 397176 397202 397239 ...
+##   .. ..$ : num [1:71, 1:2] 405218 406287 407220 407479 407661 ...
 ##   ..- attr(*, "class")= chr  "XY" "MULTIPOLYGON" "sfg"
 ##  $ area     :Object of class units:
-##  num  9.15e+07 4.16e+08 2.47e+08 4.31e+08 5.74e+08 ...
+##  num  9.14e+07 4.16e+08 2.47e+08 4.31e+08 5.74e+08 ...
 ##   ..- attr(*, "units")=List of 2
 ##   .. ..$ numerator  : chr  "m" "m"
 ##   .. ..$ denominator: chr 
@@ -396,11 +396,11 @@ summary(mun.sf)
 ##  06     :  7   06     :12   09     :14   BÁNICA        :  1  
 ##  (Other):101   (Other):19   (Other):38   (Other)       :149  
 ##      ENLACE               geom          area          
-##  010901 :  1   MULTIPOLYGON :155   Min.   :1.794e+07  
-##  010902 :  1   epsg:32619   :  0   1st Qu.:1.220e+08  
-##  010903 :  1   +proj=utm ...:  0   Median :2.117e+08  
+##  010901 :  1   MULTIPOLYGON :155   Min.   :1.781e+07  
+##  010902 :  1   epsg:32619   :  0   1st Qu.:1.219e+08  
+##  010903 :  1   +proj=utm ...:  0   Median :2.118e+08  
 ##  010904 :  1                       Mean   :3.101e+08  
-##  011801 :  1                       3rd Qu.:4.129e+08  
+##  011801 :  1                       3rd Qu.:4.128e+08  
 ##  011802 :  1                       Max.   :2.016e+09  
 ##  (Other):149
 ```
@@ -411,11 +411,11 @@ el objeto `reg.sf`, en este caso `area`.
 ``` r
 summary(mun.sf['area'])
 ##       area                      geom    
-##  Min.   :1.794e+07   MULTIPOLYGON :155  
-##  1st Qu.:1.220e+08   epsg:32619   :  0  
-##  Median :2.117e+08   +proj=utm ...:  0  
+##  Min.   :1.781e+07   MULTIPOLYGON :155  
+##  1st Qu.:1.219e+08   epsg:32619   :  0  
+##  Median :2.118e+08   +proj=utm ...:  0  
 ##  Mean   :3.101e+08                      
-##  3rd Qu.:4.129e+08                      
+##  3rd Qu.:4.128e+08                      
 ##  Max.   :2.016e+09
 ```
 
@@ -1025,21 +1025,21 @@ mun.sf.pop
 ## Simple feature collection with 155 features and 262 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## bbox:           xmin: -72.01147 ymin: 17.47033 xmax: -68.32354 ymax: 19.93211
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
 ##    PROV MUN REG               TOPONIMIA ENLACE            area Código
-## 1    01  01  10 SANTO DOMINGO DE GUZMÁN 100101  91517576 [m^2] 100101
-## 2    02  01  05                    AZUA 050201 416324302 [m^2]  50201
-## 3    02  02  05             LAS CHARCAS 050202 246669929 [m^2]  50202
-## 4    02  03  05    LAS YAYAS DE VIAJAMA 050203 431079179 [m^2]  50203
-## 5    02  04  05         PADRE LAS CASAS 050204 573880948 [m^2]  50204
-## 6    02  05  05                 PERALTA 050205 129370697 [m^2]  50205
-## 7    02  06  05            SABANA YEGUA 050206 113799233 [m^2]  50206
-## 8    02  07  05            PUEBLO VIEJO 050207  48117190 [m^2]  50207
-## 9    02  08  05           TÁBARA ARRIBA 050208 274667489 [m^2]  50208
-## 10   02  09  05                GUAYABAL 050209 235625110 [m^2]  50209
+## 1    01  01  10 SANTO DOMINGO DE GUZMÁN 100101  91445631 [m^2] 100101
+## 2    02  01  05                    AZUA 050201 416284424 [m^2]  50201
+## 3    02  02  05             LAS CHARCAS 050202 246501017 [m^2]  50202
+## 4    02  03  05    LAS YAYAS DE VIAJAMA 050203 430949892 [m^2]  50203
+## 5    02  04  05         PADRE LAS CASAS 050204 573677765 [m^2]  50204
+## 6    02  05  05                 PERALTA 050205 129369696 [m^2]  50205
+## 7    02  06  05            SABANA YEGUA 050206 113924640 [m^2]  50206
+## 8    02  07  05            PUEBLO VIEJO 050207  48083834 [m^2]  50207
+## 9    02  08  05           TÁBARA ARRIBA 050208 274922988 [m^2]  50208
+## 10   02  09  05                GUAYABAL 050209 235362759 [m^2]  50209
 ##              Municipio de residencia Jefa o jefe
 ## 1  Municipio Santo Domingo de Guzmán      289084
 ## 2                     Municipio Azua       23041
@@ -1426,16 +1426,16 @@ mun.sf.pop
 ## 9          0       0        0           3     0       0               0
 ## 10         0       0        0           0     0       0               0
 ##    Rwanda                           geom
-## 1       0 MULTIPOLYGON (((-69.9748 18...
-## 2       0 MULTIPOLYGON (((-70.71679 1...
-## 3       0 MULTIPOLYGON (((-70.57286 1...
-## 4       0 MULTIPOLYGON (((-71.00905 1...
-## 5       0 MULTIPOLYGON (((-70.86264 1...
-## 6       0 MULTIPOLYGON (((-70.82254 1...
-## 7       0 MULTIPOLYGON (((-70.85519 1...
-## 8       0 MULTIPOLYGON (((-70.75679 1...
-## 9       0 MULTIPOLYGON (((-70.87475 1...
-## 10      0 MULTIPOLYGON (((-70.76943 1...
+## 1       0 MULTIPOLYGON (((-69.89794 1...
+## 2       0 MULTIPOLYGON (((-70.71457 1...
+## 3       0 MULTIPOLYGON (((-70.50185 1...
+## 4       0 MULTIPOLYGON (((-70.85774 1...
+## 5       0 MULTIPOLYGON (((-70.77551 1...
+## 6       0 MULTIPOLYGON (((-70.73131 1...
+## 7       0 MULTIPOLYGON (((-70.83014 1...
+## 8       0 MULTIPOLYGON (((-70.79387 1...
+## 9       0 MULTIPOLYGON (((-70.83352 1...
+## 10      0 MULTIPOLYGON (((-70.68664 1...
 ```
 
 Notemos que el objeto `mun.sf.pop` conserva las columnas que contenía
@@ -1460,32 +1460,32 @@ mun.sf.sex
 ## Simple feature collection with 155 features and 7 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## bbox:           xmin: -72.01147 ymin: 17.47033 xmax: -68.32354 ymax: 19.93211
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
 ##    ENLACE               TOPONIMIA REG Hombres Mujeres            area
-## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91517576 [m^2]
-## 2  050201                    AZUA  05   46280   45065 416324302 [m^2]
-## 3  050202             LAS CHARCAS  05    5962    5281 246669929 [m^2]
-## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 431079179 [m^2]
-## 5  050204         PADRE LAS CASAS  05   10695    9346 573880948 [m^2]
-## 6  050205                 PERALTA  05    8189    7068 129370697 [m^2]
-## 7  050206            SABANA YEGUA  05   10352    8668 113799233 [m^2]
-## 8  050207            PUEBLO VIEJO  05    5861    5374  48117190 [m^2]
-## 9  050208           TÁBARA ARRIBA  05    9999    7648 274667489 [m^2]
-## 10 050209                GUAYABAL  05    2994    2269 235625110 [m^2]
+## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91445631 [m^2]
+## 2  050201                    AZUA  05   46280   45065 416284424 [m^2]
+## 3  050202             LAS CHARCAS  05    5962    5281 246501017 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 430949892 [m^2]
+## 5  050204         PADRE LAS CASAS  05   10695    9346 573677765 [m^2]
+## 6  050205                 PERALTA  05    8189    7068 129369696 [m^2]
+## 7  050206            SABANA YEGUA  05   10352    8668 113924640 [m^2]
+## 8  050207            PUEBLO VIEJO  05    5861    5374  48083834 [m^2]
+## 9  050208           TÁBARA ARRIBA  05    9999    7648 274922988 [m^2]
+## 10 050209                GUAYABAL  05    2994    2269 235362759 [m^2]
 ##                              geom  Total
-## 1  MULTIPOLYGON (((-69.9748 18... 965040
-## 2  MULTIPOLYGON (((-70.71679 1...  91345
-## 3  MULTIPOLYGON (((-70.57286 1...  11243
-## 4  MULTIPOLYGON (((-71.00905 1...  17620
-## 5  MULTIPOLYGON (((-70.86264 1...  20041
-## 6  MULTIPOLYGON (((-70.82254 1...  15257
-## 7  MULTIPOLYGON (((-70.85519 1...  19020
-## 8  MULTIPOLYGON (((-70.75679 1...  11235
-## 9  MULTIPOLYGON (((-70.87475 1...  17647
-## 10 MULTIPOLYGON (((-70.76943 1...   5263
+## 1  MULTIPOLYGON (((-69.89794 1... 965040
+## 2  MULTIPOLYGON (((-70.71457 1...  91345
+## 3  MULTIPOLYGON (((-70.50185 1...  11243
+## 4  MULTIPOLYGON (((-70.85774 1...  17620
+## 5  MULTIPOLYGON (((-70.77551 1...  20041
+## 6  MULTIPOLYGON (((-70.73131 1...  15257
+## 7  MULTIPOLYGON (((-70.83014 1...  19020
+## 8  MULTIPOLYGON (((-70.79387 1...  11235
+## 9  MULTIPOLYGON (((-70.83352 1...  17647
+## 10 MULTIPOLYGON (((-70.68664 1...   5263
 ```
 
 El objeto `mun.sf.sex` tiene los mismo 155 municipios, pero sólo 5
@@ -1645,32 +1645,32 @@ mun.sf.sex.dpob
 ## Simple feature collection with 155 features and 9 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## bbox:           xmin: -72.01147 ymin: 17.47033 xmax: -68.32354 ymax: 19.93211
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
 ##    ENLACE               TOPONIMIA REG Hombres Mujeres            area
-## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91517576 [m^2]
-## 2  050201                    AZUA  05   46280   45065 416324302 [m^2]
-## 3  050202             LAS CHARCAS  05    5962    5281 246669929 [m^2]
-## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 431079179 [m^2]
-## 5  050204         PADRE LAS CASAS  05   10695    9346 573880948 [m^2]
-## 6  050205                 PERALTA  05    8189    7068 129370697 [m^2]
-## 7  050206            SABANA YEGUA  05   10352    8668 113799233 [m^2]
-## 8  050207            PUEBLO VIEJO  05    5861    5374  48117190 [m^2]
-## 9  050208           TÁBARA ARRIBA  05    9999    7648 274667489 [m^2]
-## 10 050209                GUAYABAL  05    2994    2269 235625110 [m^2]
+## 1  100101 SANTO DOMINGO DE GUZMÁN  10  460903  504137  91445631 [m^2]
+## 2  050201                    AZUA  05   46280   45065 416284424 [m^2]
+## 3  050202             LAS CHARCAS  05    5962    5281 246501017 [m^2]
+## 4  050203    LAS YAYAS DE VIAJAMA  05    9513    8107 430949892 [m^2]
+## 5  050204         PADRE LAS CASAS  05   10695    9346 573677765 [m^2]
+## 6  050205                 PERALTA  05    8189    7068 129369696 [m^2]
+## 7  050206            SABANA YEGUA  05   10352    8668 113924640 [m^2]
+## 8  050207            PUEBLO VIEJO  05    5861    5374  48083834 [m^2]
+## 9  050208           TÁBARA ARRIBA  05    9999    7648 274922988 [m^2]
+## 10 050209                GUAYABAL  05    2994    2269 235362759 [m^2]
 ##                              geom  Total          areakm2        dpob
-## 1  MULTIPOLYGON (((-69.9748 18... 965040  91.51758 [km^2] 10544.85975
-## 2  MULTIPOLYGON (((-70.71679 1...  91345 416.32430 [km^2]   219.40828
-## 3  MULTIPOLYGON (((-70.57286 1...  11243 246.66993 [km^2]    45.57913
-## 4  MULTIPOLYGON (((-71.00905 1...  17620 431.07918 [km^2]    40.87416
-## 5  MULTIPOLYGON (((-70.86264 1...  20041 573.88095 [km^2]    34.92188
-## 6  MULTIPOLYGON (((-70.82254 1...  15257 129.37070 [km^2]   117.93242
-## 7  MULTIPOLYGON (((-70.85519 1...  19020 113.79923 [km^2]   167.13645
-## 8  MULTIPOLYGON (((-70.75679 1...  11235  48.11719 [km^2]   233.49244
-## 9  MULTIPOLYGON (((-70.87475 1...  17647 274.66749 [km^2]    64.24859
-## 10 MULTIPOLYGON (((-70.76943 1...   5263 235.62511 [km^2]    22.33633
+## 1  MULTIPOLYGON (((-69.89794 1... 965040  91.44563 [km^2] 10553.15590
+## 2  MULTIPOLYGON (((-70.71457 1...  91345 416.28442 [km^2]   219.42930
+## 3  MULTIPOLYGON (((-70.50185 1...  11243 246.50102 [km^2]    45.61036
+## 4  MULTIPOLYGON (((-70.85774 1...  17620 430.94989 [km^2]    40.88642
+## 5  MULTIPOLYGON (((-70.77551 1...  20041 573.67776 [km^2]    34.93425
+## 6  MULTIPOLYGON (((-70.73131 1...  15257 129.36970 [km^2]   117.93334
+## 7  MULTIPOLYGON (((-70.83014 1...  19020 113.92464 [km^2]   166.95247
+## 8  MULTIPOLYGON (((-70.79387 1...  11235  48.08383 [km^2]   233.65441
+## 9  MULTIPOLYGON (((-70.83352 1...  17647 274.92299 [km^2]    64.18888
+## 10 MULTIPOLYGON (((-70.68664 1...   5263 235.36276 [km^2]    22.36123
 ggplot(mun.sf.sex.dpob) + aes(fill = dpob) + geom_sf(lwd = 0.2) +
   scale_fill_gradientn(colours = brewer.pal(9, name = 'Reds'), trans = 'log10')
 ```
@@ -1699,7 +1699,7 @@ mun.sf.sex1
 ## Simple feature collection with 155 features and 4 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## bbox:           xmin: -72.01147 ymin: 17.47033 xmax: -68.32354 ymax: 19.93211
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
@@ -1715,16 +1715,16 @@ mun.sf.sex1
 ## 9            TÁBARA ARRIBA  05    7648    9999
 ## 10                GUAYABAL  05    2269    2994
 ##                              geom
-## 1  MULTIPOLYGON (((-69.9748 18...
-## 2  MULTIPOLYGON (((-70.71679 1...
-## 3  MULTIPOLYGON (((-70.57286 1...
-## 4  MULTIPOLYGON (((-71.00905 1...
-## 5  MULTIPOLYGON (((-70.86264 1...
-## 6  MULTIPOLYGON (((-70.82254 1...
-## 7  MULTIPOLYGON (((-70.85519 1...
-## 8  MULTIPOLYGON (((-70.75679 1...
-## 9  MULTIPOLYGON (((-70.87475 1...
-## 10 MULTIPOLYGON (((-70.76943 1...
+## 1  MULTIPOLYGON (((-69.89794 1...
+## 2  MULTIPOLYGON (((-70.71457 1...
+## 3  MULTIPOLYGON (((-70.50185 1...
+## 4  MULTIPOLYGON (((-70.85774 1...
+## 5  MULTIPOLYGON (((-70.77551 1...
+## 6  MULTIPOLYGON (((-70.73131 1...
+## 7  MULTIPOLYGON (((-70.83014 1...
+## 8  MULTIPOLYGON (((-70.79387 1...
+## 9  MULTIPOLYGON (((-70.83352 1...
+## 10 MULTIPOLYGON (((-70.68664 1...
 ```
 
 ¿Qué pasó? Pues simplemente, seleccionamos las columnas que nos
@@ -1743,7 +1743,7 @@ mun.sf.sex2
 ## Simple feature collection with 310 features and 4 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
-## bbox:           xmin: -72.01147 ymin: 17.47016 xmax: -68.32296 ymax: 19.93213
+## bbox:           xmin: -72.01147 ymin: 17.47033 xmax: -68.32354 ymax: 19.93211
 ## epsg (SRID):    4326
 ## proj4string:    +proj=longlat +datum=WGS84 +no_defs
 ## First 10 features:
@@ -1759,16 +1759,16 @@ mun.sf.sex2
 ## 9            TÁBARA ARRIBA  05  Mujeres   7648
 ## 10                GUAYABAL  05  Mujeres   2269
 ##                              geom
-## 1  MULTIPOLYGON (((-69.9748 18...
-## 2  MULTIPOLYGON (((-70.71679 1...
-## 3  MULTIPOLYGON (((-70.57286 1...
-## 4  MULTIPOLYGON (((-71.00905 1...
-## 5  MULTIPOLYGON (((-70.86264 1...
-## 6  MULTIPOLYGON (((-70.82254 1...
-## 7  MULTIPOLYGON (((-70.85519 1...
-## 8  MULTIPOLYGON (((-70.75679 1...
-## 9  MULTIPOLYGON (((-70.87475 1...
-## 10 MULTIPOLYGON (((-70.76943 1...
+## 1  MULTIPOLYGON (((-69.89794 1...
+## 2  MULTIPOLYGON (((-70.71457 1...
+## 3  MULTIPOLYGON (((-70.50185 1...
+## 4  MULTIPOLYGON (((-70.85774 1...
+## 5  MULTIPOLYGON (((-70.77551 1...
+## 6  MULTIPOLYGON (((-70.73131 1...
+## 7  MULTIPOLYGON (((-70.83014 1...
+## 8  MULTIPOLYGON (((-70.79387 1...
+## 9  MULTIPOLYGON (((-70.83352 1...
+## 10 MULTIPOLYGON (((-70.68664 1...
 ```
 
 El objeto resultante tiene 310 elementos, que corresponden a los 155
