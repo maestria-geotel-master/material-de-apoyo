@@ -147,6 +147,12 @@ mun.sf$area <- st_area(mun.sf)
 plot(mun.sf['area'])
 ```
 
+Puedes mostrar todas las áreas calculadas en forma de una tabla (a fin de cuentas, los objetos `sf` son igualmente `data.frame`), pues el resumen que obtienes al imprimir el objeto `sf` sólo incluye los primeros 10 (depende de la configuración del paquete). Imprimiremos sólo dos columnas, `TOPONIMIA` y `area`, y notarás que la columna de geometría se mantendrá unida al objeto (más adelante se muestra cómo imprimir la tabla de atributos sin dicha columna).
+
+```{r}
+as.data.frame(mun.sf[,c('TOPONIMIA', 'area')])
+```
+
 ### ¿Qué son *simple features*?
 
 Veamos lo básico sobre el modelo de datos *simple features*. Se trata de un estándar abierto y jerárquico del Open Geospatial Consortium (organización sin ánimo de lucro que agrupa a entidades públicas y privadas comprometida con este tipo de estándares). Mediante *simple features* se representan al menos 17 tipos de geometrías (sólo admite vectoriales), de las que 7 son ampliamente usadas en análisis espacial (ver figura a continuación).
