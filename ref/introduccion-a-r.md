@@ -234,7 +234,18 @@ plot(reg.sf['area'])
 
 <img src="../img/regiones2-1.png" width="100%" />
 
-> El mapa anterior es mejorable en muchos aspectos. En este mismo
+Finalmente, representaremos un panel simbolizando la región de código
+`REG` igual a `01`, que es la región Cibao Norte, según los campos
+disponibles (que son 3, `REG`, `TOPONIMIA` y `area`, esta último recién
+creado).
+
+``` r
+plot(reg.sf[reg.sf$REG %in% '01', ])
+```
+
+<img src="../img/regiones3-1.png" width="100%" />
+
+> Los mapas anteriores son mejorables en muchos aspectos. En este mismo
 > tutorial, probarás formas de diseñar mapas estilizados.
 
 El bloque de código a continuación carga la capa de municipios desde el

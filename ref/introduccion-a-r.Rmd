@@ -130,7 +130,13 @@ reg.sf$area <- st_area(reg.sf)
 plot(reg.sf['area'])
 ```
 
->El mapa anterior es mejorable en muchos aspectos. En este mismo tutorial, probarás formas de diseñar mapas estilizados.
+Finalmente, representaremos un panel simbolizando la región de código `REG` igual a `01`, que es la región Cibao Norte, según los campos disponibles (que son 3, `REG`, `TOPONIMIA` y `area`, esta último recién creado).
+
+```{r regiones3, results='asis'}
+plot(reg.sf[reg.sf$REG %in% '01', ])
+```
+
+>Los mapas anteriores son mejorables en muchos aspectos. En este mismo tutorial, probarás formas de diseñar mapas estilizados.
 
 El bloque de código a continuación carga la capa de municipios desde el GPKG y la representa. Al igual que con la capa regional, dado que tiene múltiples campos (en este caso, 3 adicionales), la función `plot` representa a los municipios aplicándoles distintos estilos en función del campo representado.
 
