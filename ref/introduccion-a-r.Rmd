@@ -412,13 +412,13 @@ mun.sf.pop
 
 Notemos que el objeto `mun.sf.pop` conserva las columnas que contenía inicialmente `mun.sf.ll` y se añaden todas las columnas `pop.mun`. El resumen del objeto `mun.sf.pop`, en el encabezado indica `Simple feature collection with 155 features and 262 fields`, lo que supone que se han conservado todos los municipios (cada fila un municipio) y se han añadido 256 columnas de las 257 disponibles (`ENLACE` no se añade, por tratarse del campo de unión).
 
-Creemos un objeto nuevo al que llamaremos `mun.sf.sex`, seleccionando de `mun.sf.pop` las columnas de `ENLACE`, `TOPONIMIA`, `Hombres` y `Mujeres` (número de hombres y mujeres, respectivamente). Al mismo tiempo, crearemos la columna `Total`, que contendrá la suma de la población de hombres y mujeres.
+Creemos un objeto nuevo al que llamaremos `mun.sf.sex`, seleccionando de `mun.sf.pop` las columnas de `ENLACE`, `TOPONIMIA`, `Hombres` y `Mujeres` (número de hombres y mujeres, respectivamente). Al mismo tiempo, crearemos la columna `Total`, que contendrá la suma de la población de hombres y mujeres. Finalmente, imprimiremos el objeto `mun.sf.sex` como `data.frame`, ordenado descendentemente por población total
 
 ```{r}
 mun.sf.sex <- mun.sf.pop %>%
   dplyr::select(ENLACE, TOPONIMIA, REG, Hombres, Mujeres, area) %>% #Selecciona sólo las columnas de población por sexo y el nombre del municipio 
   mutate(Total=Hombres+Mujeres) #Calcula el total de hombres y mujeres
-mun.sf.sex
+mun.sf.sex %>% dplyr::select(TOPONIMIA, Total) %>% arrange(desc(Total)) %>% as.data.frame()
 ```
 
 El objeto `mun.sf.sex` tiene los mismo 155 municipios, pero sólo 5 campos. Representemos la población por sexo y total en un panel (la función `plot` representa la misma geometría según cada uno de los campos disponibles)
