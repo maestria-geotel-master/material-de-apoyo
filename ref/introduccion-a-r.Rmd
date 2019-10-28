@@ -379,7 +379,7 @@ La lectura, escritura y manipulación de rásters normalmente exige muchos recur
 
 Probemos con un ráster pequeño, en este caso, un modelo digital de elevaciones (MDE) no proyectado (EPSG:4326), de la subcuenca del arroyo Parra, cuenca del río Ocoa.
 
-```{r}
+```{r raster}
 r <- raster('data/MDE_SRTM_30m_Naranjal_Parra.tif')
 summary(r)
 plot(r, col=terrain.colors(n=255))

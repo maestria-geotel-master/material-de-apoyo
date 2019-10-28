@@ -1102,16 +1102,381 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
 
 <img src="../img/tmmunptlinpol-1.png" width="100%" />
 
+## Exportar datos
+
+Puedes exportar los objetos creados anteriormente. Aunque se trata de
+simples geometrías, en ocasiones querrás exportar objetos creados a
+partir de análisis y operaciones geométricas o con atributos realizadas
+en R. El paquete `sf` te ofrece una gama de formatos para exportar.
+Probemos exportar el objeto `pto.sf` a la carpeta export del repo.
+
+``` r
+st_write(obj = pto.sf, dsn = 'export/pto.sf.gpkg', driver = 'GPKG')
+## Updating layer `pto.sf' to data source `export/pto.sf.gpkg' using driver `GPKG'
+## Updating existing layer pto.sf
+## Writing 1 features with 1 fields and geometry type Point.
+```
+
+Puedes encontrar una lista de drivers ejecutando:
+
+``` r
+st_drivers()
+##                          name
+## PCIDSK                 PCIDSK
+## netCDF                 netCDF
+## JP2OpenJPEG       JP2OpenJPEG
+## PDF                       PDF
+## ESRI Shapefile ESRI Shapefile
+## MapInfo File     MapInfo File
+## UK .NTF               UK .NTF
+## OGR_SDTS             OGR_SDTS
+## S57                       S57
+## DGN                       DGN
+## OGR_VRT               OGR_VRT
+## REC                       REC
+## Memory                 Memory
+## BNA                       BNA
+## CSV                       CSV
+## NAS                       NAS
+## GML                       GML
+## GPX                       GPX
+## LIBKML                 LIBKML
+## KML                       KML
+## GeoJSON               GeoJSON
+## Interlis 1         Interlis 1
+## Interlis 2         Interlis 2
+## OGR_GMT               OGR_GMT
+## GPKG                     GPKG
+## SQLite                 SQLite
+## OGR_DODS             OGR_DODS
+## ODBC                     ODBC
+## WAsP                     WAsP
+## PGeo                     PGeo
+## MSSQLSpatial     MSSQLSpatial
+## OGR_OGDI             OGR_OGDI
+## PostgreSQL         PostgreSQL
+## MySQL                   MySQL
+## OpenFileGDB       OpenFileGDB
+## XPlane                 XPlane
+## DXF                       DXF
+## CAD                       CAD
+## Geoconcept         Geoconcept
+## GeoRSS                 GeoRSS
+## GPSTrackMaker   GPSTrackMaker
+## VFK                       VFK
+## PGDUMP                 PGDUMP
+## OSM                       OSM
+## GPSBabel             GPSBabel
+## SUA                       SUA
+## OpenAir               OpenAir
+## OGR_PDS               OGR_PDS
+## WFS                       WFS
+## SOSI                     SOSI
+## HTF                       HTF
+## AeronavFAA         AeronavFAA
+## Geomedia             Geomedia
+## EDIGEO                 EDIGEO
+## GFT                       GFT
+## SVG                       SVG
+## CouchDB               CouchDB
+## Cloudant             Cloudant
+## Idrisi                 Idrisi
+## ARCGEN                 ARCGEN
+## SEGUKOOA             SEGUKOOA
+## SEGY                     SEGY
+## XLS                       XLS
+## ODS                       ODS
+## XLSX                     XLSX
+## ElasticSearch   ElasticSearch
+## Walk                     Walk
+## Carto                   Carto
+## AmigoCloud         AmigoCloud
+## SXF                       SXF
+## Selafin               Selafin
+## JML                       JML
+## PLSCENES             PLSCENES
+## CSW                       CSW
+## VDV                       VDV
+## GMLAS                   GMLAS
+## TIGER                   TIGER
+## AVCBin                 AVCBin
+## AVCE00                 AVCE00
+## HTTP                     HTTP
+##                                                                    long_name
+## PCIDSK                                                  PCIDSK Database File
+## netCDF                                            Network Common Data Format
+## JP2OpenJPEG                       JPEG-2000 driver based on OpenJPEG library
+## PDF                                                           Geospatial PDF
+## ESRI Shapefile                                                ESRI Shapefile
+## MapInfo File                                                    MapInfo File
+## UK .NTF                                                              UK .NTF
+## OGR_SDTS                                                                SDTS
+## S57                                                           IHO S-57 (ENC)
+## DGN                                                         Microstation DGN
+## OGR_VRT                                             VRT - Virtual Datasource
+## REC                                                            EPIInfo .REC 
+## Memory                                                                Memory
+## BNA                                                                Atlas BNA
+## CSV                                             Comma Separated Value (.csv)
+## NAS                                                              NAS - ALKIS
+## GML                                          Geography Markup Language (GML)
+## GPX                                                                      GPX
+## LIBKML                                      Keyhole Markup Language (LIBKML)
+## KML                                            Keyhole Markup Language (KML)
+## GeoJSON                                                              GeoJSON
+## Interlis 1                                                        Interlis 1
+## Interlis 2                                                        Interlis 2
+## OGR_GMT                                             GMT ASCII Vectors (.gmt)
+## GPKG                                                              GeoPackage
+## SQLite                                                   SQLite / Spatialite
+## OGR_DODS                                                            OGR_DODS
+## ODBC                                                                    ODBC
+## WAsP                                                        WAsP .map format
+## PGeo                                               ESRI Personal GeoDatabase
+## MSSQLSpatial                           Microsoft SQL Server Spatial Database
+## OGR_OGDI                                       OGDI Vectors (VPF, VMAP, DCW)
+## PostgreSQL                                                PostgreSQL/PostGIS
+## MySQL                                                                  MySQL
+## OpenFileGDB                                                     ESRI FileGDB
+## XPlane                                  X-Plane/Flightgear aeronautical data
+## DXF                                                              AutoCAD DXF
+## CAD                                                           AutoCAD Driver
+## Geoconcept                                                        Geoconcept
+## GeoRSS                                                                GeoRSS
+## GPSTrackMaker                                                  GPSTrackMaker
+## VFK                                     Czech Cadastral Exchange Data Format
+## PGDUMP                                                   PostgreSQL SQL dump
+## OSM                                                OpenStreetMap XML and PBF
+## GPSBabel                                                            GPSBabel
+## SUA                          Tim Newport-Peace's Special Use Airspace Format
+## OpenAir                                                              OpenAir
+## OGR_PDS                                         Planetary Data Systems TABLE
+## WFS                                            OGC WFS (Web Feature Service)
+## SOSI                                                 Norwegian SOSI Standard
+## HTF                                             Hydrographic Transfer Vector
+## AeronavFAA                                                       Aeronav FAA
+## Geomedia                                                       Geomedia .mdb
+## EDIGEO                                         French EDIGEO exchange format
+## GFT                                                     Google Fusion Tables
+## SVG                                                 Scalable Vector Graphics
+## CouchDB                                                   CouchDB / GeoCouch
+## Cloudant                                                  Cloudant / CouchDB
+## Idrisi                                                  Idrisi Vector (.vct)
+## ARCGEN                                                     Arc/Info Generate
+## SEGUKOOA                                                SEG-P1 / UKOOA P1/90
+## SEGY                                                                   SEG-Y
+## XLS                                                          MS Excel format
+## ODS                     Open Document/ LibreOffice / OpenOffice Spreadsheet 
+## XLSX                                          MS Office Open XML spreadsheet
+## ElasticSearch                                                 Elastic Search
+## Walk                                                                    Walk
+## Carto                                                                  Carto
+## AmigoCloud                                                        AmigoCloud
+## SXF                                              Storage and eXchange Format
+## Selafin                                                              Selafin
+## JML                                                             OpenJUMP JML
+## PLSCENES                                              Planet Labs Scenes API
+## CSW                                   OGC CSW (Catalog  Service for the Web)
+## VDV                                      VDV-451/VDV-452/INTREST Data Format
+## GMLAS          Geography Markup Language (GML) driven by application schemas
+## TIGER                                                 U.S. Census TIGER/Line
+## AVCBin                                              Arc/Info Binary Coverage
+## AVCE00                                         Arc/Info E00 (ASCII) Coverage
+## HTTP                                                   HTTP Fetching Wrapper
+##                write  copy is_raster is_vector   vsi
+## PCIDSK          TRUE FALSE      TRUE      TRUE  TRUE
+## netCDF          TRUE  TRUE      TRUE      TRUE FALSE
+## JP2OpenJPEG    FALSE  TRUE      TRUE      TRUE  TRUE
+## PDF             TRUE  TRUE      TRUE      TRUE  TRUE
+## ESRI Shapefile  TRUE FALSE     FALSE      TRUE  TRUE
+## MapInfo File    TRUE FALSE     FALSE      TRUE  TRUE
+## UK .NTF        FALSE FALSE     FALSE      TRUE FALSE
+## OGR_SDTS       FALSE FALSE     FALSE      TRUE FALSE
+## S57             TRUE FALSE     FALSE      TRUE  TRUE
+## DGN             TRUE FALSE     FALSE      TRUE FALSE
+## OGR_VRT        FALSE FALSE     FALSE      TRUE  TRUE
+## REC            FALSE FALSE     FALSE      TRUE FALSE
+## Memory          TRUE FALSE     FALSE      TRUE FALSE
+## BNA             TRUE FALSE     FALSE      TRUE  TRUE
+## CSV             TRUE FALSE     FALSE      TRUE  TRUE
+## NAS            FALSE FALSE     FALSE      TRUE FALSE
+## GML             TRUE FALSE     FALSE      TRUE  TRUE
+## GPX             TRUE FALSE     FALSE      TRUE  TRUE
+## LIBKML          TRUE FALSE     FALSE      TRUE  TRUE
+## KML             TRUE FALSE     FALSE      TRUE  TRUE
+## GeoJSON         TRUE FALSE     FALSE      TRUE  TRUE
+## Interlis 1      TRUE FALSE     FALSE      TRUE FALSE
+## Interlis 2      TRUE FALSE     FALSE      TRUE FALSE
+## OGR_GMT         TRUE FALSE     FALSE      TRUE FALSE
+## GPKG            TRUE  TRUE      TRUE      TRUE  TRUE
+## SQLite          TRUE FALSE     FALSE      TRUE  TRUE
+## OGR_DODS       FALSE FALSE     FALSE      TRUE FALSE
+## ODBC            TRUE FALSE     FALSE      TRUE FALSE
+## WAsP            TRUE FALSE     FALSE      TRUE  TRUE
+## PGeo           FALSE FALSE     FALSE      TRUE FALSE
+## MSSQLSpatial    TRUE FALSE     FALSE      TRUE FALSE
+## OGR_OGDI       FALSE FALSE     FALSE      TRUE FALSE
+## PostgreSQL      TRUE FALSE     FALSE      TRUE FALSE
+## MySQL           TRUE FALSE     FALSE      TRUE FALSE
+## OpenFileGDB    FALSE FALSE     FALSE      TRUE  TRUE
+## XPlane         FALSE FALSE     FALSE      TRUE  TRUE
+## DXF             TRUE FALSE     FALSE      TRUE  TRUE
+## CAD            FALSE FALSE      TRUE      TRUE  TRUE
+## Geoconcept      TRUE FALSE     FALSE      TRUE FALSE
+## GeoRSS          TRUE FALSE     FALSE      TRUE  TRUE
+## GPSTrackMaker   TRUE FALSE     FALSE      TRUE  TRUE
+## VFK            FALSE FALSE     FALSE      TRUE FALSE
+## PGDUMP          TRUE FALSE     FALSE      TRUE  TRUE
+## OSM            FALSE FALSE     FALSE      TRUE  TRUE
+## GPSBabel        TRUE FALSE     FALSE      TRUE FALSE
+## SUA            FALSE FALSE     FALSE      TRUE  TRUE
+## OpenAir        FALSE FALSE     FALSE      TRUE  TRUE
+## OGR_PDS        FALSE FALSE     FALSE      TRUE  TRUE
+## WFS            FALSE FALSE     FALSE      TRUE  TRUE
+## SOSI           FALSE FALSE     FALSE      TRUE FALSE
+## HTF            FALSE FALSE     FALSE      TRUE  TRUE
+## AeronavFAA     FALSE FALSE     FALSE      TRUE  TRUE
+## Geomedia       FALSE FALSE     FALSE      TRUE FALSE
+## EDIGEO         FALSE FALSE     FALSE      TRUE  TRUE
+## GFT             TRUE FALSE     FALSE      TRUE FALSE
+## SVG            FALSE FALSE     FALSE      TRUE  TRUE
+## CouchDB         TRUE FALSE     FALSE      TRUE FALSE
+## Cloudant        TRUE FALSE     FALSE      TRUE FALSE
+## Idrisi         FALSE FALSE     FALSE      TRUE  TRUE
+## ARCGEN         FALSE FALSE     FALSE      TRUE  TRUE
+## SEGUKOOA       FALSE FALSE     FALSE      TRUE  TRUE
+## SEGY           FALSE FALSE     FALSE      TRUE  TRUE
+## XLS            FALSE FALSE     FALSE      TRUE FALSE
+## ODS             TRUE FALSE     FALSE      TRUE  TRUE
+## XLSX            TRUE FALSE     FALSE      TRUE  TRUE
+## ElasticSearch   TRUE FALSE     FALSE      TRUE FALSE
+## Walk           FALSE FALSE     FALSE      TRUE FALSE
+## Carto           TRUE FALSE     FALSE      TRUE FALSE
+## AmigoCloud      TRUE FALSE     FALSE      TRUE FALSE
+## SXF            FALSE FALSE     FALSE      TRUE FALSE
+## Selafin         TRUE FALSE     FALSE      TRUE  TRUE
+## JML             TRUE FALSE     FALSE      TRUE  TRUE
+## PLSCENES       FALSE FALSE      TRUE      TRUE FALSE
+## CSW            FALSE FALSE     FALSE      TRUE FALSE
+## VDV             TRUE FALSE     FALSE      TRUE  TRUE
+## GMLAS          FALSE  TRUE     FALSE      TRUE  TRUE
+## TIGER           TRUE FALSE     FALSE      TRUE  TRUE
+## AVCBin         FALSE FALSE     FALSE      TRUE FALSE
+## AVCE00         FALSE FALSE     FALSE      TRUE FALSE
+## HTTP           FALSE FALSE      TRUE      TRUE FALSE
+```
+
+## Rásters
+
+La lectura, escritura y manipulación de rásters normalmente exige muchos
+recursos de memoria. No es la excepción en R, por lo que cuando quieras
+ejecutar operaciones con rásters, considera las siguientes cuestiones:
+
+  - Primero lo primero: recorta tus fuentes de manera que sólo abarque
+    el área de interés. Para esto, no es necesario utilizar R ni
+    software de interfaz de gráfico. Recurre mejor a las herramientas
+    `gdal`, que son altamente eficientes y confiables. Tan pronto cortes
+    el área de interés, elimina el archivo fuente, pero consérvalo
+    (preferiblemente comprimido) en algún repositorio accesible, por si
+    hubiese que realizar operaciones de corte posteriores.
+
+  - Considera tratar tus imágenes con código, y sólo recurre al interfaz
+    gráfico para visualizar algún resultado de interés. Serás más
+    eficiente codificando que teniendo que abrir capas completas que
+    pudieran exigir muchos recursos de memoria.
+
+  - Intenta la paralelización de operaciones. Si vas a realizar álgebra
+    de mapas o estadística zonal, utiliza herramientas de paralelización
+    (R disponde paquetes para ello) para agilizar los cálculos.
+
+Probemos con un ráster pequeño, en este caso, un modelo digital de
+elevaciones (MDE) no proyectado (EPSG:4326), de la subcuenca del arroyo
+Parra, cuenca del río Ocoa.
+
+``` r
+r <- raster('data/MDE_SRTM_30m_Naranjal_Parra.tif')
+summary(r)
+##         MDE_SRTM_30m_Naranjal_Parra
+## Min.                            388
+## 1st Qu.                         650
+## Median                          834
+## 3rd Qu.                        1054
+## Max.                           1514
+## NA's                              0
+plot(r, col=terrain.colors(n=255))
+```
+
+<img src="../img/raster-1.png" width="100%" />
+
+El `plot` simboliza las elevaciones usando la paleta `terrain.colors`,
+donde verde es “bajo” y blanco/salmón es “elevado”. Realizaremos
+operaciones más complejas con rásters en la medida que avance la
+asignatura.
+
+Una de las operaciones más comunes que realizamos con rásters, consiste
+en obtener información de las celdas que conforman un ráster. Este
+proceso se conoce como extracción, y comúnmente interactúan un ráster y
+un vectorial, o dos rásters. Una de las capas es la ráster que contiene
+las celdas sobre las que queremos indagar, y la segunda es uno o varios
+polígonos, líneas, puntos o píxeles rásters que tocan las celdas que
+queremos analizar. Al realizar la extracción, aislamos los píxeles de
+interés y los sometemos a análisis estadísticos.
+
+Veamos un ejemplo con el ráster anterior, del cual extraeremos las
+celdas que coinciden con el límite de la subcuencas de los arroyos
+Naranjal y Hondo, ambas partes de la subcuenca del Parra (las capas
+están proyectadas, EPSG:32619). Por eficiencia, usaremos un ráster
+agregado (por promedio) en un factor de 10 con la función
+`raster::aggregate`, de manera que usaremos una fuente donde una celda
+representa el promedio de 10 celdas del original:
+
+``` r
+naranjal <- st_read(dsn = 'data/subcuenca_naranjal.gpkg')
+## Reading layer `subcuenca_naranjal2' from data source `/home/jr/Documentos/clases_UASD/201902/maestria-geotel-analisis-espacial/material-de-apoyo/data/subcuenca_naranjal.gpkg' using driver `GPKG'
+## Simple feature collection with 1 feature and 2 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: 342970 ymin: 2050720 xmax: 345910 ymax: 2054920
+## epsg (SRID):    32619
+## proj4string:    +proj=utm +zone=19 +datum=WGS84 +units=m +no_defs
+hondo <- st_read(dsn = 'data/subcuenca_hondo.gpkg')
+## Reading layer `subcuenca_hondo2' from data source `/home/jr/Documentos/clases_UASD/201902/maestria-geotel-analisis-espacial/material-de-apoyo/data/subcuenca_hondo.gpkg' using driver `GPKG'
+## Simple feature collection with 1 feature and 2 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: 343660 ymin: 2049430 xmax: 347740 ymax: 2053120
+## epsg (SRID):    32619
+## proj4string:    +proj=utm +zone=19 +datum=WGS84 +units=m +no_defs
+r10 <- raster::aggregate(r, 10)
+naranjalext <- raster::extract(r10, naranjal)
+## Warning in .local(x, y, ...): Transforming SpatialPolygons to the CRS of
+## the Raster
+#Nota que la capa vectorial fue reproyectada al CRS del ráster
+summary(naranjalext[[1]])
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   544.7   585.5   641.5   665.3   739.3   934.4
+hondoext <- raster::extract(r10, hondo)
+## Warning in .local(x, y, ...): Transforming SpatialPolygons to the CRS of
+## the Raster
+summary(hondoext[[1]])
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   539.3   721.8   826.9   846.9   969.9  1185.5
+```
+
+Fíjate en el resumen: la diferencia en cuanto a elevaciones máxima y
+media entre ambas subcuencas es notoria; Hondo es una subcuenca más
+alta, al menos en cabecera, que Naranjal.
+
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-Cerremos esta introducción a R con un ligero análisis exploratorio de
-datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el
-ESDA en profundidad, en este cierre veremos los pasos básicos para hacer
-que las geometrías “brillen” con atributos reales. Tendremos que unir
-los datos espaciales con atributos externos (la unión tradicional, o
-*join*), utilizando un campo común entre ambos. Como suele ocurrir en
-cualquier flujo de trabajo de análisis de datos, el 80% del esfuerzo lo
-dedicamos a limpiar y organizar; en este caso no será diferente.
+Cerremos con un ligero análisis exploratorio de datos espaciales (ESDA).
+Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en
+este cierre veremos los pasos básicos para hacer que las geometrías
+“brillen” con atributos reales. Tendremos que unir los datos
+espaciales con atributos externos (la unión tradicional, o *join*),
+utilizando un campo común entre ambos. Como suele ocurrir en cualquier
+flujo de trabajo de análisis de datos, el 80% del esfuerzo lo dedicamos
+a limpiar y organizar; en este caso no será diferente.
 
 No hace falta abordar el problema de la unidad de área modificable en
 este punto. Baste decir por el momento que cualquier división que
