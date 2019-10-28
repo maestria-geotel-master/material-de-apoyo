@@ -353,9 +353,60 @@ tm_shape(mun.sf.ll) + tm_fill('TOPONIMIA', legend.show = F) +  tm_borders('grey'
   tm_shape(shp = pol.sf) + tm_fill(col='black')
 ```
 
+## Exportar datos
+
+Puedes exportar los objetos creados anteriormente. Aunque se trata de simples geometrías, en ocasiones querrás exportar objetos creados a partir de análisis y operaciones geométricas o con atributos realizadas en R. El paquete `sf` te ofrece una gama de formatos para exportar. Probemos exportar el objeto `pto.sf` a la carpeta export del repo.
+
+```{r}
+st_write(obj = pto.sf, dsn = 'export/pto.sf.gpkg', driver = 'GPKG')
+```
+
+Puedes encontrar una lista de drivers ejecutando:
+
+```{r}
+st_drivers()
+```
+
+## Rásters
+
+La lectura, escritura y manipulación de rásters normalmente exige muchos recursos de memoria. No es la excepción en R, por lo que cuando quieras ejecutar operaciones con rásters, considera las siguientes cuestiones:
+
+* Primero lo primero: recorta tus fuentes de manera que sólo abarque el área de interés. Para esto, no es necesario utilizar R ni software de interfaz de gráfico. Recurre mejor a las herramientas `gdal`, que son altamente eficientes y confiables. Tan pronto cortes el área de interés, elimina el archivo fuente, pero consérvalo (preferiblemente comprimido) en algún repositorio accesible, por si hubiese que realizar operaciones de corte posteriores.
+
+* Considera tratar tus imágenes con código, y sólo recurre al interfaz gráfico para visualizar algún resultado de interés. Serás más eficiente codificando que teniendo que abrir capas completas que pudieran exigir muchos recursos de memoria.
+
+* Intenta la paralelización de operaciones. Si vas a realizar álgebra de mapas o estadística zonal, utiliza herramientas de paralelización (R disponde paquetes para ello) para agilizar los cálculos.
+
+Probemos con un ráster pequeño, en este caso, un modelo digital de elevaciones (MDE) no proyectado (EPSG:4326), de la subcuenca del arroyo Parra, cuenca del río Ocoa.
+
+```{r}
+r <- raster('data/MDE_SRTM_30m_Naranjal_Parra.tif')
+summary(r)
+plot(r, col=terrain.colors(n=255))
+```
+
+El `plot` simboliza las elevaciones usando la paleta `terrain.colors`, donde verde es "bajo" y blanco/salmón es "elevado". Realizaremos operaciones más complejas con rásters en la medida que avance la asignatura.
+
+Una de las operaciones más comunes que realizamos con rásters, consiste en obtener información de las celdas que conforman un ráster. Este proceso se conoce como extracción, y comúnmente interactúan un ráster y un vectorial, o dos rásters. Una de las capas es la ráster que contiene las celdas sobre las que queremos indagar, y la segunda es uno o varios polígonos, líneas, puntos o píxeles rásters que tocan las celdas que queremos analizar. Al realizar la extracción, aislamos los píxeles de interés y los sometemos a análisis estadísticos.
+
+Veamos un ejemplo con el ráster anterior, del cual extraeremos las celdas que coinciden con el límite de la subcuencas de los arroyos Naranjal y Hondo, ambas partes de la subcuenca del Parra (las capas están proyectadas, EPSG:32619). Por eficiencia, usaremos un ráster agregado (por promedio) en un factor de 10 con la función `raster::aggregate`, de manera que usaremos una fuente donde una celda representa el promedio de 10 celdas del original:
+
+```{r}
+naranjal <- st_read(dsn = 'data/subcuenca_naranjal.gpkg')
+hondo <- st_read(dsn = 'data/subcuenca_hondo.gpkg')
+r10 <- raster::aggregate(r, 10)
+naranjalext <- raster::extract(r10, naranjal)
+#Nota que la capa vectorial fue reproyectada al CRS del ráster
+summary(naranjalext[[1]])
+hondoext <- raster::extract(r10, hondo)
+summary(hondoext[[1]])
+```
+
+Fíjate en el resumen: la diferencia en cuanto a elevaciones máxima y media entre ambas subcuencas es notoria; Hondo es una subcuenca más alta, al menos en cabecera, que Naranjal.
+
 ## Análisis exploratorio de datos espaciales (ESDA)
 
-Cerremos esta introducción a R con un ligero análisis exploratorio de datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en este cierre veremos los pasos básicos para hacer que las geometrías "brillen" con atributos reales. Tendremos que unir los datos espaciales con atributos externos (la unión tradicional, o *join*), utilizando un campo común entre ambos. Como suele ocurrir en cualquier flujo de trabajo de análisis de datos, el 80% del esfuerzo lo dedicamos a limpiar y organizar; en este caso no será diferente.
+Cerremos con un ligero análisis exploratorio de datos espaciales (ESDA). Aunque en lecciones posteriores abordaremos el ESDA en profundidad, en este cierre veremos los pasos básicos para hacer que las geometrías "brillen" con atributos reales. Tendremos que unir los datos espaciales con atributos externos (la unión tradicional, o *join*), utilizando un campo común entre ambos. Como suele ocurrir en cualquier flujo de trabajo de análisis de datos, el 80% del esfuerzo lo dedicamos a limpiar y organizar; en este caso no será diferente.
 
 No hace falta abordar el problema de la unidad de área modificable en este punto. Baste decir por el momento que cualquier división que utilicemos es y será arbitraria. Si bien la mayoría de las agencias nacionales de estadística sirven sus datos a nivel de términos municipales, regiones o provincias (u otras unidades), no olvidemos que existe un sesgo inherente, puesto que una división arbitraria no garantiza la independencia de observaciones.
 
