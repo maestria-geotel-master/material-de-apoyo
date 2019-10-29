@@ -1403,7 +1403,7 @@ summary(r)
 ## 3rd Qu.                        1054
 ## Max.                           1514
 ## NA's                              0
-plot(r, col=terrain.colors(n=255))
+plot(r, col = terrain.colors(n = 255))
 ```
 
 <img src="../img/raster-1.png" width="100%" />

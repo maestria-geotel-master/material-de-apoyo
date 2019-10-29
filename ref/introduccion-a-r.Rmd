@@ -382,7 +382,7 @@ Probemos con un ráster pequeño, en este caso, un modelo digital de elevaciones
 ```{r raster}
 r <- raster('data/MDE_SRTM_30m_Naranjal_Parra.tif')
 summary(r)
-plot(r, col=terrain.colors(n=255))
+plot(r, col = terrain.colors(n = 255))
 ```
 
 El `plot` simboliza las elevaciones usando la paleta `terrain.colors`, donde verde es "bajo" y blanco/salmón es "elevado". Realizaremos operaciones más complejas con rásters en la medida que avance la asignatura.
