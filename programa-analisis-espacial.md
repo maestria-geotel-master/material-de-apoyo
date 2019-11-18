@@ -254,8 +254,9 @@ utilidad para los proyectos.
 
 3.  Vecindad y autocorrelación espacial (análisis exploratorio,
     funciones de homogeneidad espacial, tipos de vecindad, ponderadores,
-    índices). Capítulos 2 y 3 de Loonis & Bellefon (2018), capítulo 12
-    de Olaya (2014), capítulos B.2 y B.3 de Fischer & Getis (2009).
+    índices). Sección 9.2 de Bivand et al. (2008), Capítulos 2 y 3 de
+    Loonis & Bellefon (2018), capítulo 12 de Olaya (2014), capítulos B.2
+    y B.3 de Fischer & Getis (2009).
 
 4.  Datos puntuales, geoestadística (funciones aleatorias, variograma,
     kriging). Capítulo B.6 de Fischer & Getis (2009), Capítulos 1, 2, 5
