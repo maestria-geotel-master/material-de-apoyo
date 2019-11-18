@@ -1,0 +1,190 @@
+---
+output: github_document
+bibliography: biblio.bib
+csl: apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "..")
+knitr::opts_chunk$set(
+  echo = TRUE,
+  collapse=TRUE,
+  fig.path = "../img/",
+  out.width='100%'
+)
+```
+
+
+<!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
+
+# Vecindad
+
+La determinación del tipo de vecindad es un paso necesario en el análisis espacial. El objetivo es verificar si existe algún patrón espacial en los residuos. El primer paso consiste en dar un peso determinado (no cero) a aquellos objetos que se relacionan entre sí, es decir, definir el tipo de vínculo de vecindad. Detectar patrones en mapas no es una opción aceptable, y hacerlo supone una ausencia de análisis formal [@bivand2008applied].
+
+Antes que nada, carguemos paquetes y datos. Utilizaremos como ejemplo, la capa de división municipal [@one2015datos] y los datos de población del Censo de Población y Vivienda de 2010 desagregados a nivel municipal [@one2012ixcenso]. Es necesario ajustar el campo `Código` de la tabla de datos de población.
+
+
+```{r, warning=F, message=F}
+library(sf)
+library(tidyverse)
+library(spdep) #Para crear vecinos y pesos
+
+#Municipios
+mun.sf <- st_read(dsn = 'data/divisionRD.gpkg', layer = 'MUNCenso2010', quiet = T)
+
+#Población
+pop.mun <- read_csv('data/pop_adm3.csv')
+pop.mun
+
+#Corrección de códigos en pop.mun
+pop.mun <- pop.mun %>% mutate(ENLACE = ifelse(nchar(Código)==5, paste0('0', Código),Código))
+match(pop.mun$ENLACE, mun.sf$ENLACE)
+
+#Municipios-Población unidos
+mun.sf.pop <- mun.sf %>% inner_join(pop.mun, by = 'ENLACE')
+mun.sf.pop
+
+#Objeto sp, SpatialPolygonsDataFrame
+mun.sp.pop <- as_Spatial(mun.sf.pop) #Necesitamos un objeto de clase sp para el paquete spdep
+colnames(mun.sp.pop@data)[1:20]
+
+#Si queremos los nombres de columna más legibles, debemos recuperarlos del original
+colnames(mun.sp.pop@data) <- mun.sf.pop %>% st_drop_geometry() %>% colnames
+
+#Y para que la tabla de atributos tenga nombres filas, les pondremos los del campo TOPONIMIA
+row.names(mun.sp.pop) <- as.character(mun.sp.pop$TOPONIMIA)
+```
+
+Generemos un objeto de vecindad y veamos en qué consisten, aplicando la función `poly2nb`, que considera dos objetos como vecinos siempre que exista contigüidad (vecinos contiguos), es decir, los objetos se tocan. En este caso, "se tocan" implica que comparten al menos un límite (modo *rook*, torre, en analogía con el ajedrez) o incluso si sólo comparten un vértice común (modo *queen*, reina). La función `summary` ofrece un resumen del objeto, y nos indica el número de "*regions*" (municipios en este caso), número de vínculos no "cero", es decir, número de vínculos entre objetos contiguos (si hubiese objetos sin vínculos, como islas, se relacionarían en una línea separada).
+
+```{r}
+mun.nb <- poly2nb(mun.sp.pop, queen=TRUE)
+summary(mun.nb)
+```
+
+La función `card` ofrece un resumen de la "cardinalidad", es decir, quiénes son vecinos de cada observación.
+
+```{r}
+card(mun.nb)
+```
+
+El índice numérico de vecinos de cada observación se almacena como un vector entero en el objeto de vecindad. Aunque normalmente (y por defecto) imprimimos el objeto de vecindad de forma resumida, puede también mostrarse la relación exhaustiva de vecinos de cada observación (municipio):
+
+```{r}
+sapply(mun.nb, function(x) x)
+```
+
+Normalmente, los vínculos entre observaciones se analizan mejor visualmente. El gráfico que los representa se denomina "grafo" en español.
+
+```{r mun_nb}
+plot(mun.sp.pop, border="grey", lwd=0.5)
+plot(mun.nb, coordinates(mun.sp.pop), add=T)
+```
+
+Los objetos de vecindad son listas de clase `nb` con tamaño `n`, donde `n` es el número de observaciones (municipios).
+
+```{r}
+mode(mun.nb)
+class(mun.nb)
+length(mun.nb)
+```
+
+Los objetos de vecindad pueden ser simétricos o no. En el primer caso, si *i* es vecino de *j*, y viceversa, si *j* es vecino de *i*, se dice que el objeto de vecindad es simétrico; este es el caso típíco para objetos creados por contigüidad. Si el objeto de vecindad fuese asimétrico, *i* sería vecino de *j* pero *j* no sería vecino de *i*. Si el objeto fuese asimétrico, al imprimirlo u obtener su resumen (`summary`), el método nos los informaría. En este caso, `mun.nb` es simétrico.
+
+```{r}
+is.symmetric.nb(mun.nb)
+```
+
+Hasta este punto hemos creado objetos de vecindad utilizando el criterio de contigüidad. Creemos objetos de vecindad utilizando criterios diferentes, como la distancia o número de vecinos más próximos. Obviamente, utilizando vecinos más próximos, el objeto de vecindad será asimétrico.
+
+
+```{r}
+coords <- coordinates(mun.sp.pop)
+ident <- row.names(mun.sp.pop)
+mun.nb.k1 <- knn2nb(knearneigh(coords, k = 1), row.names = ident)
+mun.nb.k2 <- knn2nb(knearneigh(coords, k = 2), row.names = ident)
+is.symmetric.nb(mun.nb.k1)
+is.symmetric.nb(mun.nb.k2)
+mun.nb.k1
+mun.nb.k2
+```
+
+Nótese que el número de vínculos es igual al *n x k*.
+
+Si representamos los vínculos entre municipios de `mun.nb.k1`, notaremos rápidamente la asimetría.
+
+```{r mun_nb_k1}
+plot(mun.sp.pop, border="grey", lwd=0.5)
+plot(mun.nb.k1, coordinates(mun.sp.pop), add=T)
+```
+
+Nótese por ejemplo el caso del municipio San Rafael del Yuma, que tiene como vecino más próximo a La Romana, pero éste último tiene como vecino más próximo a Guaymate. Por lo tanto, San Rafael del Yuma tiene como vecino a La Romana, pero La Romana "no lo considera" su vecino, y le otorga ese "honor" a Guaymate.
+
+El objeto de vecindad con *k=1*, que hemos nombrado como `mun.nb.k1`, es útil para determinar los valores extremos (mínimo y máximo) de distancias a vecinos más próximos, y conocer estadísticos descriptivos sobre las distancias entre los municipios.
+
+
+```{r mun_nb_k1_estad}
+dist <- unlist(nbdists(mun.nb.k1, coords))
+summary(dist)
+hist(dist)
+boxplot(dist)
+```
+
+Podemos también explorar cuáles son los municipios en dichos extremos (no sólo el valor absoluto). Para ello, utilizamos la función `nbdists`, que retorna la(s) distancia(s) de cada municipio a su(s) vecino(s) más próximo(s) en forma de una lista (de ahí que se utilice la función `unlist` para generar un vector). En el caso del objeto `mun.nb.k1`, sólo hay una distancia a vecino más próximo por cada municipio.
+
+```{r}
+(distmin <- min(dist)) #Distancia a vecino más próximo más pequeña
+(distmax <- max(dist)) #Distancia a vecino más próximo más grande
+indicemin <- which(dist==distmin)
+ident[indicemin] #Municipios con la distancia más pequeña a sus vecinos más próximos
+indicemax <- which(dist==distmax)
+ident[indicemax] #Municipio con la distancia más grande a su vecino más próximo
+```
+
+El objeto `mun.nb.k1` nos sirve para odernar los municipios según la distancia a su vecino más próximo (en el ejemplo a continuación, ascendentemente):
+
+```{r}
+ident[order(dist)]
+```
+
+Con la distancia máxima se puede construir un objeto de vecindad basado en distancia (el tercer método para establecer vecinos) usando la función `dnearneigh`, en el que todos los municipios tengan al menos un vecino. En el ejemplo a continuación, se utiliza la distancia máxima como umbral inferior para buscar vecinos, lo cual garantiza que cada municipio tendrá al menos un vecino. Como umbral superior se utiliza una vez y media la distancia máxima.
+
+```{r}
+mun.nb.d <- dnearneigh(coords, d1 = max(dist), d2 = 1.5*max(dist), row.names = ident)
+summary(mun.nb.d)
+```
+
+El grafo muestra una densidad de vínculos mucho mayor en este caso, lo cual es esperable.
+
+```{r mun_nb_d}
+plot(mun.sp.pop, border="grey", lwd=0.5)
+plot(mun.nb.d, coordinates(mun.sp.pop), add=T)
+```
+
+# Pesos (ponderadores) espaciales
+
+A una lista de vecinos le asignamos pesos usando criterios que elegimos en función de nuestro conocimiento del fenómeno analizado. Por defecto, la función para generar pesos en R utiliza el estilo denominado *weighted* o "W", donde los pesos de las observaciones vecinas a una observación dada, suman 1, lo cual comúnmente se denomina "estandarización por fila". Dicho estilo atribuye pesos homogéneos a cada vecino:
+
+```{r}
+mun.w.W <- nb2listw(mun.nb)
+mun.w.W
+mun.w.W$weights[[1]] #Tomando como ejemplo el peso de la observación número 1
+sum(mun.w.W$weights[[1]])
+?spweights.constants #Información sobre las constantes de pesos espaciales
+```
+
+
+Si nuestro conocimiento del fenómeno es limitado, preferiremos los pesos de estilo binario [@bivand2008applied], bajo el cual el objeto *j* recibe un peso de *1* ante el objeto *i*, siempre que el primero sea vecino del primero; por el contrario, si *k* no es vecino de *i* recibe un peso de 0 por ante *i*. Los pesos son indicativos de la fortaleza de la relación entre dos o más observaciones.
+
+```{r}
+mun.w.B <- nb2listw(mun.nb, style = 'B')
+mun.w.B
+mun.w.B$weights[[1]] #Tomando como ejemplo el peso de la observación número 1
+```
+
+
+
+## Referencias
+
