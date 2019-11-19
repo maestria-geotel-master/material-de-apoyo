@@ -1249,31 +1249,31 @@ ident[order(dist)]
 ## [155] "HIGÜEY"
 ```
 
-Con la distancia máxima se puede construir un objeto de vecindad basado
-en distancia (el tercer método para establecer vecinos) usando la
-función `dnearneigh`, en el que todos los municipios tengan al menos un
-vecino. En el ejemplo a continuación, se utiliza la distancia máxima
-como umbral inferior para buscar vecinos, lo cual garantiza que cada
-municipio tendrá al menos un vecino. Como umbral superior se utiliza una
-vez y media la distancia
+Con las distancias mínima y máxima se puede construir un objeto de
+vecindad basado en distancia (el tercer método para establecer vecinos)
+usando la función `dnearneigh`, en el que todos los municipios tengan al
+menos un vecino. En el ejemplo a continuación, se utiliza la distancia
+mínima como umbral inferior para buscar vecinos, lo cual garantiza que
+cada municipio tendrá al menos un vecino. Como umbral superior se
+utiliza una vez y media la distancia
 máxima.
 
 ``` r
-mun.nb.d <- dnearneigh(coords, d1 = max(dist), d2 = 1.5*max(dist), row.names = ident)
+mun.nb.d <- dnearneigh(coords, d1 = min(dist), d2 = 1.5*max(dist), row.names = ident)
 summary(mun.nb.d)
 ## Neighbour list object:
 ## Number of regions: 155 
-## Number of nonzero links: 1382 
-## Percentage nonzero weights: 5.752341 
-## Average number of links: 8.916129 
+## Number of nonzero links: 2716 
+## Percentage nonzero weights: 11.30489 
+## Average number of links: 17.52258 
 ## Link number distribution:
 ## 
-##  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 
-##  3  1  7 10 20 14 19 14 15 14 16 11  7  2  2 
+##  4  5  6  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 
+##  3  1  1  2  3  3  7  6  8  9 14  7 13  5 14 11 11  6  5 14  5  6  1 
 ## 3 least connected regions:
-## SAN RAFAEL DEL YUMA SAMANÁ RAMÓN SANTANA with 2 links
-## 2 most connected regions:
-## TAMAYO PERALVILLO with 16 links
+## HIGÜEY SAN RAFAEL DEL YUMA SAMANÁ with 4 links
+## 1 most connected region:
+## VILLA TAPIA with 27 links
 ```
 
 El grafo muestra una densidad de vínculos mucho mayor en este caso, lo

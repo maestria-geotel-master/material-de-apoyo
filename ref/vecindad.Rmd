@@ -149,10 +149,10 @@ El objeto `mun.nb.k1` nos sirve para odernar los municipios según la distancia 
 ident[order(dist)]
 ```
 
-Con la distancia máxima se puede construir un objeto de vecindad basado en distancia (el tercer método para establecer vecinos) usando la función `dnearneigh`, en el que todos los municipios tengan al menos un vecino. En el ejemplo a continuación, se utiliza la distancia máxima como umbral inferior para buscar vecinos, lo cual garantiza que cada municipio tendrá al menos un vecino. Como umbral superior se utiliza una vez y media la distancia máxima.
+Con las distancias mínima y máxima se puede construir un objeto de vecindad basado en distancia (el tercer método para establecer vecinos) usando la función `dnearneigh`, en el que todos los municipios tengan al menos un vecino. En el ejemplo a continuación, se utiliza la distancia mínima como umbral inferior para buscar vecinos, lo cual garantiza que cada municipio tendrá al menos un vecino. Como umbral superior se utiliza una vez y media la distancia máxima.
 
 ```{r}
-mun.nb.d <- dnearneigh(coords, d1 = max(dist), d2 = 1.5*max(dist), row.names = ident)
+mun.nb.d <- dnearneigh(coords, d1 = min(dist), d2 = 1.5*max(dist), row.names = ident)
 summary(mun.nb.d)
 ```
 
@@ -182,6 +182,11 @@ Si nuestro conocimiento del fenómeno es limitado, preferiremos los pesos de est
 mun.w.B <- nb2listw(mun.nb, style = 'B')
 mun.w.B
 mun.w.B$weights[[1]] #Tomando como ejemplo el peso de la observación número 1
+```
+
+
+```{r, echo=F, eval=F}
+save.image('export/objetos_de_vecindad.RData')
 ```
 
 
