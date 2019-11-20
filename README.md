@@ -10,4 +10,4 @@
 
 * [Vecindad y pesos espaciales](ref/vecindad.md)
 
-* [# Autocorrelación espacial: supuestos, medidas](ref/autocorrelacion.md)
+* [Autocorrelación espacial: supuestos, medidas](ref/autocorrelacion.md)
