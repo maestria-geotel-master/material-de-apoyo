@@ -19,7 +19,9 @@ knitr::opts_chunk$set(
 
 <!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
 
-# Vecindad
+# Vecindad y pesos espaciales
+
+## Vecindad
 
 La determinación del tipo de vecindad es un paso necesario en el análisis espacial. El objetivo es verificar si existe algún patrón espacial en los residuos. El primer paso consiste en dar un peso determinado (no cero) a aquellos objetos que se relacionan entre sí, es decir, definir el tipo de vínculo de vecindad. Detectar patrones en mapas no es una opción aceptable, y hacerlo supone una ausencia de análisis formal [@bivand2008applied].
 
@@ -163,7 +165,7 @@ plot(mun.sp.pop, border="grey", lwd=0.5)
 plot(mun.nb.d, coordinates(mun.sp.pop), add=T)
 ```
 
-# Pesos (ponderadores) espaciales
+## Pesos (ponderadores) espaciales
 
 A una lista de vecinos le asignamos pesos usando criterios que elegimos en función de nuestro conocimiento del fenómeno analizado. Por defecto, la función para generar pesos en R utiliza el estilo denominado *weighted* o "W", donde los pesos de las observaciones vecinas a una observación dada, suman 1, lo cual comúnmente se denomina "estandarización por fila". Dicho estilo atribuye pesos homogéneos a cada vecino:
 
@@ -188,8 +190,6 @@ mun.w.B$weights[[1]] #Tomando como ejemplo el peso de la observación número 1
 ```{r, echo=F, eval=F}
 save.image('export/objetos_de_vecindad.RData')
 ```
-
-
 
 ## Referencias
 

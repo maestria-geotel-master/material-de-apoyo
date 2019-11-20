@@ -1,7 +1,9 @@
 
 <!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
 
-# Vecindad
+# Vecindad y pesos espaciales
+
+## Vecindad
 
 La determinación del tipo de vecindad es un paso necesario en el
 análisis espacial. El objetivo es verificar si existe algún patrón
@@ -1286,7 +1288,7 @@ plot(mun.nb.d, coordinates(mun.sp.pop), add=T)
 
 <img src="../img/mun_nb_d-1.png" width="100%" />
 
-# Pesos (ponderadores) espaciales
+## Pesos (ponderadores) espaciales
 
 A una lista de vecinos le asignamos pesos usando criterios que elegimos
 en función de nuestro conocimiento del fenómeno analizado. Por defecto,

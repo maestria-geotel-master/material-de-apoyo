@@ -1,7 +1,7 @@
 
 <!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
 
-# Autocorrelación: supuestos, medidas
+# Autocorrelación espacial: supuestos, medidas
 
 ## Supuestos
 
