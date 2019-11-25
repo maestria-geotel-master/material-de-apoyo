@@ -1,0 +1,230 @@
+---
+output: github_document
+bibliography: biblio.bib
+csl: apa.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "..")
+knitr::opts_chunk$set(
+  echo = TRUE,
+  collapse=TRUE,
+  fig.path = "../img/",
+  out.width='100%'
+)
+```
+
+<!-- Este .md fue generado a partir del .Rmd homónimo. Edítese el .Rmd -->
+
+# Datos puntuales, geoestadística.
+
+## Geoestadística
+
+### Definición
+
+La geoestadística se ocupa en modelar, predecir y simular fenómenos espacialmente continuos. En realidad, lo que aborda es la obtención de valores en lugares no muestreados. Dado que es imposible tomar muestras en todas partes, la geoestadística asiste en la predicción espacialmente continua del valor de una variable.
+
+### Kriging
+
+Considera un fenómeno *Z(s)*, muestreado en *s<sub>i</sub>*, con *i=1,2,3,...,n*, pero nos interesa su valor en todas las localidades, *s<sub>0</sub>*; debemos predecir *s<sub>0</sub>*, lo cual realizaremos de manera habitual con el método del krigeaje (krigeado o __kriging__), que consiste en una predicción Gaussiana. 
+
+Existen varias modalidades de krigeaje según los distintos supuestos (todas asumen que la variación espacial es modelizable mediante el variograma), siendo las más comunes las siguientes:
+
+* __Kriging ordinario__. Asume __media constante y desconocida__ en el entorno próximo de la observación *s<sub>i</sub>*. __No se asume que la media local tenga el mismo valor que la media poblacional__, es decir, no hay requisito de estacionariedad de primer momento. Dada las pocas asunciones que requiere en su implementación, y por su aproximación más conservadora, es muy empleado en varias disciplinas.
+
+* __Kriging simple__. __Asume estacionariedad de primer momento__ (media constante) en el dominio analizado, pero la media poblacional es conocida.
+
+* __Kriging universal__. Asume una __tendencia general modelizada por polinomio__, como por ejemplo, un modelo lineal.
+
+### Semivarianza y variograma
+
+El kriging utiliza un modelo para ponderar las observaciones cercanas a *s<sub>0</sub>* denominado variograma o semivariograma. El variograma es el gráfico de representación de estimaciones de la semivarianza γ; esta última mide el grado de dependencia espacial entre muestras. En la medida en que aumenta la distancia entre pares de observaciones, se asume que la semivarianza aumenta igualmente. Observaciones cercanas obtendrán semivarianzas pequeñas, puesto que si existe autocorrelación espacial, observaciones cercanas serán muy parecidas.
+
+Las estimaciones de la semivarianza se obtienen a partir de la fórmula:
+
+<figure><img src="../img/variograma-formula.png" width="600"></figure>
+*Tomado de @pebesma2019spatial*
+
+Donde *h<sub>i</sub>=[h<sub>i,0</sub>,h<sub>i,1</sub>]* es el intervalo de distancia para *i* y *N(h<sub>i</sub>)* es el número de pares de muestras disponibles para *i* en el intervalo *h<sub>i</sub>*, *z(s<sub>i</sub>)* es el valor de la variable en *i*, y *z(s<sub>i</sub>)+h'* el valor de la variable a la distancia *h'* desde *i*.
+
+En realidad, los programas de computo de la semivarianza utilizan un diseño geométrico de búsqueda basado en *lags* que se fijan de incrementalmente de acuerdo al tamaño de intervalo. Aunque la anchura de búsqueda es fija, los *lags* pueden ser múltiples, lo que complica significativamente los cálculos.
+
+![](../img/esbozo-de-parametros-variograma.png)
+
+*Tomado de [http://geostatisticslessons.com/pdfs/variogramparameters.pdf](http://geostatisticslessons.com/pdfs/variogramparameters.pdf)*
+
+Como podrás sospechar, en la medida en la que aumenta el número de observaciones, el número de posibles pares se incrementa exponencialmente, más aun si se aumenta la distancia máxima de búsqueda y la anchura de intervalo. Calcular la semivarianza es muy tedioso si se realiza para muestras grandes. Dado que la capacidad de cómputo no es una limitante hoy en día, se puede calcular la semivarianza para muchos pares de muestras, y representar cómo ésta cambia con la distancia, lo cual se denomina semivariagrama muestral. Para realizar una predicción razonable, necesitamos un modelo para ponderar las observaciones. Utilizando el variograma muestral, ajustamos un variograma modelo que utilizaremos como función para establecer los pesos.
+
+![](../img/variograma-muestral-modelo.png)
+*Tomado de @hengl2009practical*
+
+Se utilizan distintos variogramas modelo, siendo los más comunes el exponencial y el esférico.
+
+<figure><img src="../img/variogramas-exponencial-esferico.png" width="600"></figure>\
+*Tomado de @alperin2002caracterizacion*
+
+Además de los anteriores, R dispone de los modelos comunes de variograma:
+
+```{r variogramas-modelo, message=FALSE, warning=FALSE, fig.width=8}
+library(gstat)
+show.vgms()
+vgm()
+```
+
+Los elementos de un variograma son los siguientes (según @alperin2002caracterizacion):
+
+* Efecto "pepita" (*nugget*): corresponde a la variabilidad aleatoria inherente [variabilidad inframuestra, imposible de detectarse con la espaciación elegida en el diseño muestral].
+
+* Rango (*range*), rango de influencia, alcance: corresponde a la distancia a la cual las muestras se tornan independientes, es la distancia donde se alcanza la meseta.
+
+* Meseta (*psill*): correspondiente a la varianza estructural.
+
+### ¿Cómo interpretar un variograma?
+
+La principal tarea al generar un variograma consiste en detectar autocorrelación espacial, es decir, relación entre observaciones debido a la estructrura espacial. Si existe autocorrelación, ésta podrá modelizarse adecuadamente mediante un variograma modelo.
+
+El variograma de una variable autocorrelacionada espacialmente muestra un incremento gradual de la semivarianza hasta que se alcanza la meseta en el rango (concretamente, al alcanzar el 95% de la semivarianza total). Esto implica que la semivarianza inicia en cero o cercana a éste para el intervalo de distancia cero.
+
+En el caso de una variable no autocorrelacionada, ya sea porque tiene un comportamiento aleatorio o porque la distribución espacial de las observaciones es demasiado gruesa como para detectar la autocorrelación de escalas más detalladas (variabilidad inframuestra), en la distancia cero el variograma intercepta el eje de la semivarianza en valores significativamente elevados.
+
+<figure><img src="../img/variograma-autocorrelacion.png" width="600"></figure>\
+*Tomado de [http://www.statios.com/Resources/04-variogram.pdf](http://www.statios.com/Resources/04-variogram.pdf)*
+
+
+A continuación, ejemplos de variogramas modelo aplicados a datos de abundancia de especie de plantas leñosas en la cuenca del río Ocoa.
+
+<figure><img src="../img/variograma-modelo-ejemplos.png" width="600"></figure>\
+
+Nótese por ejemplo el caso del variograma LMVE_02, donde la semivarianza aumenta gradualmente hasta alcanzar el rango, que ocurre entre 5 y 10 m. Por el contrario, EPCA_02 y LIv_1 no presentan un patrón autocorrelacionado, puesto que la semivarianza no aumenta gradualmente.
+
+
+## Estudio de caso: precipitación de República Dominicana
+
+En esta introducción realizaremos un __kriging ordinario__ y un __kriging universal__ utilizando los observatorios de precipitación de República Dominicana colectados por ONAMET.
+
+### Datos fuente
+
+Tomaremos como ejemplo la precipitación del año 1979. Primero carguemos los observatorios y las provincias:
+
+```{r, warning=FALSE, message=FALSE}
+library(sf)
+rutaobs <- 'data/onamet_prec_anual_sf.gpkg'
+rutadiv <- 'data/divisionRD.gpkg'
+st_layers(rutaobs)
+obs <- st_read(rutaobs)
+st_layers(rutadiv)
+prov <- st_read(rutadiv, layer = 'PROVCenso2010')
+```
+
+Exploremos el CRS del objeto `obs`.
+
+```{r}
+st_crs(obs)
+```
+
+Transformemos a 32619:
+
+```{r}
+crsdestino <- 32619
+obsutm <- obs %>% st_transform(crs = crsdestino)
+```
+
+### EDA básico
+
+Obtengamos los estadísticos básicos para el año 1979:
+
+```{r esda-1979, out.width=600}
+nrow(obsutm)
+summary(obsutm$a1979)
+hist(obsutm$a1979)
+hist(log(obsutm$a1979))
+shapiro.test(obsutm$a1979)
+shapiro.test(log(obs$a1979))
+```
+
+Como vemos, los datos siguen distribución normal, pero hay algo de sesgo hacia la derecha en la distribución. Igualmente, de los 25 observatorios que hay en todo el país, para 1979 en al menos 4 hay datos perdidos (`NA`). Eliminemos dichos observatorios, generemos un objeto que incluya solamente a 1979 y que contenga igualmente una columna con datos transformados:
+
+```{r}
+pre1979 <- na.omit(obsutm[,'a1979'])
+pre1979$a1979log <- log(pre1979$a1979)
+```
+
+Representemos los observatorios, estilizando por tono según la precipitación del año 1979:
+
+```{r mapa-pre-1979}
+library(ggplot2)
+ggplot() +
+  geom_sf(data = prov, fill = 'white') +
+  geom_sf(data = pre1979, aes(col = a1979log), size = 6) +
+  scale_colour_gradient(low="#deebf7", high="#3182bd") +
+  geom_sf_text(data = prov, aes(label=TOPONIMIA), check_overlap = T, size = 2) +
+  theme_bw()
+```
+
+### Variograma muestral
+
+Generemos el variograma muestral para el logaritmo de la precipitación. Para ello empleamos la función `variogram`.
+
+```{r vgm-pre1979, out.width=800}
+library(gstat)
+v79 <- variogram(a1979log~1, pre1979)
+plot(v79, plot.numbers = T)
+```
+
+Nótese la fórmula `a1979log~1`, la cual indica que la precipitación de 1979 es la variable sobre la cual se generará el variograma contra un modelo de media, que en este caso es simplemente un intercepto (media desconocida y constante). Típicamente, este variograma servirá para realizar un kriging ordinario.
+
+La función `variogram` fija una distancia máxima de búsqueda (`cutoff`), que equivale a un tercio de la diagonal del recuadro delimitador (*bounding box*), y fija intervalos de anchura constante (`width`, que es la distancia de los intervalos *h<sub>i</sub>*, referida anteriormente) equivalentes a `cutoff/15`. Dichos parámetros, `cutoff` y `width` pueden modificarse por argumentos dentro de la función `variogram`.
+
+
+```{r vgm-pre1979-ajus-exp}
+v79_m <- fit.variogram(v79, vgm(model = "Sph", range = 50000))
+plot(v79, v79_m, plot.numbers = T)
+v79_m2 <- fit.variogram(v79, vgm(model = "Exp", range = 50000))
+plot(v79, v79_m2, plot.numbers = T)
+v79_m3 <- fit.variogram(v79, vgm(model = "Gau", range = 50000))
+plot(v79, v79_m3, plot.numbers = T)
+attr(v79_m, 'SSErr')
+attr(v79_m2, 'SSErr') #Elegimos este
+attr(v79_m3, 'SSErr')
+```
+
+### Interpolación por kriging ordinario
+
+Primero creemos una cuadrícula para RD:
+
+```{r}
+library(stars)
+grd <- st_bbox(prov) %>%
+  st_as_stars(dx = 10000) %>% #10000 metros de resolución espacial
+  st_set_crs(crsdestino) %>%
+  st_crop(prov)
+grd
+```
+
+Sobre ella haremos la interpolación por kriging ordinario:
+
+```{r krige}
+k <- krige(a1979log~1, pre1979, grd, v79_m2)
+ggplot() +
+  geom_stars(data = exp(k), aes(fill = var1.pred, x = x, y = y)) + 
+  scale_fill_gradient(low="#deebf7", high="#3182bd", trans = 'log10') +
+  geom_sf(data = st_cast(prov, "MULTILINESTRING")) +
+  geom_sf(data = pre1979) +
+  geom_sf_text(data = prov, aes(label=TOPONIMIA), check_overlap = T, size = 2) +
+  theme_bw()
+```
+
+### Interpolación por kriging universal
+
+```{r}
+library(raster)
+dem <- raster('../data/dem_srtm_remuestreado.tif')
+demalineado <- raster::aggregate(dem, st_as_sf(grd, na.rm = FALSE), mean)
+
+```
+
+
+
+## Referencias
