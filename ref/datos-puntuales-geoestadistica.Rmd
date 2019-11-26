@@ -370,7 +370,6 @@ Finalmente, lo representamos.
 ```{r krige-uk}
 ggplot() +
   geom_stars(data = k_u, aes(fill = var1.pred, x = x, y = y)) + 
-  # scale_fill_gradient(low="#deebf7", high="#3182bd", trans = 'log10') +
   scale_fill_gradientn(colours = rev(brewer.pal(9, name = 'RdBu'))) +
   geom_sf(data = st_cast(prov, "MULTILINESTRING")) +
   geom_sf(data = pre1979) +
