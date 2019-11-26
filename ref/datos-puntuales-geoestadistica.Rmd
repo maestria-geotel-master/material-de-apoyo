@@ -100,7 +100,7 @@ A continuación, ejemplos de variogramas modelo aplicados a datos de abundancia 
 Nótese por ejemplo el caso del variograma LMVE_02, donde la semivarianza aumenta gradualmente hasta alcanzar el rango, que ocurre entre 5 y 10 m. Por el contrario, EPCA_02 y LIv_1 no presentan un patrón autocorrelacionado, puesto que la semivarianza no aumenta gradualmente.
 
 
-## Estudio de caso: precipitación de República Dominicana
+## Estudio de caso: precipitación de República Dominicana mediante kriging ordinario
 
 En esta introducción realizaremos un __kriging ordinario__ y un __kriging universal__ utilizando los observatorios de precipitación de República Dominicana colectados por ONAMET.
 
@@ -110,25 +110,28 @@ Tomaremos como ejemplo la precipitación del año 1979. Primero carguemos los ob
 
 ```{r, warning=FALSE, message=FALSE}
 library(sf)
-rutaobs <- 'data/onamet_prec_anual_sf.gpkg'
+rutapre <- 'data/onamet_prec_anual_sf.gpkg'
 rutadiv <- 'data/divisionRD.gpkg'
-st_layers(rutaobs)
-obs <- st_read(rutaobs)
+st_layers(rutapre)
+pre <- st_read(rutapre)
+pre
 st_layers(rutadiv)
 prov <- st_read(rutadiv, layer = 'PROVCenso2010')
+prov
 ```
 
 Exploremos el CRS del objeto `obs`.
 
 ```{r}
-st_crs(obs)
+st_crs(pre)
 ```
 
 Transformemos a 32619:
 
 ```{r}
 crsdestino <- 32619
-obsutm <- obs %>% st_transform(crs = crsdestino)
+preutm <- pre %>% st_transform(crs = crsdestino)
+preutm
 ```
 
 ### EDA básico
@@ -136,19 +139,20 @@ obsutm <- obs %>% st_transform(crs = crsdestino)
 Obtengamos los estadísticos básicos para el año 1979:
 
 ```{r esda-1979, out.width=600}
-nrow(obsutm)
-summary(obsutm$a1979)
-hist(obsutm$a1979)
-hist(log(obsutm$a1979))
-shapiro.test(obsutm$a1979)
-shapiro.test(log(obs$a1979))
+nrow(preutm)
+summary(preutm$a1979)
+hist(preutm$a1979)
+hist(log(preutm$a1979))
+shapiro.test(preutm$a1979)
+shapiro.test(log(pre$a1979))
 ```
 
 Como vemos, los datos siguen distribución normal, pero hay algo de sesgo hacia la derecha en la distribución. Igualmente, de los 25 observatorios que hay en todo el país, para 1979 en al menos 4 hay datos perdidos (`NA`). Eliminemos dichos observatorios, generemos un objeto que incluya solamente a 1979 y que contenga igualmente una columna con datos transformados:
 
 ```{r}
-pre1979 <- na.omit(obsutm[,'a1979'])
+pre1979 <- na.omit(preutm[,c('Estación', 'a1979')])
 pre1979$a1979log <- log(pre1979$a1979)
+pre1979
 ```
 
 Representemos los observatorios, estilizando por tono según la precipitación del año 1979:
@@ -160,6 +164,7 @@ ggplot() +
   geom_sf(data = pre1979, aes(col = a1979log), size = 6) +
   scale_colour_gradient(low="#deebf7", high="#3182bd") +
   geom_sf_text(data = prov, aes(label=TOPONIMIA), check_overlap = T, size = 2) +
+  geom_sf_text(data = pre1979, aes(label=Estación), check_overlap = T, size = 1.5) +
   theme_bw()
 ```
 
@@ -168,8 +173,8 @@ ggplot() +
 Generemos el variograma muestral para el logaritmo de la precipitación. Para ello empleamos la función `variogram`.
 
 ```{r vgm-pre1979, out.width=800}
-library(gstat)
 v79 <- variogram(a1979log~1, pre1979)
+v79
 plot(v79, plot.numbers = T)
 ```
 
@@ -177,13 +182,19 @@ Nótese la fórmula `a1979log~1`, la cual indica que la precipitación de 1979 e
 
 La función `variogram` fija una distancia máxima de búsqueda (`cutoff`), que equivale a un tercio de la diagonal del recuadro delimitador (*bounding box*), y fija intervalos de anchura constante (`width`, que es la distancia de los intervalos *h<sub>i</sub>*, referida anteriormente) equivalentes a `cutoff/15`. Dichos parámetros, `cutoff` y `width` pueden modificarse por argumentos dentro de la función `variogram`.
 
+### Variograma modelo
 
-```{r vgm-pre1979-ajus-exp}
+A partir del variograma muestral, generamos un variograma modelo que será el que utlizará la función `krige` para realizar la interpolación. Probamos varias opciones en función de lo visto en el variograma muestral.
+
+```{r vgm-pre1979-ajus-exp, out.width=800}
 v79_m <- fit.variogram(v79, vgm(model = "Sph", range = 50000))
+v79_m
 plot(v79, v79_m, plot.numbers = T)
 v79_m2 <- fit.variogram(v79, vgm(model = "Exp", range = 50000))
+v79_m2
 plot(v79, v79_m2, plot.numbers = T)
 v79_m3 <- fit.variogram(v79, vgm(model = "Gau", range = 50000))
+v79_m3
 plot(v79, v79_m3, plot.numbers = T)
 attr(v79_m, 'SSErr')
 attr(v79_m2, 'SSErr') #Elegimos este
@@ -192,21 +203,48 @@ attr(v79_m3, 'SSErr')
 
 ### Interpolación por kriging ordinario
 
-Primero creemos una cuadrícula para RD:
+Antes de realizar la interpolación, necesitamos una cuadrícula que "llenaremos" con las predcciones. Creemos una cuadrícula para RD, en este caso, de baja resolución, 10x10km:
 
-```{r}
+```{r grd, out.width=800}
 library(stars)
 grd <- st_bbox(prov) %>%
-  st_as_stars(dx = 10000) %>% #10000 metros de resolución espacial
+  st_as_stars(dx = 10000) %>% #10000 metros=10km de resolución espacial
   st_set_crs(crsdestino) %>%
   st_crop(prov)
 grd
+plot(grd)
 ```
 
-Sobre ella haremos la interpolación por kriging ordinario:
+Sobre ella, ejecutamos la interpolación por kriging ordinario. La función `krige` asume que se trata de kriging ordinario, dado que no se especifica un valor para el argumento `beta`, o media.
+
+```{r}
+k <- krige(formula = a1979log~1, locations = pre1979, newdata = grd, model = v79_m2)
+k
+```
+
+El objeto `k` es un ráster `stars` con dos variables, `var1.pred` y `var1.var`, que son, respectivamente, la predicción y la varianza de la predicción. La función `plot` contiene un método para imprimir el objeto `k`.
+
+```{r krige-plot-raw, out.width=800}
+plot(k)
+```
+
+Utilicemos `ggplot` para representar el objeto `stars`.
+
+```{r krige-log}
+ggplot() +
+  geom_stars(data = k, aes(fill = var1.pred, x = x, y = y)) + 
+  scale_fill_gradient(low="#deebf7", high="#3182bd") +
+  geom_sf(data = st_cast(prov, "MULTILINESTRING")) +
+  geom_sf(data = pre1979) +
+  geom_sf_text(data = prov, aes(label=TOPONIMIA), check_overlap = T, size = 2) +
+  theme_bw()
+```
+
+Nótese en la leyenda que el objeto `k`, variable `var1.pred` contiene las predicciones del logaritmo de la precipitación para la cuadrícula de 10x10km (de ahí que el rango de la leyenda sea `6.8-8.0`). Si calculamos *e<sup>6.8</sup>* obtendremos el valor de precipitación del límite inferior, y si calculamos *e<sup>8</sup>* obtendremos el límite superior.
+
+Si queremos representar los valores de precipitación, debemos realizar la operación inversa, que sería elevar al `e` el valor predicho en `k`, lo cual se realiza mediante la función `exp()`. 
 
 ```{r krige}
-k <- krige(a1979log~1, pre1979, grd, v79_m2)
 ggplot() +
   geom_stars(data = exp(k), aes(fill = var1.pred, x = x, y = y)) + 
   scale_fill_gradient(low="#deebf7", high="#3182bd", trans = 'log10') +
@@ -216,15 +254,142 @@ ggplot() +
   theme_bw()
 ```
 
-### Interpolación por kriging universal
+
+## Estudio de caso: temperatura de República Dominicana mediante kriging universal
+
+Hasta este punto, logramos ejecutar un kriging ordinario para predecir el valor de la precipitación de 1979 para todo el país a partir de 21 observatorios. Notemos que se trataba de un kriging ordinario, porque a la función `krige` no le introducimos una media (argumento `beta`), e igualmente porque con la función `variogram` generamos un variograma contra un intercepto (fórmula `a1979log~1`).
+
+El kriging universal predice el valor de la variable de interés en función del modelo espacial aportado por el variograma Y, al mismo tiempo, considerando covariables mediante polinomios. En este ejemplo, tomaremos la temperatura registrada en observatorios de ONAMET.
+
+### Datos fuente
 
 ```{r}
-library(raster)
-dem <- raster('../data/dem_srtm_remuestreado.tif')
-demalineado <- raster::aggregate(dem, st_as_sf(grd, na.rm = FALSE), mean)
-
+rutatemp <- 'data/onamet_temp_anual.gpkg'
+st_layers(rutatemp)
+temp <- st_read(rutatemp)
+temp
 ```
 
+Exploremos el CRS del objeto `obs`.
 
+```{r}
+st_crs(temp)
+```
+
+Dado que es EPSG:32619 no necesitamos realizar transformación alguna.
+
+### EDA básico
+
+Obtengamos los estadísticos básicos del objeto `temp` y de su variable `tanual`:
+
+```{r esda-temp, out.width=600}
+nrow(temp)
+summary(temp$tanual)
+hist(temp$tanual)
+qqnorm(temp$tanual)
+hist(log(temp$tanual))
+qqnorm(log(temp$tanual))
+shapiro.test(temp$tanual)
+shapiro.test(log(temp$tanual))
+```
+
+Dado que en este caso existe una fuerte desviación de una distribución normal, debemos tenerlo en cuenta al modelizar la temperatura respecto de la elevación. Al menos los residuos deberían tener distribución normal. Exploraremos el modelo oportunamente. Visualicemos los datos en un mapa
+
+
+```{r mapa-temp}
+library(RColorBrewer)
+ggplot() +
+  geom_sf(data = prov, fill = 'white') +
+  geom_sf(data = temp, aes(col = tanual), size = 6) + 
+  scale_colour_gradientn(colours = rev(brewer.pal(9, name = 'RdBu'))) +
+  geom_sf_text(data = temp, aes(label=nombre), check_overlap = T, size = 1.5) +
+  theme_bw()
+```
+
+### Importar DEM
+
+Ahora necesitamos traer el DEM, que en este caso será uno resumido a partir del SRTM-90m.
+
+```{r dem, out.width=800}
+dem <- read_stars('data/dem_srtm_remuestreado.tif')
+names(dem) <- 'ele'
+plot(dem)
+```
+
+Ahora remuestreamos el DEM para que se alinee con la cuadrícula fuente, `grd`. El DEM remuestreado será la cuadrícula del covariable (variable independiente) que utilizaremos para predecir el valor de temperatura.
+
+```{r remuestrear-dem, out.width=800}
+grdcovars <- aggregate(dem, grd, mean, na.rm=T)
+plot(grdcovars)
+```
+
+### Extraer datos de elevación y generar modelo
+
+Necesitamos que los datos de elevación pasen al objeto `temp`, de manera que podamos probar un modelo lineal que ponga en relación a la elevación con la temperatura.
+
+```{r agregar-y-modelo, out.width=600}
+temp$ele <- st_as_sf(aggregate(grdcovars, temp, mean))[[1]]
+temp$ele
+temp <- temp[!is.na(temp$ele),] #Quitar observación con NA
+plot(temp$tanual, temp$ele)
+temp_lm <- lm(tanual ~ ele, temp)
+summary(temp_lm)
+plot(temp_lm)
+```
+
+El modelo sugiere que existe asociación entre temperatura y elevación, lo cual es esperable. En este caso, el gradiente resultante es de unos -0.5°C por cada 100 metros de elevación. El gradiente comúnmente es de -0.7°C/100m, pero en este caso, al utilizar un DEM resumido, el gradiente igualmente se atenúa. Generemos variograma muestral con este modelo.
+
+### Variograma muestral
+
+```{r vgm-temp, out.width=800}
+vt <- variogram(tanual ~ ele, temp)
+vt
+plot(vt)
+```
+
+### Variograma modelo
+
+Parecería razonable utilizar un variograma modelo exponencial con rango corto, por ejemplo, 20 o 30 km. Probemos.
+
+```{r vgm-temp-ajus, out.width=800}
+vt_m <- fit.variogram(vt, vgm(model = "Exp", range = 30000))
+vt_m
+plot(vt, vt_m, plot.numbers = T)
+```
+
+### Kriging universal
+
+Finalmnente, ejecutamos el kriging.
+
+```{r kriging-universal}
+k_u <- krige(tanual ~ ele, temp, st_rasterize(st_as_sf(grdcovars)), vt_m)
+```
+
+Finalmente, lo representamos.
+
+```{r krige-uk}
+ggplot() +
+  geom_stars(data = k_u, aes(fill = var1.pred, x = x, y = y)) + 
+  # scale_fill_gradient(low="#deebf7", high="#3182bd", trans = 'log10') +
+  scale_fill_gradientn(colours = rev(brewer.pal(9, name = 'RdBu'))) +
+  geom_sf(data = st_cast(prov, "MULTILINESTRING")) +
+  geom_sf(data = pre1979) +
+  geom_sf_text(data = prov, aes(label=TOPONIMIA), check_overlap = T, size = 2) +
+  theme_bw()
+```
+
+### Nota final
+
+Dado que en este caso existe una fuerte desviación de los datos respecto a una distribución normal, aun usando transformación logarítmica, se recomienda aplicar otro tipo de transformación. En este caso, luce mejor emplear *Tukey Ladder of Powers* (escalera de potencias de Tukey). Usaremos la función `transformTukey` del paquete `rcompanion`, que cargaremos a continuación.
+
+```{r esda-temp-trans, out.width=600, eval=F}
+library(rcompanion)
+temp$tanualtrans <- transformTukey(temp$tanual, plotit = F)
+hist(temp$tanualtrans)
+qqnorm(temp$tanualtrans)
+shapiro.test(temp$tanualtrans)
+```
+
+Nótese que se trata de una transformación de potencia por medio del exponente `8.1`. Para hacer la transformación inversa, bastaría con aplicar `temp$tanualtrans^(1/8.1)`. Se podría ensayar con la variable transformada para generar la superficie continua.
 
 ## Referencias
