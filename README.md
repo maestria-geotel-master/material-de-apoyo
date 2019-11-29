@@ -11,3 +11,5 @@
 * [Vecindad y pesos espaciales](ref/vecindad.md)
 
 * [Autocorrelación espacial: supuestos, medidas](ref/autocorrelacion.md)
+
+* [Datos puntuales, geoestadística. Variograma, kriging ordinario y universal](ref/datos-puntuales-geoestadistica.md)
