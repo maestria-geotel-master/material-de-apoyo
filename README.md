@@ -13,3 +13,6 @@
 * [Autocorrelación espacial: supuestos, medidas](ref/autocorrelacion.md)
 
 * [Datos puntuales, geoestadística. Variograma, kriging ordinario y universal](ref/datos-puntuales-geoestadistica.md)
+
+* [Modelización de datos espaciales basados en geometrías poligonales
+](ref/modelizacion-datos-espaciales-poligonales.md)
