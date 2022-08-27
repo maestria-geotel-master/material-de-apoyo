@@ -28,7 +28,7 @@ Entrada BibTeX, [aquí](#entrada-bibtex)
 
 ```
 @software{jose_ramon_martinez_batlle_2022_7028143,
-  author       = {José Ramón Martínez Batlle},
+  author       = {José Ramón Martínez-Batlle},
   title        = {{maestria-geotel-master/material-de-apoyo: First 
                    release}},
   month        = aug,
